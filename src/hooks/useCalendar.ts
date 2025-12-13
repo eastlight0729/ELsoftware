@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Holidays from 'date-holidays';
 
 export function useCalendar() {
     // Helper: Get local date string 'YYYY-MM-DD'
@@ -31,6 +32,23 @@ export function useCalendar() {
     // Compute dates once: Current Year to Current Year + 4 (5 years total)
     const currentYear = new Date().getFullYear();
     const dates = getDatesRange(currentYear, currentYear + 4);
+
+    // Calculate Holidays for the range
+    // We use a Map to store dateStr -> Holiday Name
+    const holidaysMap = new Map<string, string>();
+    const hd = new Holidays('KR'); // Korea
+
+    // Optimization: Calculate only for the comprehensive years in the range
+    for (let y = currentYear; y <= currentYear + 4; y++) {
+        const yearHolidays = hd.getHolidays(y);
+        yearHolidays.forEach(h => {
+            // date-holidays returns 'date' as a string "YYYY-MM-DD HH:mm:ss" sometimes or object. 
+            // Simplest way is used to 'start' property or clean the date.
+            const dateObj = new Date(h.date);
+            const dStr = toLocalISOString(dateObj);
+            holidaysMap.set(dStr, h.name);
+        });
+    }
 
     // 3. Calculate Month Positions
     // We need to know which column index each month starts at.
@@ -86,6 +104,7 @@ export function useCalendar() {
         selectedDates,
         todayStr,
         toggleDate,
-        months
+        months,
+        holidaysMap
     };
 }

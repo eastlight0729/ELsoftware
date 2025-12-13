@@ -99,8 +99,15 @@
 .date-box.today {
     border: 2px solid #0969da;
     /* Strong Blue Border */
-    z-index: 10;
     /* Ensure the border sits on top of neighbors */
+}
+
+/* NEW: Holiday State */
+.date-box.holiday {
+    border: 2px solid #ff4d4f;
+    /* Red border */
+    z-index: 5;
+    /* Sit above regular, below today if today is also holiday? */
 }
 
 /* Optional: Adjust for dark mode */
@@ -110,6 +117,11 @@
     .date-box.today {
         border-color: #58a6ff;
         /* Lighter Blue for Dark Mode */
+    }
+
+    .date-box.holiday {
+        border-color: #ff7875;
+        /* Lighter Red for Dark Mode */
     }
 }
 
@@ -145,4 +157,23 @@
         background-color: #2ea043;
         border-color: #3fb950;
     }
+}
+
+/* Custom Tooltip */
+.tooltip {
+    position: fixed;
+    background-color: #24292f;
+    color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translate(-50%, -100%);
+    /* Center horizontally and move above */
+    margin-top: -8px;
+    /* Slight gap from cursor/element */
 }

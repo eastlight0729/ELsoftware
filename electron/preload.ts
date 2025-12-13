@@ -1,5 +1,11 @@
 import { ipcRenderer, contextBridge } from 'electron'
 
+// Expose protected methods that allow the renderer to use the IPC channels we defined in the Controller
+contextBridge.exposeInMainWorld('api', {
+  getSchedule: () => ipcRenderer.invoke('calendar:get-schedule'),
+  toggleDate: (date: string) => ipcRenderer.invoke('calendar:toggle-date', date),
+});
+
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {

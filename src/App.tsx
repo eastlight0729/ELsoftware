@@ -1,9 +1,12 @@
+import { Calendar } from './components/Calendar';
+import './App.css';
+
 function App() {
   return (
-    <div className="container">
-      <h1>ELsoftware</h1>
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+      <Calendar />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

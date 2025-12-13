@@ -6,6 +6,11 @@ contextBridge.exposeInMainWorld('api', {
   toggleDate: (date: string) => ipcRenderer.invoke('calendar:toggle-date', date),
 });
 
+contextBridge.exposeInMainWorld('plannerAPI', {
+  loadData: () => ipcRenderer.invoke('planner:load'),
+  saveData: (data: any) => ipcRenderer.invoke('planner:save', data),
+});
+
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {

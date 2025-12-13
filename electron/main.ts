@@ -1,12 +1,11 @@
 import { app, BrowserWindow } from 'electron'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 // Import the service
 import { CalendarController } from './features/CalendarController.ts';
+import { PlannerController } from './features/PlannerController.ts';
 
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
@@ -71,5 +70,9 @@ app.on('activate', () => {
 app.whenReady().then(() => {
   const calendarController = new CalendarController();
   calendarController.initialize();
+
+  const plannerController = new PlannerController();
+  plannerController.initialize();
+
   createWindow();
 })

@@ -4,10 +4,43 @@
     margin: 0 auto;
 }
 
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
 .title {
     font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin: 0;
+}
+
+.navControls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.navBtn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.navBtn:hover {
+    background-color: #f0f0f0;
+}
+
+.dateDisplay {
+    font-weight: 500;
+    min-width: 100px;
+    text-align: center;
 }
 
 .markers {

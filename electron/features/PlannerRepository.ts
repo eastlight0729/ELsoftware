@@ -10,7 +10,14 @@ export interface Category {
 
 export interface PlannerData {
     categories: Category[];
-    grid: Record<number, string | null>; // index (0-47) -> categoryId
+    // date string (YYYY-MM-DD) -> grid
+    plans: Record<string, Record<number, string | null>>;
+}
+
+// Old interface for migration
+interface LegacyPlannerData {
+    categories: Category[];
+    grid?: Record<number, string | null>;
 }
 
 export class PlannerRepository {
@@ -26,7 +33,7 @@ export class PlannerRepository {
         } catch {
             const initialData: PlannerData = {
                 categories: [],
-                grid: {}
+                plans: {}
             };
             await fs.writeFile(this.filePath, JSON.stringify(initialData), 'utf-8');
         }
@@ -34,8 +41,30 @@ export class PlannerRepository {
 
     async loadData(): Promise<PlannerData> {
         await this.ensureFileExists();
-        const data = await fs.readFile(this.filePath, 'utf-8');
-        return JSON.parse(data) as PlannerData;
+        const rawData = await fs.readFile(this.filePath, 'utf-8');
+        const parsed = JSON.parse(rawData);
+
+        // Migration check: if it has 'grid' but not 'plans', migrate it
+        if ('grid' in parsed && !('plans' in parsed)) {
+            const legacy = parsed as LegacyPlannerData;
+            const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local
+            const newData: PlannerData = {
+                categories: legacy.categories || [],
+                plans: {
+                    [today]: legacy.grid || {}
+                }
+            };
+            // Save migrated data immediately
+            await this.saveData(newData);
+            return newData;
+        }
+
+        // Ensure plans exists even if empty object (robustness)
+        if (!parsed.plans) {
+            parsed.plans = {};
+        }
+
+        return parsed as PlannerData;
     }
 
     async saveData(data: PlannerData): Promise<void> {

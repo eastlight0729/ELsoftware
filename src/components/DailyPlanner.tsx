@@ -15,6 +15,20 @@ export const DailyPlanner: React.FC = () => {
     const [activeCell, setActiveCell] = useState<number | null>(null);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newCategoryColor, setNewCategoryColor] = useState('#3498db');
+    const [currentMinutes, setCurrentMinutes] = useState(0);
+
+    // Update time every minute
+    React.useEffect(() => {
+        const updateTime = () => {
+            const now = new Date();
+            const minutes = now.getHours() * 60 + now.getMinutes();
+            setCurrentMinutes(minutes);
+        };
+
+        updateTime(); // Initial call
+        const interval = setInterval(updateTime, 60000); // 60s
+        return () => clearInterval(interval);
+    }, []);
 
     const handleCellClick = (index: number) => {
         if (grid[index]) {
@@ -105,6 +119,13 @@ export const DailyPlanner: React.FC = () => {
                         </div>
                     );
                 })}
+
+                {/* Current Time Indicator */}
+                <div
+                    className={styles.timeIndicator}
+                    style={{ left: `${(currentMinutes / 1440) * 100}%` }}
+                    title={`Current Time: ${Math.floor(currentMinutes / 60).toString().padStart(2, '0')}:${(currentMinutes % 60).toString().padStart(2, '0')}`}
+                />
             </div>
 
             {/* Controls / Legend */}

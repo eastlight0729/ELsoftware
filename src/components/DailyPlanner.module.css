@@ -65,7 +65,7 @@
     border: 1px solid #ccc;
     padding: 10px;
     z-index: 100;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     min-width: 200px;
     display: flex;
@@ -169,4 +169,18 @@
 
 .addButton:hover {
     background-color: #0056b3;
+}
+
+.timeIndicator {
+    position: absolute;
+    bottom: -8px;
+    /* Slightly overlap or hang below the grid */
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 8px solid red;
+    z-index: 50;
+    transition: left 0.5s ease-in-out;
 }

@@ -6,5 +6,6 @@ export interface Category {
 
 export interface PlannerData {
     categories: Category[];
-    grid: Record<number, string | null>; // index -> categoryId
+    // date string (YYYY-MM-DD) -> grid
+    plans: Record<string, Record<number, string | null>>;
 }

@@ -6,10 +6,13 @@ export const DailyPlanner: React.FC = () => {
     const {
         categories,
         grid,
+        currentDate,
         addCategory,
         assignCell,
         clearCell,
-        removeCategory
+        removeCategory,
+        changeDate,
+        goToToday
     } = useDailyPlanner();
 
     const [activeCell, setActiveCell] = useState<number | null>(null);
@@ -62,9 +65,38 @@ export const DailyPlanner: React.FC = () => {
     // Generate markers for hours (0, 1, 2... 23)
     const markers = Array.from({ length: 24 }, (_, i) => i);
 
+    const formatDate = (date: Date) => {
+        const today = new Date();
+        const isToday = date.toDateString() === today.toDateString();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const isYesterday = date.toDateString() === yesterday.toDateString();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        const isTomorrow = date.toDateString() === tomorrow.toDateString();
+
+        if (isToday) return 'Today';
+        if (isYesterday) return 'Yesterday';
+        if (isTomorrow) return 'Tomorrow';
+        return date.toLocaleDateString();
+    };
+
     return (
         <div className={styles.container}>
-            <h2 className={styles.title}>Daily Planner (24h)</h2>
+            <div className={styles.header}>
+                <h2 className={styles.title}>Daily Planner</h2>
+                <div className={styles.navControls}>
+                    <button className={styles.navBtn} onClick={() => changeDate(-1)} title="Previous Day">
+                        &lt;
+                    </button>
+                    <span className={styles.dateDisplay} onClick={goToToday} style={{ cursor: 'pointer' }} title="Go to Today">
+                        {formatDate(currentDate)}
+                    </span>
+                    <button className={styles.navBtn} onClick={() => changeDate(1)} title="Next Day">
+                        &gt;
+                    </button>
+                </div>
+            </div>
 
             {/* Time Markers */}
             <div className={styles.markers}>

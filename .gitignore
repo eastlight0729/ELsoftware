@@ -27,6 +27,7 @@ dist-ssr
 dist
 dist-electron
 out
+release
 
 # For developer
 .prompts

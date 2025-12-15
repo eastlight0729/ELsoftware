@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 // Import the service
-import { CalendarController } from './features/CalendarController.ts';
-import { PlannerController } from './features/PlannerController.ts';
+// Import the service
+import { CalendarController } from './controllers/CalendarController.ts';
+import { PlannerController } from './controllers/PlannerController.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

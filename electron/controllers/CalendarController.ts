@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { CalendarService } from './CalendarService';
+import { CalendarService } from '../services/CalendarService';
 
 export class CalendarController {
     private service: CalendarService;

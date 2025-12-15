@@ -1,98 +1,83 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './PomodoroTimer.module.css';
-
-type TimerMode = 'task' | 'rest';
-
-const TASK_TIME = 25 * 60;
-const REST_TIME = 5 * 60;
+import React from 'react';
+import { usePomodoroTimer } from '../hooks/usePomodoroTimer';
 
 export const PomodoroTimer: React.FC = () => {
-    const [mode, setMode] = useState<TimerMode>('task');
-    const [timeLeft, setTimeLeft] = useState(TASK_TIME);
-    const [isActive, setIsActive] = useState(false);
-    const timerRef = useRef<number | null>(null);
+    const {
+        mode,
+        timeLeft,
+        isActive,
+        handleStart,
+        handleStop,
+        handleReset,
+        switchMode,
+        formatTime
+    } = usePomodoroTimer();
 
-    useEffect(() => {
-        if (isActive && timeLeft > 0) {
-            timerRef.current = window.setInterval(() => {
-                setTimeLeft((prevTime) => prevTime - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            setIsActive(false);
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-            // Auto-switch logic
-            const nextMode = mode === 'task' ? 'rest' : 'task';
-            setMode(nextMode);
-            setTimeLeft(nextMode === 'task' ? TASK_TIME : REST_TIME);
-            // Optional: Play a sound or notification here
-        }
+    // Tailwind Class Mappings
+    const containerClasses = `
+        flex flex-col items-center justify-center p-8 rounded-xl 
+        w-full max-w-[400px] mx-auto shadow-md transition-colors duration-300 border-2
+        ${mode === 'task' ? 'bg-red-100 border-red-500' : 'bg-blue-100 border-sky-400'}
+    `;
 
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-        };
-    }, [isActive, timeLeft, mode]);
+    const timeDisplayClasses = `
+        text-6xl font-bold mb-5 font-mono
+        ${mode === 'task' ? 'text-red-700' : 'text-blue-700'}
+    `;
 
-    const handleStart = () => {
-        setIsActive(true);
-    };
+    const buttonBaseClasses = `
+        px-5 py-2.5 text-base rounded-md cursor-pointer 
+        transition-transform duration-100 active:scale-95 hover:opacity-90 font-semibold text-white
+    `;
 
-    const handleStop = () => {
-        setIsActive(false);
-    };
+    const actionButtonClasses = `
+        ${buttonBaseClasses}
+        ${mode === 'task' ? 'bg-red-500' : 'bg-sky-500'}
+    `;
 
-    const handleReset = () => {
-        setIsActive(false);
-        setTimeLeft(mode === 'task' ? TASK_TIME : REST_TIME);
-    };
+    const modeBtnBaseClasses = `
+        bg-transparent border-b-2 border-transparent cursor-pointer 
+        text-base px-2.5 py-1.5 opacity-60 hover:opacity-100
+    `;
 
-    const switchMode = (newMode: TimerMode) => {
-        setMode(newMode);
-        setIsActive(false);
-        setTimeLeft(newMode === 'task' ? TASK_TIME : REST_TIME);
-    };
-
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const getModeBtnActiveClasses = (targetMode: 'task' | 'rest') => {
+        if (mode !== targetMode) return '';
+        const colorClass = targetMode === 'task' ? 'border-red-700 text-red-700' : 'border-blue-700 text-blue-700';
+        return `opacity-100 font-bold ${colorClass}`;
     };
 
     return (
-        <div className={`${styles.container} ${styles[mode]}`}>
-            <div className={styles.modeSwitch}>
+        <div className={containerClasses}>
+            <div className="flex gap-2.5 mb-5">
                 <button
-                    className={`${styles.modeButton} ${mode === 'task' ? styles.active : ''}`}
+                    className={`${modeBtnBaseClasses} ${getModeBtnActiveClasses('task')}`}
                     onClick={() => switchMode('task')}
                 >
                     Task
                 </button>
                 <button
-                    className={`${styles.modeButton} ${mode === 'rest' ? styles.active : ''}`}
+                    className={`${modeBtnBaseClasses} ${getModeBtnActiveClasses('rest')}`}
                     onClick={() => switchMode('rest')}
                 >
                     Rest
                 </button>
             </div>
 
-            <div className={styles.timeDisplay}>
+            <div className={timeDisplayClasses}>
                 {formatTime(timeLeft)}
             </div>
 
-            <div className={styles.controls}>
+            <div className="flex gap-2.5 mb-5">
                 {!isActive ? (
-                    <button className={styles.button} onClick={handleStart}>
+                    <button className={actionButtonClasses} onClick={handleStart}>
                         Play
                     </button>
                 ) : (
-                    <button className={styles.button} onClick={handleStop}>
+                    <button className={actionButtonClasses} onClick={handleStop}>
                         Stop
                     </button>
                 )}
-                <button className={styles.button} onClick={handleReset}>
+                <button className={actionButtonClasses} onClick={handleReset}>
                     Reset
                 </button>
             </div>

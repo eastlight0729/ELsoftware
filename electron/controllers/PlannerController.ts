@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
-import { PlannerService } from './PlannerService';
-import { PlannerData } from './PlannerRepository';
+import { PlannerService } from '../services/PlannerService';
+import { PlannerData } from '../repositories/PlannerRepository';
 
 export class PlannerController {
     private service: PlannerService;

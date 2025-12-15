@@ -1,4 +1,4 @@
-import { CalendarRepository } from './CalendarRepository';
+import { CalendarRepository } from '../repositories/CalendarRepository';
 
 export class CalendarService {
     private repo: CalendarRepository;

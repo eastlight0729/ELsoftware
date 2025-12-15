@@ -1,4 +1,4 @@
-import { PlannerRepository, PlannerData } from './PlannerRepository';
+import { PlannerRepository, PlannerData } from '../repositories/PlannerRepository';
 
 export class PlannerService {
     private repository: PlannerRepository;

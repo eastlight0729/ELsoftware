@@ -1,82 +1,100 @@
-import React from 'react';
-import { usePomodoroTimer } from '../hooks/usePomodoroTimer';
+import { useState, useEffect } from 'react';
+import { Play, Square, RotateCcw, SkipForward } from 'lucide-react';
 
-export const PomodoroTimer: React.FC = () => {
-    const {
-        mode,
-        timeLeft,
-        isActive,
-        handleStart,
-        handleStop,
-        handleReset,
-        switchMode,
-        formatTime
-    } = usePomodoroTimer();
+type TimerState = 'focus' | 'rest';
 
-    // Helper to toggle modes for the "Skip" button
-    const handleSkip = () => {
-        switchMode(mode === 'task' ? 'rest' : 'task');
+export default function Pomodoro() {
+    const [state, setState] = useState<TimerState>('focus');
+    const [seconds, setSeconds] = useState(25 * 60);
+    const [isRunning, setIsRunning] = useState(false);
+
+    useEffect(() => {
+        let interval: number | undefined;
+
+        if (isRunning && seconds > 0) {
+            interval = window.setInterval(() => {
+                setSeconds(s => s - 1);
+            }, 1000);
+        } else if (seconds === 0) {
+            setIsRunning(false);
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isRunning, seconds]);
+
+    const toggleTimer = () => {
+        setIsRunning(!isRunning);
     };
 
+    const resetTimer = () => {
+        setIsRunning(false);
+        setSeconds(state === 'focus' ? 25 * 60 : 5 * 60);
+    };
+
+    const switchState = () => {
+        const newState = state === 'focus' ? 'rest' : 'focus';
+        setState(newState);
+        setSeconds(newState === 'focus' ? 25 * 60 : 5 * 60);
+        setIsRunning(false);
+    };
+
+    const formatTime = (secs: number) => {
+        const mins = Math.floor(secs / 60);
+        const remainingSecs = secs % 60;
+        return `${mins.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`;
+    };
+
+    const bgColor = state === 'focus'
+        ? 'bg-red-200'
+        : 'bg-emerald-200';
+
+    const buttonColor = state === 'focus'
+        ? 'hover:bg-red-300/50'
+        : 'hover:bg-emerald-300/50';
+
     return (
-        // Main container acting as the page background
-        <div className="min-h-screen w-full bg-timer-bg flex items-center justify-center p-4 font-sans">
+        <div className={`${bgColor} rounded-3xl p-6 shadow-lg transition-colors duration-300 w-64`}>
+            <div className="text-center space-y-4">
+                <h2 className="text-sm font-medium tracking-wider text-gray-700">
+                    {state === 'focus' ? 'FOCUS' : 'REST'}
+                </h2>
 
-            {/* Card Container */}
-            <div className="bg-card-bg rounded-3xl py-6 px-10 shadow-xl flex flex-row items-center justify-between gap-10 w-full max-w-4xl mx-auto">
-
-                {/* Left Side: Time Display */}
-                <div className="flex flex-col items-center justify-center">
-                    <h1 className="text-white text-7xl font-bold tracking-wide leading-none select-none">
-                        {formatTime(timeLeft)}
-                    </h1>
-                    <span className="text-white text-sm font-bold tracking-[0.2em] mt-1 uppercase select-none">
-                        {mode}
-                    </span>
+                <div className="text-5xl font-light text-gray-800 tabular-nums">
+                    {formatTime(seconds)}
                 </div>
 
-                {/* Right Side: Controls */}
-                <div className="flex space-x-6">
-
-                    {/* Play / Stop Button */}
-                    {!isActive ? (
-                        <button
-                            onClick={handleStart}
-                            aria-label="Start Timer"
-                            className="bg-white rounded-full w-20 h-20 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm active:scale-95 duration-200 cursor-pointer"
-                        >
-                            <i className="fa-solid fa-play text-icon-color text-3xl ml-1"></i>
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleStop}
-                            aria-label="Stop Timer"
-                            className="bg-white rounded-full w-20 h-20 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm active:scale-95 duration-200 cursor-pointer"
-                        >
-                            <i className="fa-solid fa-pause text-icon-color text-3xl"></i>
-                        </button>
-                    )}
-
-                    {/* Refresh (Reset) Button */}
+                <div className="flex justify-center gap-2 pt-2">
                     <button
-                        onClick={handleReset}
-                        aria-label="Restart Timer"
-                        className="bg-white rounded-full w-20 h-20 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm active:scale-95 duration-200 cursor-pointer"
+                        onClick={toggleTimer}
+                        className={`p-3 rounded-full ${buttonColor} transition-colors`}
+                        aria-label={isRunning ? 'Stop' : 'Start'}
                     >
-                        <i className="fa-solid fa-arrow-rotate-right text-icon-color text-3xl"></i>
+                        {isRunning ? (
+                            <Square className="w-5 h-5 text-gray-700" fill="currentColor" />
+                        ) : (
+                            <Play className="w-5 h-5 text-gray-700" fill="currentColor" />
+                        )}
                     </button>
 
-                    {/* Skip Button */}
                     <button
-                        onClick={handleSkip}
-                        aria-label="Skip Stage"
-                        className="bg-white rounded-full w-20 h-20 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm active:scale-95 duration-200 cursor-pointer"
+                        onClick={resetTimer}
+                        className={`p-3 rounded-full ${buttonColor} transition-colors`}
+                        aria-label="Reset"
                     >
-                        <i className="fa-solid fa-forward text-icon-color text-3xl"></i>
+                        <RotateCcw className="w-5 h-5 text-gray-700" />
                     </button>
 
+                    <button
+                        onClick={switchState}
+                        className={`p-3 rounded-full ${buttonColor} transition-colors`}
+                        aria-label="Next"
+                    >
+                        <SkipForward className="w-5 h-5 text-gray-700" />
+                    </button>
                 </div>
             </div>
         </div>
     );
-};
+}

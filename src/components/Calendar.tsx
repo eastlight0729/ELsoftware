@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 /* This component will generate the dates for the current year and handle the visual toggle state locally (until we connect the backend later). */
 
 import { useCalendar } from '../hooks/useCalendar';
-import styles from './Calendar.module.css'; // Import as a module
 
 export function Calendar() {
     // Facade Pattern: Retrieve logic and state from custom hook
@@ -56,21 +55,22 @@ export function Calendar() {
     }, [dates, todayStr]);
 
     return (
-        <div className={styles['calendar-wrapper']}>
+        <div className="flex items-start gap-3 p-5 bg-white text-[#1f2328] font-sans w-full box-border overflow-hidden dark:bg-[#0d1117]">
             {/* Row Labels (Mon, Wed, Fri for minimal look) */}
-            <div className={styles['day-labels']} style={{ marginTop: '24px' }}>
+            <div className="flex flex-col justify-between h-[100px] pt-[15px] text-xs text-[#656d76] shrink-0 dark:text-[#8b949e]" style={{ marginTop: '24px' }}>
                 <span>Mon</span>
                 <span>Wed</span>
                 <span>Fri</span>
             </div>
 
-            <div className={styles['scroll-container']} ref={scrollRef}>
-                <div className={styles['inner-content']}>
+            <div className="overflow-x-auto overflow-y-hidden grow pb-[5px] min-w-0" ref={scrollRef}>
+                <div className="flex flex-col w-max">
                     {/* Month Labels Header */}
-                    <div className={styles['month-row']}>
+                    <div className="relative h-5 mb-1">
                         {months.map((m, i) => (
                             <span
                                 key={i}
+                                className="absolute top-0 text-xs text-[#656d76] whitespace-nowrap"
                                 style={{
                                     left: `${m.index * 18}px` // 14px width + 4px gap = 18px stride
                                 }}
@@ -80,7 +80,7 @@ export function Calendar() {
                         ))}
                     </div>
 
-                    <div className={styles['calendar-grid']}>
+                    <div className="grid grid-rows-7 grid-flow-col gap-1">
                         {dates.map((date, index) => {
                             // Format date as YYYY-MM-DD for ID
                             const dateStr = date.toISOString().split('T')[0];
@@ -95,10 +95,10 @@ export function Calendar() {
 
                             // Construct dynamic class string carefully
                             const boxClass = `
-                                ${styles['date-box']} 
-                                ${isSelected ? styles['active'] : ''} 
-                                ${isToday ? styles['today'] : ''}
-                                ${isHoliday ? styles['holiday'] : ''}
+                                w-[14px] h-[14px] bg-[#ebedf0] border border-[#1b1f23]/6 rounded-[3px] cursor-pointer transition-all duration-100 ease-in-out appearance-none p-0 hover:border-[#1b1f23]/30 hover:scale-110 dark:bg-[#161b22] dark:border-[#f0f6fc]/10
+                                ${isSelected ? 'bg-[#40c463] border-[#3aa655] dark:bg-[#2ea043] dark:border-[#3fb950]' : ''} 
+                                ${isToday ? 'border-2 border-[#0969da] dark:border-[#58a6ff]' : ''}
+                                ${isHoliday ? 'border-2 border-[#ff4d4f] z-10 dark:border-[#ff7875]' : ''}
                             `;
 
                             // Tooltip Text
@@ -123,7 +123,7 @@ export function Calendar() {
             </div>
             {tooltip && (
                 <div
-                    className={styles['tooltip']}
+                    className="fixed bg-[#24292f] text-white px-2 py-1 rounded text-xs pointer-events-none z-[1000] whitespace-nowrap opacity-90 shadow-lg -translate-x-1/2 -translate-y-full mt-[-8px]"
                     style={{ left: tooltip.x, top: tooltip.y }}
                 >
                     {tooltip.text}

@@ -1,28 +1,12 @@
+/* The index.css file serves as the global stylesheet entry point that initializes TailwindCSS directives and establishes universal visual rules for the entire application. */
+
+/* Import Tailwind CSS v4 and its default reset */
 @import "tailwindcss";
 
+/* Define custom design tokens */
 @theme {
   --color-timer-bg: #526159;
   --color-card-bg: #A0E0C4;
   --color-icon-color: #A0E0C4;
-  --font-sans: Arial, Helvetica Neue, Roboto, sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body,
-html {
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #1e1e1e;
-  /* Dark mode base */
-  color: #ffffff;
-}
-
-.container {
-  height: 100vh;
-  padding: 20px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }

@@ -1,24 +1,40 @@
 import { useState, useEffect } from 'react';
 import { Play, Square, RotateCcw, SkipForward } from 'lucide-react';
 
+// Type Definition: Limits the state variable to exactly these two string values.
+// This prevents typos and invalid states (e.g., 'break' vs 'rest').
 type TimerState = 'focus' | 'rest';
 
 export default function Pomodoro() {
+    // State Management
+    // 1. state: Tracks the current mode (Focus vs Rest).
+    // 2. seconds: We store time as total seconds (integer) rather than separate minutes/seconds objects.
+    //    This makes math (subtraction) much easier. 25 * 60 = 1500 seconds.
+    // 3. isRunning: Boolean flag to start/stop the countdown.
     const [state, setState] = useState<TimerState>('focus');
     const [seconds, setSeconds] = useState(25 * 60);
     const [isRunning, setIsRunning] = useState(false);
 
+    // Effect: Handles the Timer Logic
+    // This hook runs whenever 'isRunning' or 'seconds' changes.
     useEffect(() => {
         let interval: number | undefined;
 
+        // Condition: Only start the interval if the timer is active and time remains.
         if (isRunning && seconds > 0) {
+            // We use 'window.setInterval' to explicitly use the Browser API (returns a number ID),
+            // distinguishing it from Node.js timers in TypeScript.
             interval = window.setInterval(() => {
-                setSeconds(s => s - 1);
+                setSeconds(s => s - 1); // Functional update ensures we use the most recent value of 's'
             }, 1000);
         } else if (seconds === 0) {
+            // Auto-stop when time hits zero.
             setIsRunning(false);
         }
 
+        // Cleanup Function:
+        // React runs this before re-running the effect or unmounting the component.
+        // It clears the previous interval to ensure we don't have multiple timers running simultaneously.
         return () => {
             if (interval) clearInterval(interval);
         };
@@ -30,25 +46,32 @@ export default function Pomodoro() {
 
     const resetTimer = () => {
         setIsRunning(false);
+        // Reset time based on the current mode (25min for focus, 5min for rest).
         setSeconds(state === 'focus' ? 25 * 60 : 5 * 60);
     };
 
     const switchState = () => {
+        // Toggle between 'focus' and 'rest'
         const newState = state === 'focus' ? 'rest' : 'focus';
         setState(newState);
+        // Set the appropriate duration for the new state
         setSeconds(newState === 'focus' ? 25 * 60 : 5 * 60);
-        setIsRunning(false);
+        setIsRunning(false); // Always pause when switching modes
     };
 
+    // Helper: Formats raw seconds into "MM:SS" string
     const formatTime = (secs: number) => {
-        const mins = Math.floor(secs / 60);
-        const remainingSecs = secs % 60;
+        const mins = Math.floor(secs / 60); // Get whole minutes
+        const remainingSecs = secs % 60;    // Get remainder seconds
+        // padStart(2, '0') ensures "5" becomes "05" for consistent layout
         return `${mins.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`;
     };
 
+    // Dynamic Styling Variables
+    // We determine colors here to keep the JSX return statement clean.
     const bgColor = state === 'focus'
-        ? 'bg-red-200'
-        : 'bg-emerald-200';
+        ? 'bg-red-200'    // Red for Focus
+        : 'bg-emerald-200'; // Green for Rest
 
     const buttonColor = state === 'focus'
         ? 'hover:bg-red-300/50'
@@ -61,6 +84,7 @@ export default function Pomodoro() {
                     {state === 'focus' ? 'FOCUS' : 'REST'}
                 </h2>
 
+                {/* tabular-nums: Ensures all numbers have the same width, preventing jitter as digits change */}
                 <div className="text-5xl font-light text-gray-800 tabular-nums">
                     {formatTime(seconds)}
                 </div>

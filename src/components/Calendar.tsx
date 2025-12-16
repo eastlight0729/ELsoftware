@@ -127,14 +127,31 @@ export function Calendar() {
                             const isHoliday = !!holidayName; // Convert string to boolean (true if exists)
 
                             // Dynamic Styling Logic:
-                            // We use a template string to combine static classes with conditional classes.
-                            // Base styles: size (14px), background colors, borders, hover effects.
+                            let bgColor = 'bg-[#ebedf0] dark:bg-[#161b22]';
+                            let borderColor = 'border-[#1b1f23]/6 dark:border-[#f0f6fc]/10';
+                            let borderWidth = 'border';
+
+                            if (isSelected) {
+                                bgColor = 'bg-[#40c463] dark:bg-[#2ea043]';
+                                borderColor = 'border-[#3aa655] dark:border-[#3fb950]';
+                            }
+
+                            // Today and Holiday override border color/width but preserve background selection
+                            if (isToday) {
+                                borderWidth = 'border-2';
+                                borderColor = 'border-[#0969da] dark:border-[#58a6ff]';
+                            }
+
+                            if (isHoliday) {
+                                borderWidth = 'border-2';
+                                borderColor = 'border-[#ff4d4f] dark:border-[#ff7875]';
+                            }
+
                             const boxClass = `
-                                w-[14px] h-[14px] bg-[#ebedf0] border border-[#1b1f23]/6 rounded-[3px] cursor-pointer transition-all duration-100 ease-in-out appearance-none p-0 hover:border-[#1b1f23]/30 hover:scale-110 dark:bg-[#161b22] dark:border-[#f0f6fc]/10
-                                ${isSelected ? 'bg-[#40c463] border-[#3aa655] dark:bg-[#2ea043] dark:border-[#3fb950]' : ''} 
-                                ${isToday ? 'border-2 border-[#0969da] dark:border-[#58a6ff]' : ''}
-                                ${isHoliday ? 'border-2 border-[#ff4d4f] z-10 dark:border-[#ff7875]' : ''}
-                            `;
+                                w-[14px] h-[14px] rounded-[3px] cursor-pointer transition-all duration-100 ease-in-out appearance-none p-0 
+                                hover:border-[#1b1f23]/30 hover:scale-110
+                                ${bgColor} ${borderWidth} ${borderColor} ${isHoliday ? 'z-10' : ''}
+                            `.trim();
 
                             // Construct Tooltip Text
                             let tooltipText = dateStr;

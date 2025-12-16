@@ -1,6 +1,6 @@
 import { Calendar } from './components/Calendar';
 import { DailyPlanner } from './components/DailyPlanner';
-import { PomodoroTimer } from './components/PomodoroTimer';
+import PomodoroTimer from './components/PomodoroTimer';
 import './App.css';
 
 function App() {

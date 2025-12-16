@@ -78,18 +78,17 @@ export default function Pomodoro() {
         : 'hover:bg-emerald-300/50';
 
     return (
-        <div className={`${bgColor} rounded-3xl p-6 shadow-lg transition-colors duration-300 w-64`}>
-            <div className="text-center space-y-4">
-                <h2 className="text-sm font-medium tracking-wider text-gray-700">
+        <div className={`${bgColor} rounded-2xl px-6 py-1! shadow-lg transition-colors duration-300 w-fit`}>
+            <div className="flex items-center gap-6">
+                <h2 className="text-xs font-medium tracking-wider text-gray-700">
                     {state === 'focus' ? 'FOCUS' : 'REST'}
                 </h2>
-
                 {/* tabular-nums: Ensures all numbers have the same width, preventing jitter as digits change */}
-                <div className="text-5xl font-light text-gray-800 tabular-nums">
+                <div className="text-2xl font-light text-gray-800 tabular-nums">
                     {formatTime(seconds)}
                 </div>
 
-                <div className="flex justify-center gap-2 pt-2">
+                <div className="flex justify-center gap-3 pt-2">
                     <button
                         onClick={toggleTimer}
                         className={`p-3 rounded-full ${buttonColor} transition-colors`}

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useDailyPlanner } from '../hooks/useDailyPlanner';
-import styles from './DailyPlanner.module.css';
 
 export const DailyPlanner: React.FC = () => {
     const {
@@ -82,33 +81,33 @@ export const DailyPlanner: React.FC = () => {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h2 className={styles.title}>Daily Planner</h2>
-                <div className={styles.navControls}>
-                    <button className={styles.navBtn} onClick={() => changeDate(-1)} title="Previous Day">
+        <div className="p-5 max-w-[1200px] mx-auto">
+            <div className="flex justify-between items-center mb-5">
+                <h2 className="text-2xl font-bold m-0">Daily Planner</h2>
+                <div className="flex gap-2.5 items-center">
+                    <button className="bg-transparent border border-[#ccc] rounded px-2.5 py-1.5 cursor-pointer text-base transition-colors duration-200 hover:bg-[#f0f0f0]" onClick={() => changeDate(-1)} title="Previous Day">
                         &lt;
                     </button>
-                    <span className={styles.dateDisplay} onClick={goToToday} style={{ cursor: 'pointer' }} title="Go to Today">
+                    <span className="font-medium min-w-[100px] text-center cursor-pointer" onClick={goToToday} title="Go to Today">
                         {formatDate(currentDate)}
                     </span>
-                    <button className={styles.navBtn} onClick={() => changeDate(1)} title="Next Day">
+                    <button className="bg-transparent border border-[#ccc] rounded px-2.5 py-1.5 cursor-pointer text-base transition-colors duration-200 hover:bg-[#f0f0f0]" onClick={() => changeDate(1)} title="Next Day">
                         &gt;
                     </button>
                 </div>
             </div>
 
             {/* Time Markers */}
-            <div className={styles.markers}>
+            <div className="grid grid-cols-24 mb-1.5 text-xs text-[#666]">
                 {markers.map(hour => (
-                    <div key={hour} className={styles.marker}>
+                    <div key={hour} className="text-left border-l border-[#ddd] pl-0.5">
                         {hour}
                     </div>
                 ))}
             </div>
 
             {/* Grid */}
-            <div className={styles.grid}>
+            <div className="grid grid-cols-48 gap-px h-20 bg-[#e0e0e0] border border-[#ccc] rounded relative">
                 {Array.from({ length: 48 }, (_, index) => {
                     const categoryId = grid[index];
                     const category = categoryId ? getCategoryById(categoryId) : null;
@@ -116,7 +115,7 @@ export const DailyPlanner: React.FC = () => {
                     return (
                         <div
                             key={index}
-                            className={styles.cell}
+                            className="bg-white cursor-pointer relative transition-colors duration-200 hover:brightness-95"
                             style={{ backgroundColor: category?.color || 'transparent' }}
                             onClick={() => handleCellClick(index)}
                             title={category ? `${category.name} (${Math.floor(index / 2)}:${index % 2 === 0 ? '00' : '30'})` : `Empty (${Math.floor(index / 2)}:${index % 2 === 0 ? '00' : '30'})`}
@@ -125,11 +124,11 @@ export const DailyPlanner: React.FC = () => {
                             {activeCell === index && (
                                 <>
                                     <div
-                                        className={styles.popoverOverlay}
+                                        className="fixed inset-0 z-[99]"
                                         onClick={(e) => { e.stopPropagation(); setActiveCell(null); }}
                                     />
-                                    <div className={styles.popover} onClick={(e) => e.stopPropagation()}>
-                                        <div className={styles.popoverTitle}>Select Activity</div>
+                                    <div className="absolute top-full left-0 mt-1.5 bg-white border border-[#ccc] p-2.5 z-100 shadow-[0_4px_15px_rgba(0,0,0,0.15)] rounded-lg min-w-[200px] flex flex-col gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                        <div className="text-[0.85rem] text-[#888] mb-1.5">Select Activity</div>
                                         {categories.length === 0 && (
                                             <div style={{ padding: '5px', fontSize: '0.8rem', color: '#999' }}>
                                                 No categories. Add one below!
@@ -138,10 +137,10 @@ export const DailyPlanner: React.FC = () => {
                                         {categories.map(cat => (
                                             <div
                                                 key={cat.id}
-                                                className={styles.categoryOption}
+                                                className="flex items-center gap-2 p-1.5 cursor-pointer rounded hover:bg-[#f5f5f5]"
                                                 onClick={() => handleCategorySelect(cat.id)}
                                             >
-                                                <div className={styles.colorBox} style={{ backgroundColor: cat.color }} />
+                                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }} />
                                                 <span>{cat.name}</span>
                                             </div>
                                         ))}
@@ -154,22 +153,22 @@ export const DailyPlanner: React.FC = () => {
 
                 {/* Current Time Indicator */}
                 <div
-                    className={styles.timeIndicator}
+                    className="absolute bottom-[-8px] -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-red-500 z-50 transition-[left] duration-500 ease-in-out"
                     style={{ left: `${(currentMinutes / 1440) * 100}%` }}
                     title={`Current Time: ${Math.floor(currentMinutes / 60).toString().padStart(2, '0')}:${(currentMinutes % 60).toString().padStart(2, '0')}`}
                 />
             </div>
 
             {/* Controls / Legend */}
-            <div className={styles.controls}>
+            <div className="mt-[30px] border-t border-[#eee] pt-5">
                 <h3>Categories</h3>
-                <div className={styles.categoryList}>
+                <div className="flex gap-4 flex-wrap mb-5">
                     {categories.map(cat => (
-                        <div key={cat.id} className={styles.categoryItem}>
-                            <div className={styles.colorBox} style={{ backgroundColor: cat.color }} />
+                        <div key={cat.id} className="flex items-center gap-2 px-2.5 py-1.5 bg-[#f8f8f8] rounded-[20px] border border-[#eee]">
+                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }} />
                             <span>{cat.name}</span>
                             <button
-                                className={styles.deleteBtn}
+                                className="bg-transparent border-0 text-[#999] cursor-pointer text-xl leading-none ml-1.5 p-0 hover:text-[#ff4444]"
                                 onClick={() => removeCategory(cat.id)}
                                 title="Remove category"
                             >
@@ -179,10 +178,10 @@ export const DailyPlanner: React.FC = () => {
                     ))}
                 </div>
 
-                <form onSubmit={handleAddCategory} className={styles.addForm}>
+                <form onSubmit={handleAddCategory} className="flex gap-2.5 items-center">
                     <input
                         type="text"
-                        className={styles.input}
+                        className="px-3 py-2 border border-[#ccc] rounded-md"
                         placeholder="New category..."
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
@@ -190,11 +189,11 @@ export const DailyPlanner: React.FC = () => {
                     />
                     <input
                         type="color"
-                        className={styles.colorInput}
+                        className="h-[35px] w-[50px] p-0 border-0 bg-transparent cursor-pointer"
                         value={newCategoryColor}
                         onChange={(e) => setNewCategoryColor(e.target.value)}
                     />
-                    <button type="submit" className={styles.addButton}>Add new things to do</button>
+                    <button type="submit" className="px-4 py-2 bg-[#007bff] text-white border-0 rounded-md cursor-pointer font-medium hover:bg-[#0056b3]">Add new things to do</button>
                 </form>
             </div>
         </div>

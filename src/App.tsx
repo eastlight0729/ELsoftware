@@ -1,15 +1,14 @@
 import { Calendar } from './components/Calendar';
 import { DailyPlanner } from './components/DailyPlanner';
 import PomodoroTimer from './components/PomodoroTimer';
-import './App.css';
 
 function App() {
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '50px' }}>
+    <div className="max-w-[1280px] mx-auto p-5 text-center">
+      <div className="flex justify-center mb-[50px]">
         <Calendar />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '50px' }}>
+      <div className="flex justify-center mb-[50px]">
         <PomodoroTimer />
       </div>
       <DailyPlanner />

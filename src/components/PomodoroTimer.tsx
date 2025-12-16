@@ -29,14 +29,40 @@ export function PomodoroTimer() {
             }, 1000);
         } else if (seconds === 0) {
             // When timer hits zero:
-            // 1. Stop the timer
+            // 1. Play a notification sound (bell ring)
+            try {
+                const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+                if (AudioContext) {
+                    const ctx = new AudioContext();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    // Bell sound settings
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.exponentialRampToValueAtTime(261.63, ctx.currentTime + 1.5); // Drop to C4
+
+                    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+
+                    osc.start();
+                    osc.stop(ctx.currentTime + 1.0);
+                }
+            } catch (error) {
+                console.error("Audio playback failed", error);
+            }
+
+            // 2. Stop the timer
             setIsRunning(false);
 
-            // 2. Switch to the other state (Focus <-> Rest)
+            // 3. Switch to the other state (Focus <-> Rest)
             const newState = state === 'focus' ? 'rest' : 'focus';
             setState(newState);
 
-            // 3. Reset the timer to the new state's duration
+            // 4. Reset the timer to the new state's duration
             setSeconds(newState === 'focus' ? 25 * 60 : 5 * 60);
         }
 

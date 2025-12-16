@@ -5,7 +5,7 @@ import { Play, Square, RotateCcw, SkipForward } from 'lucide-react';
 // This prevents typos and invalid states (e.g., 'break' vs 'rest').
 type TimerState = 'focus' | 'rest';
 
-export default function Pomodoro() {
+export function PomodoroTimer() {
     // State Management
     // 1. state: Tracks the current mode (Focus vs Rest).
     // 2. seconds: We store time as total seconds (integer) rather than separate minutes/seconds objects.

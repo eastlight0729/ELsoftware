@@ -1,73 +1,105 @@
-import { useState, useEffect, useRef } from 'react';
+// src/hooks/usePomodoroTimer.ts
+import { useState, useEffect, useRef } from "react";
 
-export type TimerMode = 'task' | 'rest';
+type TimerMode = "focus" | "rest";
 
-const TASK_TIME = 25 * 60;
-const REST_TIME = 5 * 60;
+export function usePomodoroTimer() {
+  const [mode, setMode] = useState<TimerMode>("focus");
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
 
-export const usePomodoroTimer = () => {
-    const [mode, setMode] = useState<TimerMode>('task');
-    const [timeLeft, setTimeLeft] = useState(TASK_TIME);
-    const [isActive, setIsActive] = useState(false);
-    const timerRef = useRef<number | null>(null);
+  // endTimeRef stores the exact timestamp when the timer should finish.
+  // We use useRef because we don't need to re-render when this changes, only when calculating math.
+  const endTimeRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        if (isActive && timeLeft > 0) {
-            timerRef.current = window.setInterval(() => {
-                setTimeLeft((prevTime) => prevTime - 1);
-            }, 1000);
-        } else if (timeLeft === 0) {
-            setIsActive(false);
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-            // Auto-switch logic
-            const nextMode = mode === 'task' ? 'rest' : 'task';
-            setMode(nextMode);
-            setTimeLeft(nextMode === 'task' ? TASK_TIME : REST_TIME);
-            // Optional: Play a sound or notification here
+  useEffect(() => {
+    let intervalId: number;
+
+    if (isRunning && timeLeft > 0) {
+      // If we just started (or resumed), calculate the target end time.
+      if (endTimeRef.current === null) {
+        endTimeRef.current = Date.now() + timeLeft * 1000;
+      }
+
+      intervalId = window.setInterval(() => {
+        if (endTimeRef.current) {
+          const now = Date.now();
+          // Calculate remaining seconds based on system time difference
+          const remaining = Math.ceil((endTimeRef.current - now) / 1000);
+
+          if (remaining <= 0) {
+            handleTimerComplete();
+          } else {
+            setTimeLeft(remaining);
+          }
         }
+      }, 100); // Check every 100ms to keep UI responsive. Accuracy comes from Math, not interval speed.
+    } else {
+      // When paused, clear the target time so we can calculate a new one on resume.
+      endTimeRef.current = null;
+    }
 
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-        };
-    }, [isActive, timeLeft, mode]);
+    return () => window.clearInterval(intervalId);
+  }, [isRunning, timeLeft]); // Re-run if running state or time changes
 
-    const handleStart = () => {
-        setIsActive(true);
-    };
+  const handleTimerComplete = () => {
+    playNotificationSound();
+    setIsRunning(false);
+    const nextMode = mode === "focus" ? "rest" : "focus";
+    setMode(nextMode);
+    setTimeLeft(nextMode === "focus" ? 25 * 60 : 5 * 60);
+    endTimeRef.current = null;
+  };
 
-    const handleStop = () => {
-        setIsActive(false);
-    };
+  const toggleTimer = () => setIsRunning(!isRunning);
 
-    const handleReset = () => {
-        setIsActive(false);
-        setTimeLeft(mode === 'task' ? TASK_TIME : REST_TIME);
-    };
+  const resetTimer = () => {
+    setIsRunning(false);
+    setTimeLeft(mode === "focus" ? 25 * 60 : 5 * 60);
+    endTimeRef.current = null;
+  };
 
-    const switchMode = (newMode: TimerMode) => {
-        setMode(newMode);
-        setIsActive(false);
-        setTimeLeft(newMode === 'task' ? TASK_TIME : REST_TIME);
-    };
+  const switchMode = () => {
+    const nextMode = mode === "focus" ? "rest" : "focus";
+    setMode(nextMode);
+    setTimeLeft(nextMode === "focus" ? 25 * 60 : 5 * 60);
+    setIsRunning(false);
+    endTimeRef.current = null;
+  };
 
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
+  return {
+    mode,
+    timeLeft,
+    isRunning,
+    toggleTimer,
+    resetTimer,
+    switchMode,
+  };
+}
 
-    return {
-        mode,
-        timeLeft,
-        isActive,
-        handleStart,
-        handleStop,
-        handleReset,
-        switchMode,
-        formatTime,
-    };
-};
+// Helper: Extracted sound logic for cleanliness
+function playNotificationSound() {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(261.63, ctx.currentTime + 1.5);
+
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 1.0);
+  } catch (error) {
+    console.error("Audio playback failed", error);
+  }
+}

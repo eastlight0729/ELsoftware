@@ -1,7 +1,7 @@
 import React from "react";
-import { CategoryInput } from "./CategoryInput";
-import { CategoryColorPicker } from "./CategoryColorPicker/CategoryColorPicker";
-import { CategoryAddButton } from "./CategoryAddButton";
+import { CategoryInput } from "./Input";
+import { CategoryColorPicker } from "./ColorPicker/ColorPicker";
+import { CategoryAddButton } from "./AddButton";
 
 interface CategoryFormProps {
   onAdd: (e: React.FormEvent) => void;

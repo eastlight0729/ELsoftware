@@ -1,7 +1,6 @@
 import React from "react";
 import { CategoryInput } from "./Input";
 import { CategoryColorPicker } from "./ColorPicker/ColorPicker";
-import { CategoryAddButton } from "./AddButton";
 
 interface CategoryFormProps {
   onAdd: (e: React.FormEvent) => void;
@@ -19,10 +18,9 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   setNewCategoryColor,
 }) => {
   return (
-    <form onSubmit={onAdd} className="flex gap-3 items-center w-full max-w-2xl bg-white p-2 pr-3 rounded-xl">
-      <CategoryInput value={newCategoryName} onChange={setNewCategoryName} />
+    <form onSubmit={onAdd} className="flex gap-3 items-center w-full max-w-2xl p-2 pr-3 rounded-xl">
       <CategoryColorPicker color={newCategoryColor} onChange={setNewCategoryColor} />
-      <CategoryAddButton />
+      <CategoryInput value={newCategoryName} onChange={setNewCategoryName} />
     </form>
   );
 };

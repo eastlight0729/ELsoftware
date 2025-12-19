@@ -23,8 +23,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
   setNewCategoryColor,
 }) => {
   return (
-    <div className="mt-8 bg-white/40 backdrop-blur-md rounded-2xl p-6 border border-slate-200/60 shadow-sm">
-      <CategoryList categories={categories} onRemove={onRemove} />
+    <div className="mt-3 bg-white/40 backdrop-blur-md rounded-2xl px-5 p-3 border border-slate-200/60 shadow-sm">
       <CategoryForm
         onAdd={onAdd}
         newCategoryName={newCategoryName}
@@ -32,6 +31,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
         newCategoryColor={newCategoryColor}
         setNewCategoryColor={setNewCategoryColor}
       />
+      <CategoryList categories={categories} onRemove={onRemove} />
     </div>
   );
 };

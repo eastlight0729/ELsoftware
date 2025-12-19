@@ -60,11 +60,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
 
   return (
     <div className="mt-8 bg-white/40 backdrop-blur-md rounded-2xl p-6 border border-slate-200/60 shadow-sm">
-      <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
-        Categories
-      </h3>
-
+      {/* Displays the list of existing categories as interactive tags with removal capability. */}
       <div className="flex gap-3 flex-wrap mb-6">
         {categories.map((cat) => (
           <div
@@ -85,10 +81,12 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
         {categories.length === 0 && <div className="text-sm text-slate-400 italic">No categories added yet.</div>}
       </div>
 
+      {/* Form for adding a new category with name input and color picker */}
       <form
         onSubmit={onAdd}
         className="flex gap-3 items-center w-full max-w-2xl bg-white p-2 pr-3 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-400 transition-all shadow-sm"
       >
+        {/* Input field for the new category name with transparent background to blend with container */}
         <input
           type="text"
           className="flex-1 px-3 py-2 bg-transparent text-slate-700 placeholder-slate-400 focus:outline-none text-sm font-medium"
@@ -98,8 +96,6 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
           required
         />
         <div className="h-6 w-px bg-slate-200 mx-1"></div>
-
-        {/* Color Picker Trigger */}
         <div className="relative" ref={colorPickerRef}>
           <button
             type="button"
@@ -148,6 +144,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({
           )}
         </div>
 
+        {/* The CategoryManager component provides a user interface for creating and managing task categories with customizable names and colors. */}
         <button
           type="submit"
           className="ml-2 bg-slate-900 hover:bg-blue-600 text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center"

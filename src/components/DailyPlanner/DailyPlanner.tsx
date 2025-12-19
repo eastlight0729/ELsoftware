@@ -3,7 +3,7 @@ import { useDailyPlanner } from "../../hooks/useDailyPlanner";
 import { PlannerHeader } from "./PlannerHeader";
 import { TimeLabels } from "./Timelabels";
 import { PlannerGrid } from "./PlannerGrid";
-import { CategoryManager } from "./CategoryManager";
+import { CategoryManager } from "./Category/CategoryManager";
 
 export const DailyPlanner: React.FC = () => {
   const { categories, grid, currentDate, addCategory, assignCell, clearCell, removeCategory, changeDate, goToToday } =

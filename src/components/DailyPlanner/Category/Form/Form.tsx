@@ -18,7 +18,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   setNewCategoryColor,
 }) => {
   return (
-    <form onSubmit={onAdd} className="flex gap-3 items-center w-full max-w-2xl p-2 pr-3 rounded-xl">
+    <form onSubmit={onAdd} className="flex mb-3 gap-3 items-center w-full max-w-2xl p-2 pr-3 rounded-xl">
       <CategoryColorPicker color={newCategoryColor} onChange={setNewCategoryColor} />
       <CategoryInput value={newCategoryName} onChange={setNewCategoryName} />
     </form>

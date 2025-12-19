@@ -28,11 +28,7 @@ export const DailyPlanner: React.FC = () => {
   }, []);
 
   const handleCellClick = (index: number) => {
-    if (grid[index]) {
-      clearCell(index);
-    } else {
-      setActiveCell(index);
-    }
+    setActiveCell(activeCell === index ? null : index);
   };
 
   const handleCategorySelect = (categoryId: string) => {
@@ -71,6 +67,7 @@ export const DailyPlanner: React.FC = () => {
         currentMinutes={currentMinutes}
         onCellClick={handleCellClick}
         onCategorySelect={handleCategorySelect}
+        onClearCell={clearCell}
         onClosePopover={() => setActiveCell(null)}
       />
 

@@ -7,6 +7,8 @@ interface Category {
   color: string;
 }
 
+import { Trash2 } from "lucide-react";
+
 interface PlannerGridProps {
   grid: Record<number, string | null>;
   categories: Category[];
@@ -14,6 +16,7 @@ interface PlannerGridProps {
   currentMinutes: number;
   onCellClick: (index: number) => void;
   onCategorySelect: (categoryId: string) => void;
+  onClearCell: (index: number) => void;
   onClosePopover: () => void;
 }
 
@@ -24,6 +27,7 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
   currentMinutes,
   onCellClick,
   onCategorySelect,
+  onClearCell,
   onClosePopover,
 }) => {
   const getCategoryById = (id: string | null) => {
@@ -33,7 +37,7 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
   return (
     <div className="relative group">
       {/* Main Grid Container */}
-      <div className="grid grid-cols-48 h-24 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-inner ring-1 ring-black/5">
+      <div className="grid grid-cols-48 h-24 bg-slate-50 border border-slate-200 rounded-xl shadow-inner ring-1 ring-black/5">
         {Array.from({ length: 48 }, (_, index) => {
           const categoryId = grid[index];
           const category = categoryId ? getCategoryById(categoryId) : null;
@@ -51,11 +55,13 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
                 relative cursor-pointer transition-all duration-200
                 ${!category ? "hover:bg-slate-100" : "hover:brightness-95"}
                 border-r border-slate-100 last:border-r-0
+                first:rounded-l-xl last:rounded-r-xl
+                ${isActive ? "ring-2 ring-blue-500 z-10" : ""}
               `}
               style={{
                 backgroundColor: category?.color || "transparent",
               }}
-              onClick={() => onCellClick(index)}
+              onClick={() => onCellClick(index)} // Trigger
               title={category ? `${category.name} (${timeString})` : `Empty (${timeString})`}
             >
               {/* Popover Menu */}
@@ -69,41 +75,61 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
                     }}
                   />
                   <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white/80 backdrop-blur-xl border border-white/20 p-3 z-50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl animate-in fade-in zoom-in-95 duration-200"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-white/95 backdrop-blur-xl border border-slate-200 p-2 z-50 shadow-2xl rounded-xl animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-2 ring-1 ring-black/5"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider px-1">
-                      Select Activity for {timeString}
+                    <div className="px-2 py-1.5 border-b border-slate-100 flex justify-between items-center">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{timeString}</span>
+                      {category && (
+                        <button
+                          onClick={() => {
+                            onClearCell(index);
+                            onClosePopover();
+                          }}
+                          className="text-xs flex items-center gap-1 text-red-500 hover:bg-red-50 px-2 py-1 rounded-md transition-colors"
+                        >
+                          <Trash2 size={12} />
+                          Clear
+                        </button>
+                      )}
                     </div>
 
                     {categories.length === 0 && (
-                      <div className="text-slate-400 text-sm p-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                      <div className="text-slate-400 text-sm p-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200 mx-1">
                         No categories yet.
                         <br />
                         Add one below!
                       </div>
                     )}
 
-                    <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto pr-1 thin-scrollbar">
+                    <div className="max-h-[200px] overflow-y-auto pr-1 thin-scrollbar flex flex-col gap-1">
                       {categories.map((cat) => (
                         <button
                           key={cat.id}
-                          className="flex items-center gap-3 w-full p-2 text-left rounded-lg hover:bg-slate-100/80 transition-colors group/item"
+                          className={`
+                            flex items-center gap-3 w-full p-2 text-left rounded-lg transition-all group/item
+                            ${categoryId === cat.id ? "bg-blue-50 ring-1 ring-blue-500/20" : "hover:bg-slate-50"}
+                          `}
                           onClick={() => onCategorySelect(cat.id)}
                         >
-                          <span
-                            className="w-3 h-3 rounded-full shadow-sm ring-2 ring-white"
+                          <div
+                            className="w-4 h-4 rounded-full shadow-sm ring-1 ring-black/5 transition-transform group-hover/item:scale-110"
                             style={{ backgroundColor: cat.color }}
                           />
-                          <span className="text-sm font-medium text-slate-700 group-hover/item:text-slate-900 truncate">
+                          <span
+                            className={`text-sm font-medium truncate ${
+                              categoryId === cat.id ? "text-blue-700" : "text-slate-700"
+                            }`}
+                          >
                             {cat.name}
                           </span>
+                          {categoryId === cat.id && <div className="ml-auto w-1.5 h-1.5 bg-blue-500 rounded-full" />}
                         </button>
                       ))}
                     </div>
                   </div>
                   {/* Arrow for popover */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[5px] border-l-8 border-r-8 border-b-8 border-transparent border-b-white z-50 drop-shadow-sm pointer-events-none"></div>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[5px] translate-y-3 w-4 h-4 bg-white border-t border-l border-slate-200 rotate-45 z-50 pointer-events-none"></div>
                 </>
               )}
             </div>

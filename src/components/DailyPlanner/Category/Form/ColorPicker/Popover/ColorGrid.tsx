@@ -6,38 +6,31 @@ interface ColorGridProps {
   onClose: () => void;
 }
 
-export const ColorGrid: React.FC<ColorGridProps> = ({ color, onChange, onClose }) => {
-  const presetColors = [
-    "#ef4444",
-    "#f97316",
-    "#f59e0b",
-    "#84cc16",
-    "#22c55e",
-    "#10b981",
-    "#14b8a6",
-    "#06b6d4",
-    "#3b82f6",
-    "#6366f1",
-    "#8b5cf6",
-    "#a855f7",
-    "#d946ef",
-    "#ec4899",
-    "#f43f5e",
-    "#64748b",
-  ];
+const COLORS = [
+  { label: "Red", value: "#ef4444" },
+  { label: "Orange", value: "#f97316" },
+  { label: "Yellow", value: "#eab308" },
+  { label: "Green", value: "#22c55e" },
+  { label: "Blue", value: "#3b82f6" },
+  { label: "Purple", value: "#a855f7" },
+  { label: "Gray", value: "#6b7280" },
+];
 
+export const ColorGrid: React.FC<ColorGridProps> = ({ color, onChange, onClose }) => {
   return (
-    <div className="grid grid-cols-4 gap-2 mb-3">
-      {presetColors.map((presetColor) => (
+    <div className="flex gap-1.5 justify-between">
+      {COLORS.map(({ label, value }) => (
         <button
-          key={presetColor}
+          key={value}
           type="button"
-          className={`w-8 h-8 rounded-lg transition-transform hover:scale-110 focus:outline-none ring-2 ring-offset-1 ${
-            color === presetColor ? "ring-slate-400 scale-105" : "ring-transparent"
+          aria-label={`Select ${label}`}
+          title={label}
+          className={`w-5 h-5 rounded-full transition-all focus:outline-none ring-offset-1 ${
+            color === value ? "ring-2 ring-slate-400 scale-110" : "ring-transparent hover:scale-110"
           }`}
-          style={{ backgroundColor: presetColor }}
+          style={{ backgroundColor: value }}
           onClick={() => {
-            onChange(presetColor);
+            onChange(value);
             onClose();
           }}
         />

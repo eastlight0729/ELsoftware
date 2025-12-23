@@ -124,16 +124,27 @@ export const useDailyPlanner = () => {
   // For now, let's clear them from ALL plans to be consistent with previous logic ("Remove category and clear from grid").
   const removeCategory = useCallback(
     (categoryId: string) => {
+      const categoryToRemove = categories.find((c) => c.id === categoryId);
+      const colorToPersist = categoryToRemove?.color;
+
       const newCategories = categories.filter((c) => c.id !== categoryId);
 
       const newPlans: Record<string, Record<number, string | null>> = {};
 
-      // Deep copy and clean all plans
+      // Deep copy and bake color
       Object.keys(plans).forEach((dateKey) => {
         const currentGrid = { ...plans[dateKey] };
         Object.keys(currentGrid).forEach((cellIndex) => {
           if (currentGrid[Number(cellIndex)] === categoryId) {
-            delete currentGrid[Number(cellIndex)];
+            // Replace UUID with color code
+            if (colorToPersist) {
+              currentGrid[Number(cellIndex)] = colorToPersist;
+            } else {
+              // Fallback if color not found (shouldn't happen if category exists), just keep ID or clear?
+              // If we keep ID, it becomes transparent. Let's keep ID to be safe or delete if strictly cleaning.
+              // But typically we should have the color.
+              // If category is somehow missing, we can't get color.
+            }
           }
         });
         newPlans[dateKey] = currentGrid;

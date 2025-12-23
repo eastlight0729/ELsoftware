@@ -42,9 +42,9 @@ export const DailyPlanner: React.FC = () => {
     setSelectedRange({ start, end });
   };
 
-  const handleCategorySelect = (categoryId: string) => {
+  const handleColorSelect = (color: string) => {
     if (selectedRange) {
-      assignCellRange(selectedRange.start, selectedRange.end, categoryId);
+      assignCellRange(selectedRange.start, selectedRange.end, color);
       setSelectedRange(null);
     }
   };
@@ -84,7 +84,7 @@ export const DailyPlanner: React.FC = () => {
         selectedRange={selectedRange}
         currentMinutes={currentMinutes}
         onRangeSelect={handleRangeSelect}
-        onCategorySelect={handleCategorySelect}
+        onColorSelect={handleColorSelect}
         onClearSelection={handleClearSelection}
         onClosePopover={() => setSelectedRange(null)}
       />

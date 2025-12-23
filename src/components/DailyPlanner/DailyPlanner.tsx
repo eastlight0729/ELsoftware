@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDailyPlanner } from "../../hooks/useDailyPlanner";
-import { PlannerHeader } from "./PlannerHeader";
-import { TimeLabels } from "./Timelabels";
+import { PlannerHeader } from "./PlannerHeader/PlannerHeader";
+import { TimeLabels } from "./TimeLabels/Timelabels";
 import { PlannerGrid } from "./PlannerGrid/PlannerGrid";
 import { CategoryManager } from "./Category/Category";
 

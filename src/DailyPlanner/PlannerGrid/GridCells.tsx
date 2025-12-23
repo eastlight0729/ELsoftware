@@ -1,6 +1,6 @@
 import React from "react";
 import { GridCell } from "./GridCell";
-import { Category } from "../../../types";
+import { Category } from "../../types";
 
 interface GridCellsProps {
   grid: Record<number, string | null>;

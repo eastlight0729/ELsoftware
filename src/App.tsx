@@ -1,6 +1,6 @@
-import { Calendar } from "./feature/Calendar/Calendar";
-import { DailyPlanner } from "./feature/DailyPlanner/DailyPlanner";
-import { PomodoroTimer } from "./feature/PomodoroTimer/PomodoroTimer";
+import { Calendar } from "./Calendar/Calendar";
+import { DailyPlanner } from "./DailyPlanner/DailyPlanner";
+import { PomodoroTimer } from "./PomodoroTimer/PomodoroTimer";
 
 /* Root Application Component. This component serves as the main layout container. It orchestrates the rendering of core productivity features in a centralized, vertical layout. */
 export default function App() {

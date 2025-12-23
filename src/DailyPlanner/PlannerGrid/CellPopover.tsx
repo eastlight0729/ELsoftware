@@ -2,7 +2,7 @@ import React from "react";
 import { PopoverHeader } from "./CellPopoverHeader";
 import { NoCategoriesMessage } from "./CellPopoverNoCategoriesMessage";
 import { PopoverCategoryList } from "./CellPopoverCategoryList";
-import { Category } from "../../../types";
+import { Category } from "../../types";
 
 interface CellPopoverProps {
   timeString: string;

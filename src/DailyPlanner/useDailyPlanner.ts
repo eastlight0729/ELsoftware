@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Category, PlannerData } from "../../types";
+import { Category, PlannerData } from "../types";
 
 export const useDailyPlanner = () => {
   const [categories, setCategories] = useState<Category[]>([]);

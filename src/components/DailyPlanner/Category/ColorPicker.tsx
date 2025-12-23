@@ -1,6 +1,6 @@
 import React from "react";
 import { CategoryColorTrigger } from "./ColorTrigger";
-import { CategoryColorPopover } from "./Popover/Popover";
+import { CategoryColorPopover } from "./Popover";
 
 interface CategoryColorPickerProps {
   color: string;

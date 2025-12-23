@@ -1,7 +1,7 @@
 import React from "react";
 
-import { CategoryList, Category } from "./List/List";
-import { CategoryForm } from "./Form/Form";
+import { CategoryList, Category } from "./List";
+import { CategoryForm } from "./Form";
 
 interface CategoryManagerProps {
   categories: Category[];

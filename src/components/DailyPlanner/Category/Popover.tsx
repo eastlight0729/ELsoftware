@@ -1,5 +1,5 @@
 import React from "react";
-import { ColorGrid } from "./ColorGrid";
+import { ColorGrid } from "./PopoverColorGrid";
 
 interface CategoryColorPopoverProps {
   color: string;

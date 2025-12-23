@@ -1,11 +1,13 @@
-export interface Category {
-    id: string;
-    name: string;
-    color: string;
+export interface ToDo {
+  id: string;
+  text: string;
+  completed: boolean;
+  color: string;
+  date: string;
 }
 
 export interface PlannerData {
-    categories: Category[];
-    // date string (YYYY-MM-DD) -> grid
-    plans: Record<string, Record<number, string | null>>;
+  todos: ToDo[];
+  // date string (YYYY-MM-DD) -> grid (stores color strings or IDs)
+  plans: Record<string, Record<number, string | null>>;
 }

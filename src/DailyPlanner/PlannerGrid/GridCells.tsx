@@ -1,10 +1,8 @@
 import React from "react";
 import { GridCell } from "./GridCell";
-import { Category } from "../../types";
 
 interface GridCellsProps {
   grid: Record<number, string | null>;
-  categories: Category[];
   selectedRange: { start: number; end: number } | null;
   onRangeSelect: (start: number, end: number) => void;
   onColorSelect: (color: string) => void;
@@ -14,7 +12,6 @@ interface GridCellsProps {
 
 export const GridCells: React.FC<GridCellsProps> = ({
   grid,
-  categories,
   selectedRange,
   onRangeSelect,
   onColorSelect,
@@ -60,15 +57,11 @@ export const GridCells: React.FC<GridCellsProps> = ({
     const max = Math.max(start, end);
     return index >= min && index <= max;
   };
-  const getCategoryById = (id: string | null) => {
-    return categories.find((c) => c.id === id);
-  };
 
   return (
     <div className="grid grid-cols-48 h-5 w-[960px] bg-slate-50 border border-slate-200 rounded-xl shadow-inner ring-1 ring-black/5">
       {Array.from({ length: 48 }, (_, index) => {
-        const categoryId = grid[index];
-        const category = categoryId ? getCategoryById(categoryId) : null;
+        const color = grid[index];
         const isDragging = isIndexInRange(index, dragStart, dragCurrent);
         const isSelected = isIndexInRange(index, selectedRange?.start ?? null, selectedRange?.end ?? null);
 
@@ -83,7 +76,7 @@ export const GridCells: React.FC<GridCellsProps> = ({
         return (
           <GridCell
             key={index}
-            color={category ? category.color : categoryId || undefined}
+            color={color || undefined}
             isSelected={isSelected || isDragging}
             showPopover={!!showPopover}
             timeString={timeString}

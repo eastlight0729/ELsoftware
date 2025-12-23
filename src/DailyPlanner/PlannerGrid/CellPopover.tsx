@@ -1,6 +1,6 @@
 import React from "react";
 import { PopoverHeader } from "./CellPopoverHeader";
-import { ColorGrid } from "../Category/PopoverColorGrid";
+import { ColorGrid } from "./PopoverColorGrid";
 
 interface CellPopoverProps {
   timeString: string;

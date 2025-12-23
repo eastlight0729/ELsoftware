@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Category, PlannerData } from "../types";
+import { ToDo, PlannerData } from "../types";
 
 export const useDailyPlanner = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [allTodos, setAllTodos] = useState<ToDo[]>([]);
   // date string (YYYY-MM-DD) -> grid
   const [plans, setPlans] = useState<Record<string, Record<number, string | null>>>({});
 
@@ -23,52 +23,92 @@ export const useDailyPlanner = () => {
     return plans[currentDateKey] || {};
   }, [plans, currentDateKey]);
 
+  // Derived todos for current date
+  const todos = useMemo(() => {
+    return allTodos.filter((todo) => todo.date === currentDateKey);
+  }, [allTodos, currentDateKey]);
+
   // Load data on mount
   useEffect(() => {
     const load = async () => {
       const data = await window.plannerAPI.loadData();
       if (data) {
-        setCategories(data.categories || []);
+        setAllTodos(data.todos || []);
         setPlans(data.plans || {});
       }
     };
     load();
   }, []);
 
-  const saveData = useCallback(
-    async (newCategories: Category[], newPlans: Record<string, Record<number, string | null>>) => {
-      const data: PlannerData = {
-        categories: newCategories,
-        plans: newPlans,
-      };
-      await window.plannerAPI.saveData(data);
-    },
-    []
-  );
+  const saveData = useCallback(async (newTodos: ToDo[], newPlans: Record<string, Record<number, string | null>>) => {
+    const data: PlannerData = {
+      todos: newTodos,
+      plans: newPlans,
+    };
+    await window.plannerAPI.saveData(data);
+  }, []);
 
-  const addCategory = useCallback(
-    (name: string, color: string) => {
-      const newCategory: Category = {
+  const addToDo = useCallback(
+    (text: string, color: string) => {
+      const newToDo: ToDo = {
         id: crypto.randomUUID(),
-        name,
+        text,
+        completed: false,
         color,
+        date: currentDateKey,
       };
-      const newCategories = [...categories, newCategory];
-      setCategories(newCategories);
-      saveData(newCategories, plans);
+      const newTodos = [...allTodos, newToDo];
+      setAllTodos(newTodos);
+      saveData(newTodos, plans);
     },
-    [categories, plans, saveData]
+    [allTodos, plans, saveData, currentDateKey]
   );
 
+  const toggleToDo = useCallback(
+    (id: string) => {
+      const newTodos = allTodos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
+      setAllTodos(newTodos);
+      saveData(newTodos, plans);
+    },
+    [allTodos, plans, saveData]
+  );
+
+  const removeToDo = useCallback(
+    (id: string) => {
+      const newTodos = allTodos.filter((t) => t.id !== id);
+      setAllTodos(newTodos);
+      saveData(newTodos, plans);
+    },
+    [allTodos, plans, saveData]
+  );
+
+  // Grid Operations (Color based)
   const assignCell = useCallback(
-    (index: number, categoryId: string) => {
-      const newGrid = { ...grid, [index]: categoryId };
+    (index: number, color: string) => {
+      const newGrid = { ...grid, [index]: color };
       const newPlans = { ...plans, [currentDateKey]: newGrid };
 
       setPlans(newPlans);
-      saveData(categories, newPlans);
+      saveData(allTodos, newPlans);
     },
-    [grid, plans, currentDateKey, categories, saveData]
+    [grid, plans, currentDateKey, allTodos, saveData]
+  );
+
+  const assignCellRange = useCallback(
+    (startIndex: number, endIndex: number, color: string) => {
+      const newGrid = { ...grid };
+      const start = Math.min(startIndex, endIndex);
+      const end = Math.max(startIndex, endIndex);
+
+      for (let i = start; i <= end; i++) {
+        newGrid[i] = color;
+      }
+
+      const newPlans = { ...plans, [currentDateKey]: newGrid };
+      setPlans(newPlans);
+      saveData(allTodos, newPlans);
+    },
+    [grid, plans, currentDateKey, allTodos, saveData]
   );
 
   const clearCell = useCallback(
@@ -78,26 +118,9 @@ export const useDailyPlanner = () => {
 
       const newPlans = { ...plans, [currentDateKey]: newGrid };
       setPlans(newPlans);
-      saveData(categories, newPlans);
+      saveData(allTodos, newPlans);
     },
-    [grid, plans, currentDateKey, categories, saveData]
-  );
-
-  const assignCellRange = useCallback(
-    (startIndex: number, endIndex: number, categoryId: string) => {
-      const newGrid = { ...grid };
-      const start = Math.min(startIndex, endIndex);
-      const end = Math.max(startIndex, endIndex);
-
-      for (let i = start; i <= end; i++) {
-        newGrid[i] = categoryId;
-      }
-
-      const newPlans = { ...plans, [currentDateKey]: newGrid };
-      setPlans(newPlans);
-      saveData(categories, newPlans);
-    },
-    [grid, plans, currentDateKey, categories, saveData]
+    [grid, plans, currentDateKey, allTodos, saveData]
   );
 
   const clearCellRange = useCallback(
@@ -112,49 +135,9 @@ export const useDailyPlanner = () => {
 
       const newPlans = { ...plans, [currentDateKey]: newGrid };
       setPlans(newPlans);
-      saveData(categories, newPlans);
+      saveData(allTodos, newPlans);
     },
-    [grid, plans, currentDateKey, categories, saveData]
-  );
-
-  // Remove category and clear from ALL grids?
-  // Requirement says "category does not reseted if daily planner move another day" (implies categories are global)
-  // "removeCategory" usually implies global removal.
-  // We should probably keep legacy assignments or clear them.
-  // For now, let's clear them from ALL plans to be consistent with previous logic ("Remove category and clear from grid").
-  const removeCategory = useCallback(
-    (categoryId: string) => {
-      const categoryToRemove = categories.find((c) => c.id === categoryId);
-      const colorToPersist = categoryToRemove?.color;
-
-      const newCategories = categories.filter((c) => c.id !== categoryId);
-
-      const newPlans: Record<string, Record<number, string | null>> = {};
-
-      // Deep copy and bake color
-      Object.keys(plans).forEach((dateKey) => {
-        const currentGrid = { ...plans[dateKey] };
-        Object.keys(currentGrid).forEach((cellIndex) => {
-          if (currentGrid[Number(cellIndex)] === categoryId) {
-            // Replace UUID with color code
-            if (colorToPersist) {
-              currentGrid[Number(cellIndex)] = colorToPersist;
-            } else {
-              // Fallback if color not found (shouldn't happen if category exists), just keep ID or clear?
-              // If we keep ID, it becomes transparent. Let's keep ID to be safe or delete if strictly cleaning.
-              // But typically we should have the color.
-              // If category is somehow missing, we can't get color.
-            }
-          }
-        });
-        newPlans[dateKey] = currentGrid;
-      });
-
-      setCategories(newCategories);
-      setPlans(newPlans);
-      saveData(newCategories, newPlans);
-    },
-    [categories, plans, saveData]
+    [grid, plans, currentDateKey, allTodos, saveData]
   );
 
   // Navigation
@@ -172,15 +155,16 @@ export const useDailyPlanner = () => {
   }, []);
 
   return {
-    categories,
+    todos, // Returns todos for current date
     grid, // Returns grid for current date
     currentDate,
-    addCategory,
+    addToDo,
+    removeToDo,
+    toggleToDo,
     assignCell,
     assignCellRange,
     clearCell,
     clearCellRange,
-    removeCategory,
     changeDate,
     goToToday,
   };

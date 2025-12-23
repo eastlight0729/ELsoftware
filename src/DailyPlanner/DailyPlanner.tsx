@@ -3,26 +3,25 @@ import { useDailyPlanner } from "./useDailyPlanner";
 import { PlannerHeader } from "./PlannerHeader/PlannerHeader";
 import { TimeLabels } from "./PlannerGrid/Timelabels";
 import { PlannerGrid } from "./PlannerGrid/PlannerGrid";
-import { CategoryManager } from "./Category/Category";
+import { ToDoManager } from "./Category/Category";
 
 export const DailyPlanner: React.FC = () => {
   const {
-    categories,
+    todos,
     grid,
     currentDate,
-    addCategory,
-    // assignCell, // removed
+    addToDo,
     assignCellRange,
-    // clearCell, // removed
     clearCellRange,
-    removeCategory,
+    removeToDo,
+    toggleToDo,
     changeDate,
     goToToday,
   } = useDailyPlanner();
 
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryColor, setNewCategoryColor] = useState("#3498db");
+  const [newTodoText, setNewTodoText] = useState("");
+  const [newTodoColor, setNewTodoColor] = useState("#3b82f6"); // Default blue
   const [currentMinutes, setCurrentMinutes] = useState(0);
 
   // Time Sync Effect
@@ -56,11 +55,11 @@ export const DailyPlanner: React.FC = () => {
     }
   };
 
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleAddToDo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newCategoryName.trim()) {
-      addCategory(newCategoryName, newCategoryColor);
-      setNewCategoryName("");
+    if (newTodoText.trim()) {
+      addToDo(newTodoText, newTodoColor);
+      setNewTodoText("");
     }
   };
 
@@ -80,7 +79,6 @@ export const DailyPlanner: React.FC = () => {
       {/* 3. The Interactive Grid */}
       <PlannerGrid
         grid={grid}
-        categories={categories}
         selectedRange={selectedRange}
         currentMinutes={currentMinutes}
         onRangeSelect={handleRangeSelect}
@@ -89,15 +87,16 @@ export const DailyPlanner: React.FC = () => {
         onClosePopover={() => setSelectedRange(null)}
       />
 
-      {/* 4. Footer Section */}
-      <CategoryManager
-        categories={categories}
-        onRemove={removeCategory}
-        onAdd={handleAddCategory}
-        newCategoryName={newCategoryName}
-        setNewCategoryName={setNewCategoryName}
-        newCategoryColor={newCategoryColor}
-        setNewCategoryColor={setNewCategoryColor}
+      {/* 4. Footer Section Checks */}
+      <ToDoManager
+        todos={todos}
+        onRemove={removeToDo}
+        onToggle={toggleToDo}
+        onAdd={handleAddToDo}
+        newTodoText={newTodoText}
+        setNewTodoText={setNewTodoText}
+        newTodoColor={newTodoColor}
+        setNewTodoColor={setNewTodoColor}
       />
     </div>
   );

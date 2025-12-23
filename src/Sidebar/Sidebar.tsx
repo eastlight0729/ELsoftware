@@ -2,8 +2,8 @@ import { ClipboardList, LayoutDashboard, Settings, StickyNote } from "lucide-rea
 
 interface SidebarProps {
   isOpen: boolean;
-  activeCategory: "task" | "schedule" | "setting" | "memo";
-  onSelectCategory: (category: "task" | "schedule" | "setting" | "memo") => void;
+  activeCategory: "memo" | "task" | "schedule" | "setting";
+  onSelectCategory: (category: "memo" | "task" | "schedule" | "setting") => void;
 }
 
 export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarProps) {
@@ -24,6 +24,13 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarPro
 
       <nav className="flex flex-col gap-2 p-2 flex-1">
         <SidebarItem
+          icon={<StickyNote size={20} />}
+          label="Memo"
+          isActive={activeCategory === "memo"}
+          onClick={() => onSelectCategory("memo")}
+          showLabel={isOpen}
+        />
+        <SidebarItem
           icon={<ClipboardList size={20} />}
           label="Task"
           isActive={activeCategory === "task"}
@@ -35,13 +42,6 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarPro
           label="Schedule"
           isActive={activeCategory === "schedule"}
           onClick={() => onSelectCategory("schedule")}
-          showLabel={isOpen}
-        />
-        <SidebarItem
-          icon={<StickyNote size={20} />}
-          label="Memo"
-          isActive={activeCategory === "memo"}
-          onClick={() => onSelectCategory("memo")}
           showLabel={isOpen}
         />
       </nav>

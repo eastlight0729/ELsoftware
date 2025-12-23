@@ -8,7 +8,7 @@ import { Sidebar } from "./Sidebar/Sidebar";
 /* Root Application Component. This component serves as the main layout container. It orchestrates the rendering of core productivity features in a centralized, vertical layout. */
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<"task" | "schedule" | "setting">("schedule");
+  const [activeCategory, setActiveCategory] = useState<"task" | "schedule" | "setting" | "memo">("schedule");
 
   return (
     <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">
@@ -57,6 +57,12 @@ export default function App() {
             /* Task View - Empty for now */
             <div className="w-full h-[60vh] flex flex-col items-center justify-center text-neutral-400 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-3xl">
               <span className="text-xl font-medium">Tasks</span>
+              <span className="text-sm mt-2">No features yet. Just empty space.</span>
+            </div>
+          ) : activeCategory === "memo" ? (
+            /* Memo View - Empty for now */
+            <div className="w-full h-[60vh] flex flex-col items-center justify-center text-neutral-400 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-3xl">
+              <span className="text-xl font-medium">Memo</span>
               <span className="text-sm mt-2">No features yet. Just empty space.</span>
             </div>
           ) : (

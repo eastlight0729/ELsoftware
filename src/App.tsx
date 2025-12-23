@@ -25,15 +25,24 @@ export default function App() {
         {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
+      {/* Backdrop for Overlay Mode */}
+      {/* Covers the main content when sidebar is open, effectively dimming and blurring it */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content Area */}
-      {/* Add left padding transition when sidebar is open to push content (optional, or just overlay) 
-          Given the 'Sidebar' is fixed, we can push content by adding logic margin/padding here.
-          I will make it push the content for a cleaner desktop layout.
+      {/* 
+          Padding is always pl-16 (mini-sidebar width).
+          When sidebar opens to w-64, it overlays the content instead of pushing it.
       */}
       <main
         className={`
           transition-[padding] duration-300 ease-in-out
-          ${isSidebarOpen ? "pl-64" : "pl-16"}
+          pl-16
           min-h-screen
         `}
       >

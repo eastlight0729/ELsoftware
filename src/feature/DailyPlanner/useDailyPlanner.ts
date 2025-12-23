@@ -83,6 +83,40 @@ export const useDailyPlanner = () => {
     [grid, plans, currentDateKey, categories, saveData]
   );
 
+  const assignCellRange = useCallback(
+    (startIndex: number, endIndex: number, categoryId: string) => {
+      const newGrid = { ...grid };
+      const start = Math.min(startIndex, endIndex);
+      const end = Math.max(startIndex, endIndex);
+
+      for (let i = start; i <= end; i++) {
+        newGrid[i] = categoryId;
+      }
+
+      const newPlans = { ...plans, [currentDateKey]: newGrid };
+      setPlans(newPlans);
+      saveData(categories, newPlans);
+    },
+    [grid, plans, currentDateKey, categories, saveData]
+  );
+
+  const clearCellRange = useCallback(
+    (startIndex: number, endIndex: number) => {
+      const newGrid = { ...grid };
+      const start = Math.min(startIndex, endIndex);
+      const end = Math.max(startIndex, endIndex);
+
+      for (let i = start; i <= end; i++) {
+        delete newGrid[i];
+      }
+
+      const newPlans = { ...plans, [currentDateKey]: newGrid };
+      setPlans(newPlans);
+      saveData(categories, newPlans);
+    },
+    [grid, plans, currentDateKey, categories, saveData]
+  );
+
   // Remove category and clear from ALL grids?
   // Requirement says "category does not reseted if daily planner move another day" (implies categories are global)
   // "removeCategory" usually implies global removal.
@@ -132,7 +166,9 @@ export const useDailyPlanner = () => {
     currentDate,
     addCategory,
     assignCell,
+    assignCellRange,
     clearCell,
+    clearCellRange,
     removeCategory,
     changeDate,
     goToToday,

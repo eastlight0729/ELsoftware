@@ -6,10 +6,21 @@ import { PlannerGrid } from "./PlannerGrid/PlannerGrid";
 import { CategoryManager } from "./Category/Category";
 
 export const DailyPlanner: React.FC = () => {
-  const { categories, grid, currentDate, addCategory, assignCell, clearCell, removeCategory, changeDate, goToToday } =
-    useDailyPlanner();
+  const {
+    categories,
+    grid,
+    currentDate,
+    addCategory,
+    // assignCell, // removed
+    assignCellRange,
+    // clearCell, // removed
+    clearCellRange,
+    removeCategory,
+    changeDate,
+    goToToday,
+  } = useDailyPlanner();
 
-  const [activeCell, setActiveCell] = useState<number | null>(null);
+  const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#3498db");
   const [currentMinutes, setCurrentMinutes] = useState(0);
@@ -27,14 +38,21 @@ export const DailyPlanner: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCellClick = (index: number) => {
-    setActiveCell(activeCell === index ? null : index);
+  const handleRangeSelect = (start: number, end: number) => {
+    setSelectedRange({ start, end });
   };
 
   const handleCategorySelect = (categoryId: string) => {
-    if (activeCell !== null) {
-      assignCell(activeCell, categoryId);
-      setActiveCell(null);
+    if (selectedRange) {
+      assignCellRange(selectedRange.start, selectedRange.end, categoryId);
+      setSelectedRange(null);
+    }
+  };
+
+  const handleClearSelection = () => {
+    if (selectedRange) {
+      clearCellRange(selectedRange.start, selectedRange.end);
+      setSelectedRange(null);
     }
   };
 
@@ -63,12 +81,12 @@ export const DailyPlanner: React.FC = () => {
       <PlannerGrid
         grid={grid}
         categories={categories}
-        activeCell={activeCell}
+        selectedRange={selectedRange}
         currentMinutes={currentMinutes}
-        onCellClick={handleCellClick}
+        onRangeSelect={handleRangeSelect}
         onCategorySelect={handleCategorySelect}
-        onClearCell={clearCell}
-        onClosePopover={() => setActiveCell(null)}
+        onClearSelection={handleClearSelection}
+        onClosePopover={() => setSelectedRange(null)}
       />
 
       {/* 4. Footer Section */}

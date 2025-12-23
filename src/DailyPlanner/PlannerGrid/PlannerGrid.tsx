@@ -9,7 +9,7 @@ interface PlannerGridProps {
   selectedRange: { start: number; end: number } | null;
   currentMinutes: number;
   onRangeSelect: (start: number, end: number) => void;
-  onCategorySelect: (categoryId: string) => void;
+  onColorSelect: (color: string) => void;
   onClearSelection: () => void;
   onClosePopover: () => void;
 }
@@ -20,7 +20,7 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
   selectedRange,
   currentMinutes,
   onRangeSelect,
-  onCategorySelect,
+  onColorSelect,
   onClearSelection,
   onClosePopover,
 }) => {
@@ -31,7 +31,7 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
         categories={categories}
         selectedRange={selectedRange}
         onRangeSelect={onRangeSelect}
-        onCategorySelect={onCategorySelect}
+        onColorSelect={onColorSelect}
         onClearSelection={onClearSelection}
         onClosePopover={onClosePopover}
       />

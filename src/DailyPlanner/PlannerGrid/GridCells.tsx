@@ -7,7 +7,7 @@ interface GridCellsProps {
   categories: Category[];
   selectedRange: { start: number; end: number } | null;
   onRangeSelect: (start: number, end: number) => void;
-  onCategorySelect: (categoryId: string) => void;
+  onColorSelect: (color: string) => void;
   onClearSelection: () => void;
   onClosePopover: () => void;
 }
@@ -17,7 +17,7 @@ export const GridCells: React.FC<GridCellsProps> = ({
   categories,
   selectedRange,
   onRangeSelect,
-  onCategorySelect,
+  onColorSelect,
   onClearSelection,
   onClosePopover,
 }) => {
@@ -83,15 +83,13 @@ export const GridCells: React.FC<GridCellsProps> = ({
         return (
           <GridCell
             key={index}
-            category={category}
+            color={category ? category.color : categoryId || undefined}
             isSelected={isSelected || isDragging}
             showPopover={!!showPopover}
             timeString={timeString}
-            categories={categories}
-            categoryId={categoryId}
             onMouseDown={() => handleMouseDown(index)}
             onMouseEnter={() => handleMouseEnter(index)}
-            onCategorySelect={onCategorySelect}
+            onColorSelect={onColorSelect}
             onClearSelection={onClearSelection}
             onClosePopover={onClosePopover}
           />

@@ -11,7 +11,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarPro
     <aside
       className={`
         fixed top-0 left-0 h-full z-40 flex flex-col
-        ${isOpen ? "w-64" : "w-20"}
+        ${isOpen ? "w-64" : "w-16"}
         bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md
         border-r border-neutral-200 dark:border-neutral-800
         transition-all duration-300 ease-in-out
@@ -92,16 +92,6 @@ function SidebarItem({ icon, label, isActive, onClick, showLabel }: SidebarItemP
         <span className="relative z-10 whitespace-nowrap overflow-hidden transition-all duration-200 animate-in fade-in slide-in-from-left-2">
           {label}
         </span>
-      )}
-
-      {/* Active Indicator */}
-      {isActive && (
-        <div
-          className={`
-          absolute top-1/2 -translate-y-1/2 bg-emerald-500 rounded-full transition-all duration-200
-          ${showLabel ? "left-0 w-1 h-8 rounded-r-full" : "left-1 w-1 h-1 rounded-full"}
-        `}
-        />
       )}
     </button>
   );

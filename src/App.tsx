@@ -19,7 +19,7 @@ export default function App() {
       {/* Placed fixed at top-left to be always accessible */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="fixed top-5 left-5 z-50 p-2 rounded-lg bg-white/80 dark:bg-neutral-700/80 backdrop-blur-sm shadow-md hover:bg-white dark:hover:bg-neutral-600 transition-all duration-200 text-neutral-600 dark:text-neutral-200"
+        className="fixed top-5 left-3 z-50 p-2 rounded-lg hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 transition-all duration-200 text-neutral-600 dark:text-neutral-200"
         aria-label="Toggle Sidebar"
       >
         {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -33,7 +33,7 @@ export default function App() {
       <main
         className={`
           transition-[padding] duration-300 ease-in-out
-          ${isSidebarOpen ? "pl-64" : "pl-20"}
+          ${isSidebarOpen ? "pl-64" : "pl-16"}
           min-h-screen
         `}
       >

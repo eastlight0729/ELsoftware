@@ -33,7 +33,7 @@ export default function App() {
       <main
         className={`
           transition-[padding] duration-300 ease-in-out
-          ${isSidebarOpen ? "pl-64" : "pl-0"}
+          ${isSidebarOpen ? "pl-64" : "pl-20"}
           min-h-screen
         `}
       >

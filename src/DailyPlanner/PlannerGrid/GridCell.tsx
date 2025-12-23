@@ -1,6 +1,6 @@
 import React from "react";
 import { CellPopover } from "./CellPopover";
-import { Category } from "../../../types";
+import { Category } from "../../types";
 
 interface GridCellProps {
   category: Category | null | undefined;

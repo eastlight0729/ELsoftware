@@ -1,28 +1,28 @@
-import { ClipboardList, LayoutDashboard } from "lucide-react";
+import { ClipboardList, LayoutDashboard, Settings } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
-  activeCategory: "task" | "schedule";
-  onSelectCategory: (category: "task" | "schedule") => void;
+  activeCategory: "task" | "schedule" | "setting";
+  onSelectCategory: (category: "task" | "schedule" | "setting") => void;
 }
 
 export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarProps) {
   return (
     <aside
       className={`
-        fixed top-0 left-0 h-full z-40
+        fixed top-0 left-0 h-full z-40 flex flex-col
         ${isOpen ? "w-64 translate-x-0" : "w-64 -translate-x-full"}
         bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md
         border-r border-neutral-200 dark:border-neutral-800
         transition-transform duration-300 ease-in-out
-        pt-20 shadow-2xl
+        pt-20 shadow-2xl pb-4
       `}
     >
       <div className="px-4 mb-6">
         <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-wider px-2">Menu</h2>
       </div>
 
-      <nav className="flex flex-col gap-2 p-4 pt-0">
+      <nav className="flex flex-col gap-2 p-4 pt-0 flex-1">
         <SidebarItem
           icon={<ClipboardList size={20} />}
           label="Task"
@@ -36,6 +36,16 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarPro
           onClick={() => onSelectCategory("schedule")}
         />
       </nav>
+
+      {/* Settings Category at the bottom */}
+      <div className="p-4 z-10">
+        <SidebarItem
+          icon={<Settings size={20} />}
+          label="Settings"
+          isActive={activeCategory === "setting"}
+          onClick={() => onSelectCategory("setting")}
+        />
+      </div>
 
       {/* Decorative background element */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-linear-to-t from-neutral-100/50 dark:from-neutral-800/50 to-transparent pointer-events-none" />

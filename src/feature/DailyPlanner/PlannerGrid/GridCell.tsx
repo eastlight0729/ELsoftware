@@ -3,28 +3,30 @@ import { CellPopover } from "./CellPopover";
 import { Category } from "../../../types";
 
 interface GridCellProps {
-  index: number;
   category: Category | null | undefined;
-  isActive: boolean;
+  isSelected: boolean;
+  showPopover: boolean;
   timeString: string;
   categories: Category[];
   categoryId: string | null;
-  onCellClick: (index: number) => void;
+  onMouseDown: () => void;
+  onMouseEnter: () => void;
   onCategorySelect: (categoryId: string) => void;
-  onClearCell: (index: number) => void;
+  onClearSelection: () => void;
   onClosePopover: () => void;
 }
 
 export const GridCell: React.FC<GridCellProps> = ({
-  index,
   category,
-  isActive,
+  isSelected,
+  showPopover,
   timeString,
   categories,
   categoryId,
-  onCellClick,
+  onMouseDown,
+  onMouseEnter,
   onCategorySelect,
-  onClearCell,
+  onClearSelection,
   onClosePopover,
 }) => {
   return (
@@ -34,22 +36,22 @@ export const GridCell: React.FC<GridCellProps> = ({
         ${!category ? "hover:bg-slate-100" : "hover:brightness-95"}
         border-r border-slate-100 last:border-r-0
         first:rounded-l-xl last:rounded-r-xl
-        ${isActive ? "ring-2 ring-blue-500 z-10" : ""}
+        ${isSelected ? "ring-2 ring-blue-500 z-10" : ""}
       `}
       style={{
         backgroundColor: category?.color || "transparent",
       }}
-      onClick={() => onCellClick(index)} // Trigger
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
       title={category ? `${category.name} (${timeString})` : `Empty (${timeString})`}
     >
-      {isActive && (
+      {showPopover && (
         <CellPopover
-          index={index}
           timeString={timeString}
           category={category}
           categories={categories}
           categoryId={categoryId}
-          onClearCell={onClearCell}
+          onClear={onClearSelection}
           onClosePopover={onClosePopover}
           onCategorySelect={onCategorySelect}
         />

@@ -6,22 +6,22 @@ import { CurrentTimeIndicator } from "./CurrentTimeIndicator";
 interface PlannerGridProps {
   grid: Record<number, string | null>;
   categories: Category[];
-  activeCell: number | null;
+  selectedRange: { start: number; end: number } | null;
   currentMinutes: number;
-  onCellClick: (index: number) => void;
+  onRangeSelect: (start: number, end: number) => void;
   onCategorySelect: (categoryId: string) => void;
-  onClearCell: (index: number) => void;
+  onClearSelection: () => void;
   onClosePopover: () => void;
 }
 
 export const PlannerGrid: React.FC<PlannerGridProps> = ({
   grid,
   categories,
-  activeCell,
+  selectedRange,
   currentMinutes,
-  onCellClick,
+  onRangeSelect,
   onCategorySelect,
-  onClearCell,
+  onClearSelection,
   onClosePopover,
 }) => {
   return (
@@ -29,10 +29,10 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
       <GridCells
         grid={grid}
         categories={categories}
-        activeCell={activeCell}
-        onCellClick={onCellClick}
+        selectedRange={selectedRange}
+        onRangeSelect={onRangeSelect}
         onCategorySelect={onCategorySelect}
-        onClearCell={onClearCell}
+        onClearSelection={onClearSelection}
         onClosePopover={onClosePopover}
       />
       <CurrentTimeIndicator currentMinutes={currentMinutes} />

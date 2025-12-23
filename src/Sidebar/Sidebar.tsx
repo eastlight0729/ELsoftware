@@ -1,9 +1,9 @@
-import { ClipboardList, LayoutDashboard, Settings } from "lucide-react";
+import { ClipboardList, LayoutDashboard, Settings, StickyNote } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
-  activeCategory: "task" | "schedule" | "setting";
-  onSelectCategory: (category: "task" | "schedule" | "setting") => void;
+  activeCategory: "memo" | "task" | "schedule" | "setting";
+  onSelectCategory: (category: "memo" | "task" | "schedule" | "setting") => void;
 }
 
 export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarProps) {
@@ -23,6 +23,13 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory }: SidebarPro
       </div>
 
       <nav className="flex flex-col gap-2 p-2 flex-1">
+        <SidebarItem
+          icon={<StickyNote size={20} />}
+          label="Memo"
+          isActive={activeCategory === "memo"}
+          onClick={() => onSelectCategory("memo")}
+          showLabel={isOpen}
+        />
         <SidebarItem
           icon={<ClipboardList size={20} />}
           label="Task"

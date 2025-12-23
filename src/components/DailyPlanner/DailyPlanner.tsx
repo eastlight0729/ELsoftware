@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDailyPlanner } from "../../hooks/useDailyPlanner";
 import { PlannerHeader } from "./PlannerHeader";
 import { TimeLabels } from "./Timelabels";
-import { PlannerGrid } from "./PlannerGrid";
+import { PlannerGrid } from "./PlannerGrid/PlannerGrid";
 import { CategoryManager } from "./Category/Category";
 
 export const DailyPlanner: React.FC = () => {

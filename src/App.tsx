@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { Calendar } from "./Calendar/Calendar";
 import { DailyPlanner } from "./DailyPlanner/DailyPlanner";
 import { PomodoroTimer } from "./PomodoroTimer/PomodoroTimer";
+import { Memo } from "./Memo/Memo";
 import { Sidebar } from "./Sidebar/Sidebar";
 
 /* Root Application Component. This component serves as the main layout container. It orchestrates the rendering of core productivity features in a centralized, vertical layout. */
@@ -60,11 +61,7 @@ export default function App() {
               <span className="text-sm mt-2">No features yet. Just empty space.</span>
             </div>
           ) : activeCategory === "memo" ? (
-            /* Memo View - Empty for now */
-            <div className="w-full h-[60vh] flex flex-col items-center justify-center text-neutral-400 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-3xl">
-              <span className="text-xl font-medium">Memo</span>
-              <span className="text-sm mt-2">No features yet. Just empty space.</span>
-            </div>
+            <Memo />
           ) : (
             /* Settings View - Empty for now */
             <div className="w-full h-[60vh] flex flex-col items-center justify-center text-neutral-400 border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-3xl">

@@ -2,6 +2,7 @@
 
 /* Import Tailwind CSS v4 and its default reset */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Define custom design tokens */
 @theme {

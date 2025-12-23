@@ -1,11 +1,9 @@
 import React from "react";
-import { Category } from "../../types";
 import { GridCells } from "./GridCells";
 import { CurrentTimeIndicator } from "./CurrentTimeIndicator";
 
 interface PlannerGridProps {
   grid: Record<number, string | null>;
-  categories: Category[];
   selectedRange: { start: number; end: number } | null;
   currentMinutes: number;
   onRangeSelect: (start: number, end: number) => void;
@@ -16,7 +14,6 @@ interface PlannerGridProps {
 
 export const PlannerGrid: React.FC<PlannerGridProps> = ({
   grid,
-  categories,
   selectedRange,
   currentMinutes,
   onRangeSelect,
@@ -28,7 +25,6 @@ export const PlannerGrid: React.FC<PlannerGridProps> = ({
     <div className="relative group">
       <GridCells
         grid={grid}
-        categories={categories}
         selectedRange={selectedRange}
         onRangeSelect={onRangeSelect}
         onColorSelect={onColorSelect}

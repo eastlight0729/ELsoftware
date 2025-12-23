@@ -1,37 +1,41 @@
 import React from "react";
 
-import { CategoryList, Category } from "./List";
-import { CategoryForm } from "./Form";
+import { ToDoList } from "./List";
+import { ToDoForm } from "./Form";
+import { ToDo } from "../../types";
 
 interface CategoryManagerProps {
-  categories: Category[];
+  todos: ToDo[];
   onRemove: (id: string) => void;
+  onToggle: (id: string) => void;
   onAdd: (e: React.FormEvent) => void;
-  newCategoryName: string;
-  setNewCategoryName: (name: string) => void;
-  newCategoryColor: string;
-  setNewCategoryColor: (color: string) => void;
+  newTodoText: string;
+  setNewTodoText: (text: string) => void;
+  newTodoColor: string;
+  setNewTodoColor: (color: string) => void;
 }
 
-export const CategoryManager: React.FC<CategoryManagerProps> = ({
-  categories,
+export const ToDoManager: React.FC<CategoryManagerProps> = ({
+  todos,
   onRemove,
+  onToggle,
   onAdd,
-  newCategoryName,
-  setNewCategoryName,
-  newCategoryColor,
-  setNewCategoryColor,
+  newTodoText,
+  setNewTodoText,
+  newTodoColor,
+  setNewTodoColor,
 }) => {
   return (
     <div className="mt-3 bg-white/40 backdrop-blur-md rounded-2xl px-5 p-3 border border-slate-200/60 shadow-sm">
-      <CategoryForm
+      <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Tasks</h3>
+      <ToDoForm
         onAdd={onAdd}
-        newCategoryName={newCategoryName}
-        setNewCategoryName={setNewCategoryName}
-        newCategoryColor={newCategoryColor}
-        setNewCategoryColor={setNewCategoryColor}
+        newTodoText={newTodoText}
+        setNewTodoText={setNewTodoText}
+        newTodoColor={newTodoColor}
+        setNewTodoColor={setNewTodoColor}
       />
-      <CategoryList categories={categories} onRemove={onRemove} />
+      <ToDoList todos={todos} onRemove={onRemove} onToggle={onToggle} />
     </div>
   );
 };

@@ -65,7 +65,7 @@ export const GridCells: React.FC<GridCellsProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-48 h-24 bg-slate-50 border border-slate-200 rounded-xl shadow-inner ring-1 ring-black/5">
+    <div className="grid grid-cols-48 h-5 w-[960px] bg-slate-50 border border-slate-200 rounded-xl shadow-inner ring-1 ring-black/5">
       {Array.from({ length: 48 }, (_, index) => {
         const categoryId = grid[index];
         const category = categoryId ? getCategoryById(categoryId) : null;

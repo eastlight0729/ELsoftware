@@ -1,6 +1,6 @@
 // src/components/PomodoroTimer.tsx
 import { Play, Square, RotateCcw, SkipForward } from "lucide-react";
-import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
+import { usePomodoroTimer } from "./usePomodoroTimer";
 
 export function PomodoroTimer() {
   // Logic is now imported from the Custom Hook

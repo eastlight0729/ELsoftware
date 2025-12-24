@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { ConfirmModal } from "./ConfirmModal";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,6 +31,8 @@ export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [marks, setMarks] = useState<Record<string, boolean>>({});
   const [holidays, setHolidays] = useState<Set<string>>(new Set());
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [pendingDateToRemove, setPendingDateToRemove] = useState<string | null>(null);
   const today = new Date();
 
   useEffect(() => {
@@ -72,6 +75,19 @@ export function YearCalendar() {
 
   const handleDayClick = async (monthIndex: number, day: number) => {
     const dateStr = formatDate(year, monthIndex, day);
+    const isMarked = marks[dateStr];
+
+    if (isMarked) {
+      // Ask for confirmation before removing
+      setPendingDateToRemove(dateStr);
+      setConfirmModalOpen(true);
+    } else {
+      // Add mark immediately
+      toggleMark(dateStr);
+    }
+  };
+
+  const toggleMark = async (dateStr: string) => {
     if ((window as any).ipcRenderer) {
       try {
         const newMarks = await (window as any).ipcRenderer.invoke("year-calendar:toggle-mark", dateStr);
@@ -79,6 +95,12 @@ export function YearCalendar() {
       } catch (error) {
         console.error("Failed to toggle mark:", error);
       }
+    }
+  };
+
+  const handleConfirmRemove = () => {
+    if (pendingDateToRemove) {
+      toggleMark(pendingDateToRemove);
     }
   };
 
@@ -249,6 +271,14 @@ export function YearCalendar() {
           <span className="text-neutral-300 dark:text-neutral-600">S M T ... represents Weekdays</span>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModalOpen}
+        onClose={() => setConfirmModalOpen(false)}
+        onConfirm={handleConfirmRemove}
+        title="Remove Mark"
+        message="Are you sure you want to remove this mark from your schedule?"
+      />
     </div>
   );
 }

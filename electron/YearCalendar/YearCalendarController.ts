@@ -1,6 +1,7 @@
 import { ipcMain, app } from "electron";
 import path from "node:path";
 import fs from "node:fs/promises";
+import Holidays from "date-holidays";
 
 const DATA_FILE = "year-calendar.json";
 
@@ -14,6 +15,7 @@ export class YearCalendarController {
   public initialize() {
     ipcMain.handle("year-calendar:get-marks", () => this.getMarks());
     ipcMain.handle("year-calendar:toggle-mark", (_, date: string) => this.toggleMark(date));
+    ipcMain.handle("year-calendar:get-holidays", (_, year: number) => this.getHolidays(year));
   }
 
   private async getMarks(): Promise<Record<string, boolean>> {
@@ -41,5 +43,12 @@ export class YearCalendarController {
       console.error("Failed to save calendar marks", error);
     }
     return marks;
+  }
+
+  private getHolidays(year: number): string[] {
+    const hd = new Holidays("KR");
+    const holidays = hd.getHolidays(year);
+    // Return array of YYYY-MM-DD strings
+    return holidays.map((h) => h.date.split(" ")[0]);
   }
 }

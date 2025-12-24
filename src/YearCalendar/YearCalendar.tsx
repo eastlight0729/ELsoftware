@@ -29,6 +29,7 @@ const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [marks, setMarks] = useState<Record<string, boolean>>({});
+  const [holidays, setHolidays] = useState<Set<string>>(new Set());
   const today = new Date();
 
   useEffect(() => {
@@ -39,6 +40,15 @@ export function YearCalendar() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    // Load holidays for the current year
+    if ((window as any).ipcRenderer) {
+      (window as any).ipcRenderer.invoke("year-calendar:get-holidays", year).then((data: string[]) => {
+        setHolidays(new Set(data));
+      });
+    }
+  }, [year]);
 
   const getDaysInMonth = (monthIndex: number, year: number) => {
     return new Date(year, monthIndex + 1, 0).getDate();
@@ -167,6 +177,7 @@ export function YearCalendar() {
 
                         const dateStr = formatDate(year, monthIndex, day);
                         const isMarked = marks[dateStr];
+                        const isHoliday = holidays.has(dateStr);
 
                         return (
                           <div
@@ -177,13 +188,15 @@ export function YearCalendar() {
                               "hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer",
                               isMarked
                                 ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/50"
-                                : isWeekend
+                                : isWeekend || isHoliday
                                 ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
                                 : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
                               !isMarked &&
                                 "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
                             )}
-                            title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}`}
+                            title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${
+                              isHoliday ? " (Holiday)" : ""
+                            }`}
                           >
                             <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>
                               {day}

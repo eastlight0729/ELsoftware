@@ -2,6 +2,7 @@ import { AppCategory } from "./Sidebar/types";
 import { DailyPlanner } from "./DailyPlanner/DailyPlanner";
 import { PomodoroTimer } from "./PomodoroTimer/PomodoroTimer";
 import { Memo } from "./Memo/Memo";
+import { YearCalendar } from "./YearCalendar/YearCalendar";
 
 interface AppContentProps {
   /** The currently active category to display. */
@@ -23,6 +24,8 @@ export function AppContent({ activeCategory }: AppContentProps) {
       );
     case "memo":
       return <Memo />;
+    case "year":
+      return <YearCalendar />;
     case "task":
       return (
         /* Task View - Placeholder */

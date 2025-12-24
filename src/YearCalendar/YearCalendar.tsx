@@ -78,9 +78,10 @@ export function YearCalendar() {
         <div className="flex-1 overflow-auto p-6">
           <div className="inline-block min-w-full">
             {/* Grid Header (Weekdays) */}
-            <div className="flex mb-4">
+            <div className="flex mb-4 gap-6">
               {/* Month Label Spacer */}
-              <div className="w-24 shrink-0" />
+              {/* Month Label Spacer */}
+              <div className="w-8 shrink-0" />
               {/* Columns */}
               <div className="flex-1 grid grid-cols-[repeat(37,minmax(0,1fr))] gap-1">
                 {Array.from({ length: TOTAL_COLUMNS }).map((_, i) => {
@@ -116,11 +117,11 @@ export function YearCalendar() {
                 ];
 
                 return (
-                  <div key={monthName} className="flex items-center group">
-                    {/* Month Name */}
-                    <div className="w-24 shrink-0">
-                      <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300 group-hover:text-primary-500 transition-colors uppercase tracking-wide">
-                        {monthName.substring(0, 3)}
+                  <div key={monthName} className="flex items-center group gap-6">
+                    {/* Month Number */}
+                    <div className="w-8 shrink-0 flex justify-end pr-3">
+                      <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors">
+                        {monthIndex + 1}
                       </span>
                     </div>
 

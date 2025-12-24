@@ -187,10 +187,13 @@ export function YearCalendar() {
                               "aspect-square rounded-sm transition-all duration-200 relative group/cell flex items-center justify-center",
                               "hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer",
                               isMarked
-                                ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/50"
+                                ? "bg-emerald-100 dark:bg-emerald-900/40 ring-1 ring-emerald-500/50"
                                 : isWeekend || isHoliday
-                                ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
-                                : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
+                                ? "bg-neutral-100 dark:bg-neutral-800/50"
+                                : "bg-neutral-200/50 dark:bg-neutral-700/30",
+                              isWeekend || isHoliday
+                                ? "text-red-500/80 dark:text-red-400/80"
+                                : "text-neutral-700 dark:text-neutral-300",
                               !isMarked &&
                                 "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
                             )}

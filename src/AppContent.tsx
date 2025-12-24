@@ -1,5 +1,4 @@
 import { AppCategory } from "./Sidebar/types";
-import { Calendar } from "./Calendar/Calendar";
 import { DailyPlanner } from "./DailyPlanner/DailyPlanner";
 import { PomodoroTimer } from "./PomodoroTimer/PomodoroTimer";
 import { Memo } from "./Memo/Memo";
@@ -18,7 +17,6 @@ export function AppContent({ activeCategory }: AppContentProps) {
     case "schedule":
       return (
         <>
-          <Calendar />
           <PomodoroTimer />
           <DailyPlanner />
         </>

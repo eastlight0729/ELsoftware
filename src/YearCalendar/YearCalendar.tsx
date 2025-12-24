@@ -28,6 +28,7 @@ const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
+  const today = new Date();
 
   const getDaysInMonth = (monthIndex: number, year: number) => {
     return new Date(year, monthIndex + 1, 0).getDate();
@@ -136,18 +137,24 @@ export function YearCalendar() {
                           return <div key={`blank-${cellIndex}`} className="aspect-square rounded-sm bg-transparent" />;
                         }
 
+                        const isToday =
+                          year === today.getFullYear() && monthIndex === today.getMonth() && day === today.getDate();
+
                         return (
                           <div
                             key={`day-${day}`}
                             className={cn(
                               "aspect-square rounded-sm transition-all duration-200 relative group/cell flex items-center justify-center",
                               "hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer",
-                              isWeekend
+                              isToday
+                                ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-400 dark:ring-indigo-500 z-10"
+                                : isWeekend
                                 ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
                                 : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
-                              "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
+                              !isToday &&
+                                "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
                             )}
-                            title={`${monthName} ${day}, ${year}`}
+                            title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}`}
                           >
                             <span className="text-[10px] font-medium leading-none">{day}</span>
                           </div>
@@ -179,6 +186,10 @@ export function YearCalendar() {
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-neutral-100 dark:bg-neutral-800/50" />
           <span>Weekend</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm bg-indigo-600 shadow-sm" />
+          <span>Today</span>
         </div>
         <div className="flex items-center gap-2 ml-4">
           <span className="text-neutral-300 dark:text-neutral-600">S M T ... represents Weekdays</span>

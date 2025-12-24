@@ -2,11 +2,15 @@
 import { Play, Square, RotateCcw, SkipForward } from "lucide-react";
 import { usePomodoroTimer } from "./usePomodoroTimer";
 
+/**
+ * The main UI component for the Pomodoro Timer.
+ * Displays the current time, mode (Focus/Rest), and controls (Start/Stop, Reset, Skip).
+ * Logic is handled by `usePomodoroTimer`.
+ */
 export function PomodoroTimer() {
-  // Logic is now imported from the Custom Hook
   const { mode, timeLeft, isRunning, toggleTimer, resetTimer, switchMode } = usePomodoroTimer();
 
-  // Helper: Formats raw seconds into "MM:SS"
+  /** Helper: Formats raw seconds into "MM:SS" */
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const remainingSecs = secs % 60;

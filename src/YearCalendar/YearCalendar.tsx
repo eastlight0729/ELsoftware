@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -28,7 +28,17 @@ const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
+  const [marks, setMarks] = useState<Record<string, boolean>>({});
   const today = new Date();
+
+  useEffect(() => {
+    // Load initial marks
+    if ((window as any).ipcRenderer) {
+      (window as any).ipcRenderer.invoke("year-calendar:get-marks").then((data: Record<string, boolean>) => {
+        setMarks(data);
+      });
+    }
+  }, []);
 
   const getDaysInMonth = (monthIndex: number, year: number) => {
     return new Date(year, monthIndex + 1, 0).getDate();
@@ -43,8 +53,24 @@ export function YearCalendar() {
     return (day + 6) % 7;
   };
 
+  const formatDate = (y: number, m: number, d: number) => {
+    return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  };
+
   const handlePrevYear = () => setYear((y) => y - 1);
   const handleNextYear = () => setYear((y) => y + 1);
+
+  const handleDayClick = async (monthIndex: number, day: number) => {
+    const dateStr = formatDate(year, monthIndex, day);
+    if ((window as any).ipcRenderer) {
+      try {
+        const newMarks = await (window as any).ipcRenderer.invoke("year-calendar:toggle-mark", dateStr);
+        setMarks(newMarks);
+      } catch (error) {
+        console.error("Failed to toggle mark:", error);
+      }
+    }
+  };
 
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500">
@@ -80,7 +106,6 @@ export function YearCalendar() {
           <div className="inline-block min-w-full">
             {/* Grid Header (Weekdays) */}
             <div className="flex mb-4 gap-6">
-              {/* Month Label Spacer */}
               {/* Month Label Spacer */}
               <div className="w-8 shrink-0" />
               {/* Columns */}
@@ -140,23 +165,31 @@ export function YearCalendar() {
                         const isToday =
                           year === today.getFullYear() && monthIndex === today.getMonth() && day === today.getDate();
 
+                        const dateStr = formatDate(year, monthIndex, day);
+                        const isMarked = marks[dateStr];
+
                         return (
                           <div
                             key={`day-${day}`}
+                            onClick={() => handleDayClick(monthIndex, day)}
                             className={cn(
                               "aspect-square rounded-sm transition-all duration-200 relative group/cell flex items-center justify-center",
                               "hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer",
                               isToday
                                 ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-400 dark:ring-indigo-500 z-10"
+                                : isMarked
+                                ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/50"
                                 : isWeekend
                                 ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
                                 : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
                               !isToday &&
+                                !isMarked &&
                                 "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
                             )}
                             title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}`}
                           >
                             <span className="text-[10px] font-medium leading-none">{day}</span>
+                            {/* Optional: Add a small dot for marked days if not already visually distinct enough */}
                           </div>
                         );
                       })}
@@ -186,6 +219,10 @@ export function YearCalendar() {
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-neutral-100 dark:bg-neutral-800/50" />
           <span>Weekend</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm bg-emerald-100 dark:bg-emerald-900/40 ring-1 ring-emerald-500/50" />
+          <span>Marked</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-indigo-600 shadow-sm" />

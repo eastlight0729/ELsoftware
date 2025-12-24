@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { AppCategory } from "./Sidebar/types";
 import { Calendar } from "./Calendar/Calendar";
 import { DailyPlanner } from "./DailyPlanner/DailyPlanner";
 import { PomodoroTimer } from "./PomodoroTimer/PomodoroTimer";
@@ -9,7 +10,7 @@ import { Sidebar } from "./Sidebar/Sidebar";
 /* Root Application Component. This component serves as the main layout container. It orchestrates the rendering of core productivity features in a centralized, vertical layout. */
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<"memo" | "task" | "schedule" | "setting">("schedule");
+  const [activeCategory, setActiveCategory] = useState<AppCategory>("schedule");
 
   return (
     <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">

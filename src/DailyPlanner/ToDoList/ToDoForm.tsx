@@ -2,14 +2,26 @@ import React, { useState, useRef, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { ColorGrid } from "../PlannerGrid/PopoverColorGrid";
 
+/**
+ * Props for the ToDoForm component.
+ */
 interface ToDoFormProps {
+  /** Callback triggered when the form is submitted. */
   onAdd: (e: React.FormEvent) => void;
+  /** The current text value for the new task. */
   newTodoText: string;
+  /** Setter for the new task text value. */
   setNewTodoText: (text: string) => void;
+  /** The current color value selected for the new task. */
   newTodoColor: string;
+  /** Setter for the new task color value. */
   setNewTodoColor: (color: string) => void;
 }
 
+/**
+ * ToDoForm Component
+ * An input form for creating new todo items, including color selection and text entry.
+ */
 export const ToDoForm: React.FC<ToDoFormProps> = ({
   onAdd,
   newTodoText,
@@ -17,9 +29,14 @@ export const ToDoForm: React.FC<ToDoFormProps> = ({
   newTodoColor,
   setNewTodoColor,
 }) => {
+  /** UI state to control the visibility of the color picker dropdown. */
   const [showColorPicker, setShowColorPicker] = useState(false);
+  /** Reference to the popover element to detect outside clicks. */
   const popoverRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Effect to handle clicks outside the color picker to automatically close it.
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
@@ -35,6 +52,7 @@ export const ToDoForm: React.FC<ToDoFormProps> = ({
       onSubmit={onAdd}
       className="flex mb-3 gap-3 items-center w-full max-w-2xl p-2 pr-3 rounded-xl border border-slate-200 bg-white"
     >
+      {/* Color Selection Control */}
       <div className="relative" ref={popoverRef}>
         <button
           type="button"
@@ -43,6 +61,7 @@ export const ToDoForm: React.FC<ToDoFormProps> = ({
           style={{ backgroundColor: newTodoColor }}
           title="Select color"
         />
+        {/* Color Picker Popover */}
         {showColorPicker && (
           <div className="absolute top-full left-0 mt-2 z-50 bg-white p-3 rounded-xl shadow-xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
             <ColorGrid color={newTodoColor} onChange={setNewTodoColor} onClose={() => setShowColorPicker(false)} />
@@ -50,6 +69,7 @@ export const ToDoForm: React.FC<ToDoFormProps> = ({
         )}
       </div>
 
+      {/* Task Text Input */}
       <input
         type="text"
         value={newTodoText}
@@ -57,6 +77,8 @@ export const ToDoForm: React.FC<ToDoFormProps> = ({
         placeholder="Add a new task..."
         className="flex-1 bg-transparent border-none outline-none text-sm text-slate-700 placeholder:text-slate-400 h-9 px-2"
       />
+
+      {/* Submit Button */}
       <button
         type="submit"
         disabled={!newTodoText.trim()}

@@ -1,110 +1,100 @@
-import { useState, useEffect } from 'react';
-import Holidays from 'date-holidays';
+import { useState, useEffect, useMemo } from "react";
+import Holidays from "date-holidays";
+import { CalendarState, MonthLabel } from "./types";
 
-export function useCalendar() {
-    // Helper: Get local date string 'YYYY-MM-DD'
-    // (Fixes the issue where toISOString() uses UTC and might show yesterday)
-    const toLocalISOString = (date: Date) => {
-        const offset = date.getTimezoneOffset() * 60000;
-        const localDate = new Date(date.getTime() - offset);
-        return localDate.toISOString().split('T')[0];
-    };
+/**
+ * Custom hook to manage the Calendar logic and state.
+ * Handles date generation, holiday calculations, and interaction with the backend API.
+ * Uses memoization to optimize performance for expensive date calculations.
+ *
+ * @returns {CalendarState} The complete state and handlers required by the Calendar UI.
+ */
+export function useCalendar(): CalendarState {
+  const toLocalISOString = (date: Date) => {
+    const offset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toISOString().split("T")[0];
+  };
 
-    // 1. Generate dates for a range of years
-    const getDatesRange = (startYear: number, endYear: number) => {
-        const dates = [];
-        const date = new Date(startYear, 0, 1); // Jan 1st of start year
-
-        // Loop until we reach Jan 1st of the year AFTER endYear
-        while (date.getFullYear() <= endYear) {
-            dates.push(new Date(date));
-            date.setDate(date.getDate() + 1);
-        }
-        return dates;
-    };
-
-    // 2. Local state to simulate On/Off logic for UI testing
-    const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
-
-    // 1. Get Today's string to compare
-    const todayStr = toLocalISOString(new Date());
-
-    // Compute dates once: Current Year to Current Year + 4 (5 years total)
-    const currentYear = new Date().getFullYear();
-    const dates = getDatesRange(currentYear, currentYear + 4);
-
-    // Calculate Holidays for the range
-    // We use a Map to store dateStr -> Holiday Name
-    const holidaysMap = new Map<string, string>();
-    const hd = new Holidays('KR'); // Korea
-
-    // Optimization: Calculate only for the comprehensive years in the range
-    for (let y = currentYear; y <= currentYear + 4; y++) {
-        const yearHolidays = hd.getHolidays(y);
-        yearHolidays.forEach(h => {
-            // date-holidays returns 'date' as a string "YYYY-MM-DD HH:mm:ss" sometimes or object. 
-            // Simplest way is used to 'start' property or clean the date.
-            const dateObj = new Date(h.date);
-            const dStr = toLocalISOString(dateObj);
-            holidaysMap.set(dStr, h.name);
-        });
+  const getDatesRange = (startYear: number, endYear: number) => {
+    const dates = [];
+    const date = new Date(startYear, 0, 1);
+    while (date.getFullYear() <= endYear) {
+      dates.push(new Date(date));
+      date.setDate(date.getDate() + 1);
     }
+    return dates;
+  };
 
-    // 3. Calculate Month Positions
-    // We need to know which column index each month starts at.
-    // The grid fills columns. Column Index = Math.floor((Index + StartOffset) / 7)
-    const months: { label: string; index: number }[] = [];
+  const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
+
+  // MEMOIZATION START
+  // These values only change once a year (or never during a session), so we shouldn't re-calculate them on every render.
+
+  const todayStr = useMemo(() => toLocalISOString(new Date()), []);
+
+  // We only need the current 4 year window
+  const currentYear = new Date().getFullYear();
+
+  const dates = useMemo(() => getDatesRange(currentYear, currentYear + 4), [currentYear]);
+
+  const holidaysMap = useMemo(() => {
+    const map = new Map<string, string>();
+    const hd = new Holidays("KR");
+    for (let y = currentYear; y <= currentYear + 4; y++) {
+      const yearHolidays = hd.getHolidays(y);
+      yearHolidays.forEach((h) => {
+        const dateObj = new Date(h.date);
+        const dStr = toLocalISOString(dateObj);
+        map.set(dStr, h.name);
+      });
+    }
+    return map;
+  }, [currentYear]);
+
+  const months = useMemo(() => {
+    const m: MonthLabel[] = [];
     let lastMonth = -1;
 
     if (dates.length > 0) {
-        const startDay = dates[0].getDay(); // 0=Sun, ... 6=Sat
-
-        dates.forEach((date, i) => {
-            const currentMonth = date.getMonth();
-            if (currentMonth !== lastMonth) {
-                lastMonth = currentMonth;
-
-                // Calculate Column Index
-                const colIndex = Math.floor((i + startDay) / 7);
-
-                // Label (e.g., "Jan")
-                const label = date.toLocaleString('default', { month: 'short' });
-
-                // Only add if not duplicate (start of year logic handles it naturally)
-                months.push({ label, index: colIndex });
-            }
-        });
+      const startDay = dates[0].getDay();
+      dates.forEach((date, i) => {
+        const currentMonth = date.getMonth();
+        if (currentMonth !== lastMonth) {
+          lastMonth = currentMonth;
+          const colIndex = Math.floor((i + startDay) / 7);
+          const label = date.toLocaleString("default", { month: "short" });
+          m.push({ label, index: colIndex });
+        }
+      });
     }
+    return m;
+  }, [dates]);
+  // MEMOIZATION END
 
-    // --- EFFECT: Load Data on Startup ---
-    useEffect(() => {
-        async function fetchData() {
-            // Call the backend to get real data from file
-            if (window.api) {
-                const savedDates = await window.api.getSchedule();
-                setSelectedDates(new Set(savedDates));
-            }
-        }
-        fetchData();
-    }, []);
+  useEffect(() => {
+    async function fetchData() {
+      if (window.api) {
+        const savedDates = await window.api.getSchedule();
+        setSelectedDates(new Set(savedDates));
+      }
+    }
+    fetchData();
+  }, []);
 
-    // --- HANDLER: Toggle Data via Backend ---
-    const toggleDate = async (dateStr: string) => {
-        // 1. Send command to backend
-        // The backend saves to file and returns the updated list
-        if (window.api) {
-            const updatedList = await window.api.toggleDate(dateStr);
-            // 2. Update UI with the confirmed data from backend
-            setSelectedDates(new Set(updatedList));
-        }
-    };
+  const toggleDate = async (dateStr: string) => {
+    if (window.api) {
+      const updatedList = await window.api.toggleDate(dateStr);
+      setSelectedDates(new Set(updatedList));
+    }
+  };
 
-    return {
-        dates,
-        selectedDates,
-        todayStr,
-        toggleDate,
-        months,
-        holidaysMap
-    };
+  return {
+    dates,
+    selectedDates,
+    todayStr,
+    toggleDate,
+    months,
+    holidaysMap,
+  };
 }

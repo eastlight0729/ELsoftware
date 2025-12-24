@@ -1,6 +1,12 @@
 import React from "react";
 
+/**
+ * TimeLabels Component
+ * Renders the horizontal time markers (0-23 hours) above the planner grid.
+ * Helps users identify the time slots corresponding to grid columns.
+ */
 export const TimeLabels: React.FC = () => {
+  /** Create an array of 24 markers representing each hour of the day. */
   const markers = Array.from({ length: 24 }, (_, i) => i);
 
   return (

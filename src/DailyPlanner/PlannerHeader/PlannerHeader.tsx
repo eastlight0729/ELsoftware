@@ -1,14 +1,32 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+/**
+ * Props for the PlannerHeader component.
+ */
 interface PlannerHeaderProps {
+  /** The currently selected date to display. */
   currentDate: Date;
+  /** Callback triggered when the 'Previous' button is clicked. */
   onPrev: () => void;
+  /** Callback triggered when the 'Next' button is clicked. */
   onNext: () => void;
+  /** Callback triggered when the date label is clicked to return to current date. */
   onToday: () => void;
 }
 
+/**
+ * PlannerHeader Component
+ * Displays the current date and provide navigation controls to change the date.
+ */
 export const PlannerHeader: React.FC<PlannerHeaderProps> = ({ currentDate, onPrev, onNext, onToday }) => {
+  /**
+   * Formats the date into a human-readable string.
+   * Special labels like 'Today', 'Yesterday', and 'Tomorrow' are used when applicable.
+   *
+   * @param date The date to format.
+   * @returns A string representation of the date.
+   */
   const formatDate = (date: Date) => {
     const today = new Date();
     const isToday = date.toDateString() === today.toDateString();
@@ -24,6 +42,7 @@ export const PlannerHeader: React.FC<PlannerHeaderProps> = ({ currentDate, onPre
     if (isToday) return "Today";
     if (isYesterday) return "Yesterday";
     if (isTomorrow) return "Tomorrow";
+
     return date.toLocaleDateString(undefined, {
       weekday: "long",
       month: "long",
@@ -37,6 +56,7 @@ export const PlannerHeader: React.FC<PlannerHeaderProps> = ({ currentDate, onPre
         Daily Planner
       </h2>
       <div className="flex gap-3 items-center">
+        {/* Previous Day Button */}
         <button
           className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95 cursor-pointer text-slate-600 hover:text-slate-900 border border-transparent hover:border-slate-200"
           onClick={onPrev}
@@ -44,6 +64,8 @@ export const PlannerHeader: React.FC<PlannerHeaderProps> = ({ currentDate, onPre
         >
           <ChevronLeft size={20} />
         </button>
+
+        {/* Date Display / Go to Today Trigger */}
         <span
           className="font-semibold min-w-[140px] text-center cursor-pointer select-none text-slate-700 hover:text-blue-600 transition-colors"
           onClick={onToday}
@@ -51,6 +73,8 @@ export const PlannerHeader: React.FC<PlannerHeaderProps> = ({ currentDate, onPre
         >
           {formatDate(currentDate)}
         </span>
+
+        {/* Next Day Button */}
         <button
           className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95 cursor-pointer text-slate-600 hover:text-slate-900 border border-transparent hover:border-slate-200"
           onClick={onNext}

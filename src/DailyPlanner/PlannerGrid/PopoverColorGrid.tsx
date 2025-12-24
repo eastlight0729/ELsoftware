@@ -1,11 +1,21 @@
 import React from "react";
 
+/**
+ * Props for the ColorGrid component.
+ */
 interface ColorGridProps {
+  /** The currently selected color value. */
   color: string;
+  /** Callback triggered when a new color is selected. */
   onChange: (color: string) => void;
+  /** Callback triggered to close the color picker popover. */
   onClose: () => void;
 }
 
+/**
+ * Predefined set of colors available for categorization in the planner.
+ * Using Tailwind CSS default color palette (500 weight).
+ */
 const COLORS = [
   { label: "Red", value: "#ef4444" },
   { label: "Orange", value: "#f97316" },
@@ -16,6 +26,10 @@ const COLORS = [
   { label: "Gray", value: "#6b7280" },
 ];
 
+/**
+ * ColorGrid Component
+ * Renders a horizontal list of color circles for the user to choose from.
+ */
 export const ColorGrid: React.FC<ColorGridProps> = ({ color, onChange, onClose }) => {
   return (
     <div className="flex gap-1.5 justify-between">

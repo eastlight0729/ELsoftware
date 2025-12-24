@@ -1,53 +1,95 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { ToDo, PlannerData } from "../types";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { ToDo, PlannerData } from "./types";
 
+/**
+ * Custom hook to manage Daily Planner state and logic.
+ * Handles loading/saving data, date navigation, and operations on Todos and the Grid.
+ *
+ * @returns An object containing state and functions to interact with the daily planner.
+ */
 export const useDailyPlanner = () => {
+  // --- State ---
+  /** Stores all todos across all dates. */
   const [allTodos, setAllTodos] = useState<ToDo[]>([]);
-  // date string (YYYY-MM-DD) -> grid
+  /** Stores grid data (plans) mapped by date string (YYYY-MM-DD). */
   const [plans, setPlans] = useState<Record<string, Record<number, string | null>>>({});
-
-  // Date Management
+  /** The currently selected date in the planner. */
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
-  // Helper to get YYYY-MM-DD string (local time)
+  // --- Date Helpers ---
+  /**
+   * Converts a Date object to a YYYY-MM-DD string in local time.
+   * @param date The date to convert.
+   * @returns A string representation of the date.
+   */
   const getDateKey = (date: Date): string => {
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60 * 1000);
     return localDate.toISOString().split("T")[0];
   };
 
+  /** The YYYY-MM-DD key for the currently selected date. */
   const currentDateKey = useMemo(() => getDateKey(currentDate), [currentDate]);
 
-  // Derived grid for current date
+  // --- Derived State ---
+  /** The grid data for the currently selected date. */
   const grid = useMemo(() => {
     return plans[currentDateKey] || {};
   }, [plans, currentDateKey]);
 
-  // Derived todos for current date
+  /** The todos filtered for the currently selected date. */
   const todos = useMemo(() => {
     return allTodos.filter((todo) => todo.date === currentDateKey);
   }, [allTodos, currentDateKey]);
 
-  // Load data on mount
+  // --- Data Persistence ---
+  /**
+   * Initial load of data from the persistence layer (via window.plannerAPI).
+   */
   useEffect(() => {
     const load = async () => {
-      const data = await window.plannerAPI.loadData();
-      if (data) {
-        setAllTodos(data.todos || []);
-        setPlans(data.plans || {});
+      // Ensure the API exists before calling it (Electron environment)
+      if (window.plannerAPI) {
+        const data = await window.plannerAPI.loadData();
+        if (data) {
+          setAllTodos(data.todos || []);
+          setPlans(data.plans || {});
+        }
       }
     };
     load();
   }, []);
 
-  const saveData = useCallback(async (newTodos: ToDo[], newPlans: Record<string, Record<number, string | null>>) => {
-    const data: PlannerData = {
-      todos: newTodos,
-      plans: newPlans,
-    };
-    await window.plannerAPI.saveData(data);
-  }, []);
+  /** Ref to track if the initial load has completed to prevent saving empty state over existing data. */
+  const isLoaded = useRef(false);
 
+  /**
+   * Autosave effect: triggers whenever todos or plans change.
+   */
+  useEffect(() => {
+    // Skip the first run to allow loading to complete
+    if (isLoaded.current) {
+      const saveData = async () => {
+        const data: PlannerData = {
+          todos: allTodos,
+          plans: plans,
+        };
+        if (window.plannerAPI) {
+          await window.plannerAPI.saveData(data);
+        }
+      };
+      saveData();
+    } else {
+      isLoaded.current = true;
+    }
+  }, [allTodos, plans]);
+
+  // --- Todo Actions ---
+  /**
+   * Adds a new todo item to the current date.
+   * @param text The description of the task.
+   * @param color The color associated with the task.
+   */
   const addToDo = useCallback(
     (text: string, color: string) => {
       const newToDo: ToDo = {
@@ -57,90 +99,109 @@ export const useDailyPlanner = () => {
         color,
         date: currentDateKey,
       };
-      const newTodos = [...allTodos, newToDo];
-      setAllTodos(newTodos);
-      saveData(newTodos, plans);
+      setAllTodos((prev) => [...prev, newToDo]);
     },
-    [allTodos, plans, saveData, currentDateKey]
+    [currentDateKey]
   );
 
-  const toggleToDo = useCallback(
-    (id: string) => {
-      const newTodos = allTodos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t));
-      setAllTodos(newTodos);
-      saveData(newTodos, plans);
-    },
-    [allTodos, plans, saveData]
-  );
+  /**
+   * Toggles the completion status of a todo item.
+   * @param id The unique ID of the todo.
+   */
+  const toggleToDo = useCallback((id: string) => {
+    setAllTodos((prev) => prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)));
+  }, []);
 
-  const removeToDo = useCallback(
-    (id: string) => {
-      const newTodos = allTodos.filter((t) => t.id !== id);
-      setAllTodos(newTodos);
-      saveData(newTodos, plans);
-    },
-    [allTodos, plans, saveData]
-  );
+  /**
+   * Removes a todo item.
+   * @param id The unique ID of the todo.
+   */
+  const removeToDo = useCallback((id: string) => {
+    setAllTodos((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
-  // Grid Operations (Color based)
+  // --- Grid Actions ---
+  /**
+   * Assigns a color to a single cell in the grid.
+   * @param index The cell index (0-95 for 15-min intervals).
+   * @param color The color to assign.
+   */
   const assignCell = useCallback(
     (index: number, color: string) => {
-      const newGrid = { ...grid, [index]: color };
-      const newPlans = { ...plans, [currentDateKey]: newGrid };
-
-      setPlans(newPlans);
-      saveData(allTodos, newPlans);
+      setPlans((prev) => {
+        const currentGrid = prev[currentDateKey] || {};
+        return {
+          ...prev,
+          [currentDateKey]: { ...currentGrid, [index]: color },
+        };
+      });
     },
-    [grid, plans, currentDateKey, allTodos, saveData]
+    [currentDateKey]
   );
 
+  /**
+   * Assigns a color to a range of cells in the grid.
+   * @param startIndex Starting cell index.
+   * @param endIndex Ending cell index.
+   * @param color The color to assign.
+   */
   const assignCellRange = useCallback(
     (startIndex: number, endIndex: number, color: string) => {
-      const newGrid = { ...grid };
-      const start = Math.min(startIndex, endIndex);
-      const end = Math.max(startIndex, endIndex);
+      setPlans((prev) => {
+        const currentGrid = { ...(prev[currentDateKey] || {}) };
+        const start = Math.min(startIndex, endIndex);
+        const end = Math.max(startIndex, endIndex);
 
-      for (let i = start; i <= end; i++) {
-        newGrid[i] = color;
-      }
-
-      const newPlans = { ...plans, [currentDateKey]: newGrid };
-      setPlans(newPlans);
-      saveData(allTodos, newPlans);
+        for (let i = start; i <= end; i++) {
+          currentGrid[i] = color;
+        }
+        return { ...prev, [currentDateKey]: currentGrid };
+      });
     },
-    [grid, plans, currentDateKey, allTodos, saveData]
+    [currentDateKey]
   );
 
+  /**
+   * Clears the color from a single cell.
+   * @param index The cell index.
+   */
   const clearCell = useCallback(
     (index: number) => {
-      const newGrid = { ...grid };
-      delete newGrid[index];
-
-      const newPlans = { ...plans, [currentDateKey]: newGrid };
-      setPlans(newPlans);
-      saveData(allTodos, newPlans);
+      setPlans((prev) => {
+        const currentGrid = { ...(prev[currentDateKey] || {}) };
+        delete currentGrid[index];
+        return { ...prev, [currentDateKey]: currentGrid };
+      });
     },
-    [grid, plans, currentDateKey, allTodos, saveData]
+    [currentDateKey]
   );
 
+  /**
+   * Clears colors from a range of cells.
+   * @param startIndex Starting cell index.
+   * @param endIndex Ending cell index.
+   */
   const clearCellRange = useCallback(
     (startIndex: number, endIndex: number) => {
-      const newGrid = { ...grid };
-      const start = Math.min(startIndex, endIndex);
-      const end = Math.max(startIndex, endIndex);
+      setPlans((prev) => {
+        const currentGrid = { ...(prev[currentDateKey] || {}) };
+        const start = Math.min(startIndex, endIndex);
+        const end = Math.max(startIndex, endIndex);
 
-      for (let i = start; i <= end; i++) {
-        delete newGrid[i];
-      }
-
-      const newPlans = { ...plans, [currentDateKey]: newGrid };
-      setPlans(newPlans);
-      saveData(allTodos, newPlans);
+        for (let i = start; i <= end; i++) {
+          delete currentGrid[i];
+        }
+        return { ...prev, [currentDateKey]: currentGrid };
+      });
     },
-    [grid, plans, currentDateKey, allTodos, saveData]
+    [currentDateKey]
   );
 
-  // Navigation
+  // --- Navigation Actions ---
+  /**
+   * Changes the current date by a specified number of days.
+   * @param days Number of days to add (negative to subtract).
+   */
   const changeDate = useCallback(
     (days: number) => {
       const newDate = new Date(currentDate);
@@ -150,13 +211,16 @@ export const useDailyPlanner = () => {
     [currentDate]
   );
 
+  /**
+   * Resets the current date to today's date.
+   */
   const goToToday = useCallback(() => {
     setCurrentDate(new Date());
   }, []);
 
   return {
-    todos, // Returns todos for current date
-    grid, // Returns grid for current date
+    todos,
+    grid,
     currentDate,
     addToDo,
     removeToDo,

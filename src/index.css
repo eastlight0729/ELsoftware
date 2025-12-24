@@ -1,17 +1,34 @@
-/* The index.css file serves as the global stylesheet entry point that initializes TailwindCSS directives and establishes universal visual rules for the entire application. */
+/* 
+  Global Stylesheet Entry Point
+  -----------------------------
+  This file initializes Tailwind CSS v4 and defines global design tokens.
+*/
 
-/* Import Tailwind CSS v4 and its default reset */
+/* Import Tailwind CSS v4 core and reset */
 @import "tailwindcss";
+
+/* Import Typography Plugin for Markdown rendering in Memo component */
 @plugin "@tailwindcss/typography";
 
-/* Define custom design tokens */
+/* 
+  Custom Design Tokens
+  --------------------
+  Extends the default Tailwind theme.
+  Uses the new @theme directive for v4.
+*/
 @theme {
+  /* Timer Specific Colors */
   --color-timer-bg: #526159;
   --color-card-bg: #a0e0c4;
   --color-icon-color: #a0e0c4;
 
+  /* Font Stack Override */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
+  /* 
+    Custom Animations 
+    used for the Color Picker spread effect
+  */
   --animate-spread: spread 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 
   @keyframes spread {
@@ -20,14 +37,19 @@
       opacity: 0;
     }
     to {
-      max-width: 12rem; /* w-48 */
+      max-width: 12rem; /* Matches w-48 */
       opacity: 1;
     }
   }
 }
 
+/* 
+  Global Resets 
+  -------------
+  Basic resets not covered by Tailwind or specific to this app.
+*/
 html,
 body {
-  /* height: 100%; */
   margin: 0;
+  /* Height is managed by the root component layout classes */
 }

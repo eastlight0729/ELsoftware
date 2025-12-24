@@ -1,13 +1,22 @@
 import React from "react";
 
 interface SidebarItemProps {
+  /** The icon element to render. */
   icon: React.ReactNode;
+  /** The text label for the item. */
   label: string;
+  /** Whether this item is currently selected. */
   isActive: boolean;
+  /** Callback to handle click events. */
   onClick: () => void;
+  /** Whether to show the text label (expanded state) or just the icon (collapsed state). */
   showLabel: boolean;
 }
 
+/**
+ * A single navigation item in the sidebar.
+ * Handles styling for active/inactive states and collapsed/expanded modes.
+ */
 export function SidebarItem({ icon, label, isActive, onClick, showLabel }: SidebarItemProps) {
   return (
     <button

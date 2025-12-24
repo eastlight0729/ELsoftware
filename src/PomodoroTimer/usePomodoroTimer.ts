@@ -1,11 +1,18 @@
 // src/hooks/usePomodoroTimer.ts
 import { useState, useEffect, useRef } from "react";
+import { TimerMode } from "./types";
+import { TIMER_DURATIONS } from "./config";
+import { playNotificationSound } from "./sound";
 
-type TimerMode = "focus" | "rest";
-
+/**
+ * Custom hook to manage the Pomodoro Timer logic.
+ * Handles timer state, interval counting, mode switching, and sound notifications.
+ *
+ * @returns {Object} Timer state and control functions.
+ */
 export function usePomodoroTimer() {
   const [mode, setMode] = useState<TimerMode>("focus");
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [timeLeft, setTimeLeft] = useState(TIMER_DURATIONS.focus);
   const [isRunning, setIsRunning] = useState(false);
 
   // endTimeRef stores the exact timestamp when the timer should finish.
@@ -42,27 +49,34 @@ export function usePomodoroTimer() {
     return () => window.clearInterval(intervalId);
   }, [isRunning, timeLeft]); // Re-run if running state or time changes
 
+  /**
+   * Handles the completion of the countdown.
+   * Plays sound, switches mode, and resets timer.
+   */
   const handleTimerComplete = () => {
     playNotificationSound();
     setIsRunning(false);
-    const nextMode = mode === "focus" ? "rest" : "focus";
+    const nextMode: TimerMode = mode === "focus" ? "rest" : "focus";
     setMode(nextMode);
-    setTimeLeft(nextMode === "focus" ? 25 * 60 : 5 * 60);
+    setTimeLeft(TIMER_DURATIONS[nextMode]);
     endTimeRef.current = null;
   };
 
+  /** Toggles the start/pause state of the timer. */
   const toggleTimer = () => setIsRunning(!isRunning);
 
+  /** Stops the timer and resets the time for the current mode. */
   const resetTimer = () => {
     setIsRunning(false);
-    setTimeLeft(mode === "focus" ? 25 * 60 : 5 * 60);
+    setTimeLeft(TIMER_DURATIONS[mode]);
     endTimeRef.current = null;
   };
 
+  /** Skips the current session and switches to the next mode immediately. */
   const switchMode = () => {
-    const nextMode = mode === "focus" ? "rest" : "focus";
+    const nextMode: TimerMode = mode === "focus" ? "rest" : "focus";
     setMode(nextMode);
-    setTimeLeft(nextMode === "focus" ? 25 * 60 : 5 * 60);
+    setTimeLeft(TIMER_DURATIONS[nextMode]);
     setIsRunning(false);
     endTimeRef.current = null;
   };
@@ -75,31 +89,4 @@ export function usePomodoroTimer() {
     resetTimer,
     switchMode,
   };
-}
-
-// Helper: Extracted sound logic for cleanliness
-function playNotificationSound() {
-  try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) return;
-
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(261.63, ctx.currentTime + 1.5);
-
-    gain.gain.setValueAtTime(0.5, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 1.0);
-  } catch (error) {
-    console.error("Audio playback failed", error);
-  }
 }

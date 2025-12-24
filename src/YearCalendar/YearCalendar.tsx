@@ -84,7 +84,7 @@ export function YearCalendar() {
               {/* Month Label Spacer */}
               <div className="w-8 shrink-0" />
               {/* Columns */}
-              <div className="flex-1 grid grid-cols-[repeat(37,minmax(0,1fr))] gap-1">
+              <div className="flex-1 grid grid-cols-37 gap-1">
                 {Array.from({ length: TOTAL_COLUMNS }).map((_, i) => {
                   const isWeekend = i % 7 === 5 || i % 7 === 6;
                   return (
@@ -127,7 +127,7 @@ export function YearCalendar() {
                     </div>
 
                     {/* Days Grid */}
-                    <div className="flex-1 grid grid-cols-[repeat(37,minmax(0,1fr))] gap-1">
+                    <div className="flex-1 grid grid-cols-37 gap-1">
                       {/* Render valid cells (blanks + days) */}
                       {cells.map((day, cellIndex) => {
                         // Global column index determines weekday

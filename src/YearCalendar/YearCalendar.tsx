@@ -175,21 +175,22 @@ export function YearCalendar() {
                             className={cn(
                               "aspect-square rounded-sm transition-all duration-200 relative group/cell flex items-center justify-center",
                               "hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer",
-                              isToday
-                                ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-400 dark:ring-indigo-500 z-10"
-                                : isMarked
+                              isMarked
                                 ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/50"
                                 : isWeekend
                                 ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
                                 : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
-                              !isToday &&
-                                !isMarked &&
+                              !isMarked &&
                                 "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
                             )}
                             title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}`}
                           >
-                            <span className="text-[10px] font-medium leading-none">{day}</span>
-                            {/* Optional: Add a small dot for marked days if not already visually distinct enough */}
+                            <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>
+                              {day}
+                            </span>
+                            {isToday && (
+                              <div className="absolute inset-0 border-2 border-indigo-600 dark:border-indigo-500 rounded-sm pointer-events-none" />
+                            )}
                           </div>
                         );
                       })}
@@ -225,7 +226,7 @@ export function YearCalendar() {
           <span>Marked</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-indigo-600 shadow-sm" />
+          <div className="w-3 h-3 rounded-sm border-2 border-indigo-600 dark:border-indigo-500" />
           <span>Today</span>
         </div>
         <div className="flex items-center gap-2 ml-4">

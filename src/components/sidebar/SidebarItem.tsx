@@ -1,4 +1,5 @@
 import React from "react";
+import { SIDEBAR_BUTTON_ACTIVE, SIDEBAR_BUTTON_BASE, SIDEBAR_BUTTON_COLORS } from "./constants";
 
 interface SidebarItemProps {
   /** The icon element to render. */
@@ -23,14 +24,10 @@ export function SidebarItem({ icon, label, isActive, onClick, showLabel }: Sideb
       onClick={onClick}
       title={!showLabel ? label : undefined}
       className={`
-        group flex items-center gap-3 p-2 rounded-lg transition-all duration-200
+        group flex items-center gap-3 ${SIDEBAR_BUTTON_BASE}
         ${showLabel ? "w-full text-left" : "w-full justify-center"}
         relative overflow-hidden
-        ${
-          isActive
-            ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-sm"
-            : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-neutral-700 dark:hover:text-neutral-200"
-        }
+        ${isActive ? SIDEBAR_BUTTON_ACTIVE : SIDEBAR_BUTTON_COLORS}
       `}
     >
       <span

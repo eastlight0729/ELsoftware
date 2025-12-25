@@ -1,5 +1,6 @@
 import { Calendar, ClipboardList, Settings, StickyNote } from "lucide-react";
 import { AppCategory } from "./types";
+import { SIDEBAR_ICON_SIZE } from "./constants";
 
 /**
  * Configuration interface for a single item in the sidebar navigation.
@@ -20,19 +21,19 @@ export const sidebarConfig: SidebarConfigItem[] = [
   {
     id: "memo",
     label: "Memo",
-    icon: <StickyNote size={16} />,
+    icon: <StickyNote size={SIDEBAR_ICON_SIZE} />,
   },
   {
     id: "task",
     label: "Task",
-    icon: <ClipboardList size={16} />,
+    icon: <ClipboardList size={SIDEBAR_ICON_SIZE} />,
   },
   // Schedule removed
 
   {
     id: "year",
     label: "Year Calendar",
-    icon: <Calendar size={16} />,
+    icon: <Calendar size={SIDEBAR_ICON_SIZE} />,
   },
 ];
 
@@ -42,5 +43,5 @@ export const sidebarConfig: SidebarConfigItem[] = [
 export const settingsConfig: SidebarConfigItem = {
   id: "setting",
   label: "Settings",
-  icon: <Settings size={16} />,
+  icon: <Settings size={SIDEBAR_ICON_SIZE} />,
 };

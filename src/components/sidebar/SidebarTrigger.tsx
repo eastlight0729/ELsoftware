@@ -1,4 +1,5 @@
 import { Menu, X } from "lucide-react";
+import { SIDEBAR_BUTTON_BASE, SIDEBAR_BUTTON_COLORS, SIDEBAR_ICON_SIZE } from "./constants";
 
 interface SidebarTriggerProps {
   /** Whether the sidebar is currently open. */
@@ -15,10 +16,10 @@ export function SidebarTrigger({ isOpen, onToggle }: SidebarTriggerProps) {
   return (
     <button
       onClick={onToggle}
-      className="fixed top-5 left-2 z-50 p-2 rounded-lg hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50 transition-all duration-200 text-neutral-600 dark:text-neutral-200"
+      className={`fixed top-5 left-2 z-50 ${SIDEBAR_BUTTON_BASE} ${SIDEBAR_BUTTON_COLORS}`}
       aria-label="Toggle Sidebar"
     >
-      {isOpen ? <X size={16} /> : <Menu size={16} />}
+      {isOpen ? <X size={SIDEBAR_ICON_SIZE} /> : <Menu size={SIDEBAR_ICON_SIZE} />}
     </button>
   );
 }

@@ -1,15 +1,17 @@
 import React from "react";
 import { SIDEBAR_BUTTON_ACTIVE, SIDEBAR_BUTTON_BASE, SIDEBAR_BUTTON_COLORS } from "./constants";
 
-interface SidebarItemProps {
+interface SidebarItemProps<T extends string> {
+  /** The unique identifier for this item. passed back in onClick. */
+  id: T;
   /** The icon element to render. */
   icon: React.ReactNode;
   /** The text label for the item. */
   label: string;
   /** Whether this item is currently selected. */
   isActive: boolean;
-  /** Callback to handle click events. */
-  onClick: () => void;
+  /** Callback to handle click events, receives the id. */
+  onClick: (id: T) => void;
   /** Whether to show the text label (expanded state) or just the icon (collapsed state). */
   showLabel: boolean;
 }
@@ -17,11 +19,12 @@ interface SidebarItemProps {
 /**
  * A single navigation item in the sidebar.
  * Handles styling for active/inactive states and collapsed/expanded modes.
+ * Memoized to prevent re-renders when other sidebar items change.
  */
-export function SidebarItem({ icon, label, isActive, onClick, showLabel }: SidebarItemProps) {
+function SidebarItemInternal<T extends string>({ id, icon, label, isActive, onClick, showLabel }: SidebarItemProps<T>) {
   return (
     <button
-      onClick={onClick}
+      onClick={() => onClick(id)}
       title={!showLabel ? label : undefined}
       className={`
         group flex items-center gap-3 ${SIDEBAR_BUTTON_BASE}
@@ -46,3 +49,6 @@ export function SidebarItem({ icon, label, isActive, onClick, showLabel }: Sideb
     </button>
   );
 }
+
+// Cast to any to allow generic usage in React.memo which can be tricky with generics
+export const SidebarItem = React.memo(SidebarItemInternal) as typeof SidebarItemInternal;

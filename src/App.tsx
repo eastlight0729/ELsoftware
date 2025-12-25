@@ -5,6 +5,9 @@ import { SidebarTrigger } from "./components/sidebar/SidebarTrigger";
 import { SidebarBackdrop } from "./components/sidebar/SidebarBackdrop";
 import { AppContent } from "./AppContent";
 
+import { useAuth, Login } from "./features/auth";
+import { Loader2 } from "lucide-react";
+
 /**
  * Root Application Component.
  *
@@ -16,6 +19,19 @@ import { AppContent } from "./AppContent";
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-neutral-900 text-white">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Login />;
+  }
 
   return (
     <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">

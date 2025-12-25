@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { AppCategory } from "./Sidebar/types";
-import { Sidebar } from "./Sidebar/Sidebar";
-import { SidebarTrigger } from "./Sidebar/SidebarTrigger";
-import { SidebarBackdrop } from "./Sidebar/SidebarBackdrop";
+import { AppCategory } from "./components/sidebar/types";
+import { Sidebar } from "./components/sidebar/Sidebar";
+import { SidebarTrigger } from "./components/sidebar/SidebarTrigger";
+import { SidebarBackdrop } from "./components/sidebar/SidebarBackdrop";
 import { AppContent } from "./AppContent";
 
 /**

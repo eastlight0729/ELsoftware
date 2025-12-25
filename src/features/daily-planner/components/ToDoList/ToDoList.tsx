@@ -1,6 +1,6 @@
 import React from "react";
 import { Trash2, CheckCircle, Circle } from "lucide-react";
-import { ToDo } from "../types";
+import { ToDo } from "../../types";
 
 /**
  * Props for the ToDoList component.

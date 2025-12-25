@@ -1,6 +1,6 @@
 // src/components/PomodoroTimer.tsx
 import { Play, Square, RotateCcw, SkipForward } from "lucide-react";
-import { usePomodoroTimer } from "./usePomodoroTimer";
+import { usePomodoroTimer } from "../hooks/usePomodoroTimer";
 
 /**
  * The main UI component for the Pomodoro Timer.

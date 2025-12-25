@@ -2,7 +2,7 @@ import React from "react";
 
 import { ToDoList } from "./ToDoList";
 import { ToDoForm } from "./ToDoForm";
-import { ToDo } from "../types";
+import { ToDo } from "../../types";
 
 /**
  * Props for the ToDoListManager component.

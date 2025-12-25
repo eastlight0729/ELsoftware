@@ -1,8 +1,8 @@
-import { AppCategory } from "./Sidebar/types";
-import { DailyPlanner } from "./DailyPlanner/DailyPlanner";
-import { PomodoroTimer } from "./PomodoroTimer/PomodoroTimer";
-import { Memo } from "./Memo/Memo";
-import { YearCalendar } from "./YearCalendar/YearCalendar";
+import { AppCategory } from "./components/sidebar/types";
+import { DailyPlanner } from "./features/daily-planner";
+import { PomodoroTimer } from "./features/pomodoro-timer";
+import { Memo } from "./features/memo";
+import { YearCalendar } from "./features/year-calendar";
 
 interface AppContentProps {
   /** The currently active category to display. */

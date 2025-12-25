@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMemoContent } from "./useMemoContent";
+import { useMemoContent } from "../hooks/useMemoContent";
 import { MemoHeader } from "./MemoHeader";
 import { MemoEditor } from "./MemoEditor";
 import { MemoPreview } from "./MemoPreview";

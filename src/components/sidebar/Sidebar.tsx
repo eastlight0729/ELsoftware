@@ -42,7 +42,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
         bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md
         border-r border-neutral-200 dark:border-neutral-800
         transition-all duration-300 ease-in-out
-        pt-20 shadow-2xl pb-4
+        pt-20 shadow-2xl pb-1
       `}
     >
       {/* User Info - Only visible when open */}
@@ -80,7 +80,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
       </div>
 
       {/* Main Navigation Items */}
-      <nav className="flex flex-col gap-2 px-2 py-2 flex-1">
+      <nav className="flex flex-col gap-3 px-2 py-2 flex-1">
         {sidebarConfig.map((item) => (
           <SidebarItem
             key={item.id}

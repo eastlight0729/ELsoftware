@@ -18,3 +18,9 @@ export const SIDEBAR_BUTTON_COLORS =
  */
 export const SIDEBAR_BUTTON_ACTIVE =
   "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-sm";
+
+/**
+ * Standard stroke width for sidebar icons.
+ * 1.5 provides a cleaner, more modern look than the default 2.
+ */
+export const SIDEBAR_ICON_STROKE_WIDTH = 1.5;

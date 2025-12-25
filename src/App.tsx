@@ -35,7 +35,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">
-      <Sidebar isOpen={isSidebarOpen} activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+        userEmail={session.user.email}
+      />
 
       <SidebarTrigger isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
 

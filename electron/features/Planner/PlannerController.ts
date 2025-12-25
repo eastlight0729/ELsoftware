@@ -2,7 +2,9 @@ import { ipcMain } from "electron";
 import { PlannerService } from "./PlannerService";
 import { PlannerData } from "./PlannerRepository";
 
-export class PlannerController {
+import { IController } from "../../shared/types";
+
+export class PlannerController implements IController {
   private service: PlannerService;
 
   constructor() {

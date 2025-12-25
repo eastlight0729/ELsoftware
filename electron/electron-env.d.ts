@@ -15,13 +15,24 @@ declare namespace NodeJS {
      * │
      * ```
      */
-    APP_ROOT: string
+    APP_ROOT: string;
     /** /dist/ or /public/ */
-    VITE_PUBLIC: string
+    VITE_PUBLIC: string;
   }
 }
 
 // Used in Renderer process, expose in `preload.ts`
 interface Window {
-  ipcRenderer: import('electron').IpcRenderer
+  electron: {
+    planner: {
+      loadData: () => Promise<any>;
+      saveData: (data: any) => Promise<void>;
+    };
+    yearCalendar: {
+      getMarks: () => Promise<Record<string, boolean>>;
+      toggleMark: (date: string) => Promise<Record<string, boolean>>;
+      getHolidays: (year: number) => Promise<string[]>;
+    };
+    onMainProcessMessage: (callback: (message: string) => void) => () => void;
+  };
 }

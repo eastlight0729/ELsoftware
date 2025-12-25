@@ -44,16 +44,19 @@ export const useDailyPlanner = () => {
 
   // --- Data Persistence ---
   /**
-   * Initial load of data from the persistence layer (via window.plannerAPI).
+   * Initial load of data from the persistence layer (via window.electron.planner).
    */
   useEffect(() => {
     const load = async () => {
-      // Ensure the API exists before calling it (Electron environment)
-      if (window.plannerAPI) {
-        const data = await window.plannerAPI.loadData();
-        if (data) {
-          setAllTodos(data.todos || []);
-          setPlans(data.plans || {});
+      if (window.electron?.planner) {
+        try {
+          const data = await window.electron.planner.loadData();
+          if (data) {
+            setAllTodos(data.todos || []);
+            setPlans(data.plans || {});
+          }
+        } catch (error) {
+          console.error("Failed to load planner data:", error);
         }
       }
     };
@@ -74,8 +77,12 @@ export const useDailyPlanner = () => {
           todos: allTodos,
           plans: plans,
         };
-        if (window.plannerAPI) {
-          await window.plannerAPI.saveData(data);
+        if (window.electron?.planner) {
+          try {
+            await window.electron.planner.saveData(data);
+          } catch (error) {
+            console.error("Failed to save planner data:", error);
+          }
         }
       };
       saveData();

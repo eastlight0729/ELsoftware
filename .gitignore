@@ -28,3 +28,7 @@ dist
 dist-electron
 out
 release
+# Environment Variables
+.env
+.env.local
+

@@ -17,6 +17,7 @@ export class YearCalendarController implements IController {
   public initialize() {
     ipcMain.handle("year-calendar:get-marks", () => this.getMarks());
     ipcMain.handle("year-calendar:toggle-mark", (_, date: string) => this.toggleMark(date));
+    ipcMain.handle("year-calendar:clear-marks", () => this.clearMarks());
     ipcMain.handle("year-calendar:get-holidays", (_, year: number) => this.getHolidays(year));
   }
 
@@ -45,6 +46,20 @@ export class YearCalendarController implements IController {
       console.error("Failed to save calendar marks", error);
     }
     return marks;
+  }
+
+  private async clearMarks(): Promise<void> {
+    try {
+      // Create a backup before clearing
+      try {
+        await fs.copyFile(this.dataPath, this.dataPath + ".bak");
+      } catch (e) {
+        // Ignore if file doesn't exist
+      }
+      await fs.writeFile(this.dataPath, JSON.stringify({ marks: {} }, null, 2));
+    } catch (error) {
+      console.error("Failed to clear calendar marks", error);
+    }
   }
 
   private getHolidays(year: number): string[] {

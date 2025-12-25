@@ -11,6 +11,7 @@ export type Database = {
           full_name: string | null;
           id: string;
           updated_at: string;
+          user_int_id: number;
         };
         Insert: {
           avatar_url?: string | null;
@@ -19,6 +20,7 @@ export type Database = {
           full_name?: string | null;
           id: string;
           updated_at?: string;
+          user_int_id?: number;
         };
         Update: {
           avatar_url?: string | null;
@@ -27,29 +29,38 @@ export type Database = {
           full_name?: string | null;
           id?: string;
           updated_at?: string;
+          user_int_id?: number;
         };
         Relationships: [];
       };
       year_calendar_marks: {
         Row: {
-          created_at: string;
+          created_at: string | null;
           date: string;
-          id: string;
-          user_id: string | null;
+          id: number;
+          user_id: number;
         };
         Insert: {
-          created_at?: string;
+          created_at?: string | null;
           date: string;
-          id?: string;
-          user_id?: string | null;
+          id?: number;
+          user_id: number;
         };
         Update: {
-          created_at?: string;
+          created_at?: string | null;
           date?: string;
-          id?: string;
-          user_id?: string | null;
+          id?: number;
+          user_id?: number;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "year_calendar_marks_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["user_int_id"];
+          }
+        ];
       };
     };
     Views: {

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ConfirmModal } from "./ConfirmModal";
+import { useYearCalendarMarks, useToggleYearCalendarMark, migrateLegacyMarks } from "../api/useYearCalendar";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -29,19 +30,30 @@ const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
-  const [marks, setMarks] = useState<Record<string, boolean>>({});
+  const { data: marks = {} } = useYearCalendarMarks();
+  const toggleMutation = useToggleYearCalendarMark();
   const [holidays, setHolidays] = useState<Set<string>>(new Set());
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [pendingDateToRemove, setPendingDateToRemove] = useState<string | null>(null);
   const today = new Date();
 
   useEffect(() => {
-    // Load initial marks
-    if (window.electron?.yearCalendar) {
-      window.electron.yearCalendar.getMarks().then((data: Record<string, boolean>) => {
-        setMarks(data);
-      });
-    }
+    const migrate = async () => {
+      if (window.electron?.yearCalendar) {
+        try {
+          const legacyMarks = await window.electron.yearCalendar.getMarks();
+          if (Object.keys(legacyMarks).length > 0) {
+            console.log("Migrating legacy marks...");
+            await migrateLegacyMarks(legacyMarks);
+            await window.electron.yearCalendar.clearMarks();
+            console.log("Migration complete.");
+          }
+        } catch (e) {
+          console.error("Migration failed:", e);
+        }
+      }
+    };
+    migrate();
   }, []);
 
   useEffect(() => {
@@ -88,14 +100,7 @@ export function YearCalendar() {
   };
 
   const toggleMark = async (dateStr: string) => {
-    if (window.electron?.yearCalendar) {
-      try {
-        const newMarks = await window.electron.yearCalendar.toggleMark(dateStr);
-        setMarks(newMarks);
-      } catch (error) {
-        console.error("Failed to toggle mark:", error);
-      }
-    }
+    toggleMutation.mutate(dateStr);
   };
 
   const handleConfirmRemove = () => {

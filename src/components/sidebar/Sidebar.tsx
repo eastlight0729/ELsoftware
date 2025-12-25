@@ -38,7 +38,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
     <aside
       className={`
         fixed top-0 left-0 h-full z-40 flex flex-col
-        ${isOpen ? "w-64" : "w-16"}
+        ${isOpen ? "w-64" : "w-12"}
         bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md
         border-r border-neutral-200 dark:border-neutral-800
         transition-all duration-300 ease-in-out
@@ -80,7 +80,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
       </div>
 
       {/* Main Navigation Items */}
-      <nav className="flex flex-col gap-2 p-2 flex-1">
+      <nav className="flex flex-col gap-2 px-2 py-2 flex-1">
         {sidebarConfig.map((item) => (
           <SidebarItem
             key={item.id}
@@ -94,7 +94,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
       </nav>
 
       {/* Settings Category at the bottom */}
-      <div className="p-2 z-10">
+      <div className="px-2 py-2 z-10">
         <SidebarItem
           icon={settingsConfig.icon}
           label={settingsConfig.label}

@@ -23,7 +23,7 @@ export function SidebarItem({ icon, label, isActive, onClick, showLabel }: Sideb
       onClick={onClick}
       title={!showLabel ? label : undefined}
       className={`
-        group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200
+        group flex items-center gap-3 p-2 rounded-lg transition-all duration-200
         ${showLabel ? "w-full text-left" : "w-full justify-center"}
         relative overflow-hidden
         ${

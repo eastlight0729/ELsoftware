@@ -20,19 +20,19 @@ export const sidebarConfig: SidebarConfigItem[] = [
   {
     id: "memo",
     label: "Memo",
-    icon: <StickyNote size={20} />,
+    icon: <StickyNote size={16} />,
   },
   {
     id: "task",
     label: "Task",
-    icon: <ClipboardList size={20} />,
+    icon: <ClipboardList size={16} />,
   },
   // Schedule removed
 
   {
     id: "year",
     label: "Year Calendar",
-    icon: <Calendar size={20} />,
+    icon: <Calendar size={16} />,
   },
 ];
 
@@ -42,5 +42,5 @@ export const sidebarConfig: SidebarConfigItem[] = [
 export const settingsConfig: SidebarConfigItem = {
   id: "setting",
   label: "Settings",
-  icon: <Settings size={20} />,
+  icon: <Settings size={16} />,
 };

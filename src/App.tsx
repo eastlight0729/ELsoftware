@@ -94,7 +94,7 @@ export default function App() {
       <main
         className={`
           transition-[padding] duration-300 ease-in-out
-          pl-16
+          pl-12
           min-h-screen
         `}
       >

@@ -1,8 +1,8 @@
 // src/hooks/usePomodoroTimer.ts
 import { useState, useEffect, useRef } from "react";
-import { TimerMode } from "./types";
-import { TIMER_DURATIONS } from "./config";
-import { playNotificationSound } from "./sound";
+import { TimerMode } from "../types";
+import { TIMER_DURATIONS } from "../config";
+import { playNotificationSound } from "../sound";
 
 /**
  * Custom hook to manage the Pomodoro Timer logic.

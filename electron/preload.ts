@@ -2,10 +2,6 @@ import { ipcRenderer, contextBridge } from "electron";
 
 // Define specific API without exposing generic ipcRenderer
 contextBridge.exposeInMainWorld("electron", {
-  planner: {
-    loadData: () => ipcRenderer.invoke("planner:load"),
-    saveData: (data: any) => ipcRenderer.invoke("planner:save", data),
-  },
   yearCalendar: {
     getMarks: () => ipcRenderer.invoke("year-calendar:get-marks"),
     toggleMark: (date: string) => ipcRenderer.invoke("year-calendar:toggle-mark", date),

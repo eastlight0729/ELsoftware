@@ -1,6 +1,5 @@
 import { AppCategory } from "./components/sidebar/types";
-import { DailyPlanner } from "./features/daily-planner";
-import { PomodoroTimer } from "./features/pomodoro-timer";
+
 import { Memo } from "./features/memo";
 import { YearCalendar } from "./features/year-calendar";
 
@@ -15,13 +14,6 @@ interface AppContentProps {
  */
 export function AppContent({ activeCategory }: AppContentProps) {
   switch (activeCategory) {
-    case "schedule":
-      return (
-        <>
-          <PomodoroTimer />
-          <DailyPlanner />
-        </>
-      );
     case "memo":
       return <Memo />;
     case "year":

@@ -15,7 +15,7 @@ import { AppContent } from "./AppContent";
  */
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<AppCategory>("schedule");
+  const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
 
   return (
     <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">

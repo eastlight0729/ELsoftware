@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 // Import the service
-import { PlannerController } from "./features/Planner/PlannerController.ts";
+
 import { YearCalendarController } from "./features/YearCalendar/YearCalendarController.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,9 +68,6 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(() => {
-  const plannerController = new PlannerController();
-  plannerController.initialize();
-
   const yearCalendarController = new YearCalendarController();
   yearCalendarController.initialize();
 

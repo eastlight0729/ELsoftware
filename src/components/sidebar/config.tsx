@@ -1,4 +1,4 @@
-import { Calendar, ClipboardList, LayoutDashboard, Settings, StickyNote } from "lucide-react";
+import { Calendar, ClipboardList, Settings, StickyNote } from "lucide-react";
 import { AppCategory } from "./types";
 
 /**
@@ -27,11 +27,8 @@ export const sidebarConfig: SidebarConfigItem[] = [
     label: "Task",
     icon: <ClipboardList size={20} />,
   },
-  {
-    id: "schedule",
-    label: "Schedule",
-    icon: <LayoutDashboard size={20} />,
-  },
+  // Schedule removed
+
   {
     id: "year",
     label: "Year Calendar",

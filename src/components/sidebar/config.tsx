@@ -1,4 +1,4 @@
-import { Calendar, ClipboardList, Settings, StickyNote } from "lucide-react";
+import { Calendar, Kanban, Settings, StickyNote } from "lucide-react";
 import { AppCategory } from "./types";
 import { SIDEBAR_ICON_SIZE, SIDEBAR_ICON_STROKE_WIDTH } from "./constants";
 
@@ -25,8 +25,8 @@ export const sidebarConfig: SidebarConfigItem[] = [
   },
   {
     id: "task",
-    label: "Task",
-    icon: <ClipboardList size={SIDEBAR_ICON_SIZE} strokeWidth={SIDEBAR_ICON_STROKE_WIDTH} />,
+    label: "Kanban",
+    icon: <Kanban size={SIDEBAR_ICON_SIZE} strokeWidth={SIDEBAR_ICON_STROKE_WIDTH} />,
   },
   // Schedule removed
 

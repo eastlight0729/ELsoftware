@@ -19,7 +19,7 @@ import { Loader2 } from "lucide-react";
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
-  const { session, loading } = useAuth();
+  const { session, loading, signOut } = useAuth();
 
   if (loading) {
     return (
@@ -40,6 +40,7 @@ export default function App() {
         activeCategory={activeCategory}
         onSelectCategory={setActiveCategory}
         userEmail={session.user.email}
+        onLogout={signOut}
       />
 
       <SidebarTrigger isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />

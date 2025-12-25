@@ -1,8 +1,16 @@
 /// <reference types="vite/client" />
 
 interface Window {
-  plannerAPI: {
-    loadData: () => Promise<import("./DailyPlanner/types").PlannerData>;
-    saveData: (data: import("./DailyPlanner/types").PlannerData) => Promise<void>;
+  electron: {
+    planner: {
+      loadData: () => Promise<any>;
+      saveData: (data: any) => Promise<void>;
+    };
+    yearCalendar: {
+      getMarks: () => Promise<Record<string, boolean>>;
+      toggleMark: (date: string) => Promise<Record<string, boolean>>;
+      getHolidays: (year: number) => Promise<string[]>;
+    };
+    onMainProcessMessage: (callback: (message: string) => void) => () => void;
   };
 }

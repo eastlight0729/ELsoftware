@@ -1,31 +1,20 @@
 import { ipcRenderer, contextBridge } from "electron";
 
-// Expose protected methods that allow the renderer to use the IPC channels we defined in the Controller
-
-contextBridge.exposeInMainWorld("plannerAPI", {
-  loadData: () => ipcRenderer.invoke("planner:load"),
-  saveData: (data: any) => ipcRenderer.invoke("planner:save", data),
-});
-
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld("ipcRenderer", {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args;
-    return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args));
+// Define specific API without exposing generic ipcRenderer
+contextBridge.exposeInMainWorld("electron", {
+  planner: {
+    loadData: () => ipcRenderer.invoke("planner:load"),
+    saveData: (data: any) => ipcRenderer.invoke("planner:save", data),
   },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.off(channel, ...omit);
+  yearCalendar: {
+    getMarks: () => ipcRenderer.invoke("year-calendar:get-marks"),
+    toggleMark: (date: string) => ipcRenderer.invoke("year-calendar:toggle-mark", date),
+    getHolidays: (year: number) => ipcRenderer.invoke("year-calendar:get-holidays", year),
   },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.send(channel, ...omit);
+  // Expose a way to listen for the main process message without exposing 'on'
+  onMainProcessMessage: (callback: (message: string) => void) => {
+    const listener = (_event: any, message: string) => callback(message);
+    ipcRenderer.on("main-process-message", listener);
+    return () => ipcRenderer.off("main-process-message", listener);
   },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.invoke(channel, ...omit);
-  },
-
-  // You can expose other APTs you need here.
-  // ...
 });

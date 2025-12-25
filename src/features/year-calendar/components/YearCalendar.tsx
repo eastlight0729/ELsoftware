@@ -37,8 +37,8 @@ export function YearCalendar() {
 
   useEffect(() => {
     // Load initial marks
-    if ((window as any).ipcRenderer) {
-      (window as any).ipcRenderer.invoke("year-calendar:get-marks").then((data: Record<string, boolean>) => {
+    if (window.electron?.yearCalendar) {
+      window.electron.yearCalendar.getMarks().then((data: Record<string, boolean>) => {
         setMarks(data);
       });
     }
@@ -46,8 +46,8 @@ export function YearCalendar() {
 
   useEffect(() => {
     // Load holidays for the current year
-    if ((window as any).ipcRenderer) {
-      (window as any).ipcRenderer.invoke("year-calendar:get-holidays", year).then((data: string[]) => {
+    if (window.electron?.yearCalendar) {
+      window.electron.yearCalendar.getHolidays(year).then((data: string[]) => {
         setHolidays(new Set(data));
       });
     }
@@ -88,9 +88,9 @@ export function YearCalendar() {
   };
 
   const toggleMark = async (dateStr: string) => {
-    if ((window as any).ipcRenderer) {
+    if (window.electron?.yearCalendar) {
       try {
-        const newMarks = await (window as any).ipcRenderer.invoke("year-calendar:toggle-mark", dateStr);
+        const newMarks = await window.electron.yearCalendar.toggleMark(dateStr);
         setMarks(newMarks);
       } catch (error) {
         console.error("Failed to toggle mark:", error);

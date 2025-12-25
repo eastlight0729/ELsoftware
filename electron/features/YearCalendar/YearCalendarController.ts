@@ -5,7 +5,9 @@ import Holidays from "date-holidays";
 
 const DATA_FILE = "year-calendar.json";
 
-export class YearCalendarController {
+import { IController } from "../../shared/types";
+
+export class YearCalendarController implements IController {
   private dataPath: string;
 
   constructor() {

@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { AppCategory } from "./types";
 import { SidebarItem } from "./SidebarItem";
 import { sidebarConfig, settingsConfig } from "./config";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 import { LogOut } from "lucide-react";
 
@@ -22,6 +24,16 @@ interface SidebarProps {
  * Displays navigation items defined in `config.tsx`.
  */
 export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, onLogout }: SidebarProps) {
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = () => {
+    onLogout();
+    setShowLogoutConfirm(false);
+  };
   return (
     <aside
       className={`
@@ -53,7 +65,7 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
             </span>
           </div>
           <button
-            onClick={onLogout}
+            onClick={handleLogoutClick}
             className="ml-auto p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer"
             title="Sign out"
           >
@@ -94,6 +106,16 @@ export function Sidebar({ isOpen, activeCategory, onSelectCategory, userEmail, o
 
       {/* Decorative background element */}
       <div className="absolute bottom-0 left-0 w-full h-32 bg-linear-to-t from-neutral-100/50 dark:from-neutral-800/50 to-transparent pointer-events-none" />
+
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleConfirmLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out of your account?"
+        confirmLabel="Sign Out"
+        variant="danger"
+      />
     </aside>
   );
 }

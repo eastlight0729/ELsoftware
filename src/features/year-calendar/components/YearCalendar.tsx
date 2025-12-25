@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ConfirmModal } from "./ConfirmModal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useYearCalendarMarks, useToggleYearCalendarMark, migrateLegacyMarks } from "../api/useYearCalendar";
 
 function cn(...inputs: ClassValue[]) {
@@ -283,6 +283,7 @@ export function YearCalendar() {
         onConfirm={handleConfirmRemove}
         title="Remove Mark"
         message="Are you sure you want to remove this mark from your schedule?"
+        confirmLabel="Remove"
       />
     </div>
   );

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppCategory } from "./components/sidebar/types";
 import { Sidebar } from "./components/sidebar/Sidebar";
+import { sidebarConfig } from "./components/sidebar/config";
 import { SidebarTrigger } from "./components/sidebar/SidebarTrigger";
 import { SidebarBackdrop } from "./components/sidebar/SidebarBackdrop";
 import { AppContent } from "./AppContent";
@@ -20,6 +21,44 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
   const { session, loading, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle Sidebar: Cmd + b
+      if ((e.metaKey || e.ctrlKey) && e.key === "b") {
+        e.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
+      }
+
+      // Menu Navigation: Cmd + Up/Down
+      if (e.metaKey || e.ctrlKey) {
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const currentIndex = sidebarConfig.findIndex((item) => item.id === activeCategory);
+
+          let nextIndex;
+          if (currentIndex === -1) {
+            // Currently in Settings or unknown
+            if (e.key === "ArrowUp") nextIndex = sidebarConfig.length - 1;
+            else nextIndex = 0;
+          } else {
+            if (e.key === "ArrowUp") {
+              // Wrap around to the last item if at the beginning
+              nextIndex = (currentIndex - 1 + sidebarConfig.length) % sidebarConfig.length;
+            } else {
+              // Wrap around to the first item if at the end
+              nextIndex = (currentIndex + 1) % sidebarConfig.length;
+            }
+          }
+
+          setActiveCategory(sidebarConfig[nextIndex].id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeCategory]);
 
   if (loading) {
     return (

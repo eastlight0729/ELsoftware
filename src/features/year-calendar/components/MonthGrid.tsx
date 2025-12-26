@@ -53,7 +53,7 @@ export const MonthGrid = memo(function MonthGrid({
         </span>
       </div>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative mr-2 min-w-0">
         {/* Range Backgrounds (Bottom Layer - Colors) */}
         <div className="absolute inset-0 grid grid-cols-37 gap-1 pointer-events-none z-0">
           {ranges.map((range) => {

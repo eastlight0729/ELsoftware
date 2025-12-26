@@ -156,12 +156,12 @@ export function YearCalendar() {
       {/* Calendar Grid Container */}
       <div className="flex-1 overflow-hidden flex flex-col border-y border-neutral-300 dark:border-neutral-700">
         {/* Scrollable Area */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="inline-block min-w-full">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
+          <div>
             {/* Grid Header (Weekdays) */}
             <div className="flex mb-4 gap-6">
               <div className="w-8 shrink-0" />
-              <div className="flex-1 grid grid-cols-37 gap-1">
+              <div className="flex-1 grid grid-cols-37 gap-1 mr-2 min-w-0">
                 {Array.from({ length: TOTAL_COLUMNS }).map((_, i) => {
                   const isWeekend = i % 7 === 5 || i % 7 === 6;
                   return (

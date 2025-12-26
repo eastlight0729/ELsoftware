@@ -3,11 +3,13 @@ import { cn } from "@/lib/utils";
 import { CalendarRange } from "../api/useYearCalendar";
 import { getDaysInMonth, getRangeSegmentsForMonth, getStartDayOfMonth, formatDate, TOTAL_COLUMNS } from "../utils";
 
+const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
 interface MonthGridProps {
   year: number;
   monthIndex: number;
   monthName: string;
-  holidays: Set<string>;
+  holidays: Record<string, string>;
   ranges: CalendarRange[];
   dragSelection: { start: string; end: string } | null;
   onMouseDown: (dateStr: string) => void;
@@ -98,7 +100,9 @@ export const MonthGrid = memo(function MonthGrid({
             const isToday = year === today.getFullYear() && monthIndex === today.getMonth() && day === today.getDate();
 
             const dateStr = formatDate(year, monthIndex, day);
-            const isHoliday = holidays.has(dateStr);
+            const holidayName = holidays[dateStr];
+            const isHoliday = !!holidayName;
+            const dayOfWeek = DAY_NAMES[cellIndex % 7];
 
             const isCoveredByRange = monthRanges.some((r) => dateStr >= r.start_date && dateStr <= r.end_date);
             const isCoveredByDrag = dragSelection && dateStr >= dragSelection.start && dateStr <= dragSelection.end;
@@ -110,19 +114,30 @@ export const MonthGrid = memo(function MonthGrid({
                 onMouseDown={() => onMouseDown(dateStr)}
                 onMouseEnter={() => onMouseEnter(dateStr)}
                 className={cn(
-                  "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer",
+                  "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer group/cell",
                   isCovered ? "bg-transparent" : isWeekend ? "bg-neutral-100 dark:bg-neutral-800/50" : "bg-transparent",
                   isWeekend || isHoliday
                     ? "text-red-500/80 dark:text-red-400/80"
                     : "text-neutral-700 dark:text-neutral-300",
-                  "hover:bg-green-500/20 hover:z-0"
+                  "hover:bg-green-500/20 hover:z-50"
                 )}
-                title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${isHoliday ? " (Holiday)" : ""}`}
               >
                 <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>{day}</span>
                 {isToday && (
                   <div className="absolute inset-0 border-2 border-indigo-600 dark:border-indigo-500 rounded-sm pointer-events-none" />
                 )}
+
+                {/* Custom Tooltip */}
+                <div
+                  className={cn(
+                    "absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-[10px] rounded-md shadow-sm whitespace-nowrap pointer-events-none opacity-0 group-hover/cell:opacity-100 transition-opacity duration-75 z-50",
+                    "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-900"
+                  )}
+                >
+                  {`${monthName} ${day}, ${dayOfWeek}${isToday ? " (Today)" : ""}${
+                    isHoliday ? ` (${holidayName})` : ""
+                  }`}
+                </div>
               </div>
             );
           })}

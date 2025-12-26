@@ -17,7 +17,7 @@ export function YearCalendar() {
   const upsertRangeMutation = useUpsertYearCalendarRange();
   const deleteRangeMutation = useDeleteYearCalendarRange();
 
-  const [holidays, setHolidays] = useState<Set<string>>(new Set());
+  const [holidays, setHolidays] = useState<Record<string, string>>({});
 
   // Selection / Dragging state
   const [isDragging, setIsDragging] = useState(false);
@@ -42,8 +42,8 @@ export function YearCalendar() {
 
   useEffect(() => {
     if (window.electron?.yearCalendar) {
-      window.electron.yearCalendar.getHolidays(year).then((data: string[]) => {
-        setHolidays(new Set(data));
+      window.electron.yearCalendar.getHolidays(year).then((data: Record<string, string>) => {
+        setHolidays(data);
       });
     }
   }, [year]);

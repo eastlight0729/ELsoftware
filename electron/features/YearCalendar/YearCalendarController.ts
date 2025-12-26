@@ -62,10 +62,16 @@ export class YearCalendarController implements IController {
     }
   }
 
-  private getHolidays(year: number): string[] {
+  private getHolidays(year: number): Record<string, string> {
     const hd = new Holidays("KR");
     const holidays = hd.getHolidays(year);
-    // Return array of YYYY-MM-DD strings
-    return holidays.map((h) => h.date.split(" ")[0]);
+
+    // Return map of YYYY-MM-DD -> Holiday Name
+    const holidayMap: Record<string, string> = {};
+    holidays.forEach((h) => {
+      const date = h.date.split(" ")[0];
+      holidayMap[date] = h.name;
+    });
+    return holidayMap;
   }
 }

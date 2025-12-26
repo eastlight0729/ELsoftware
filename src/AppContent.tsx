@@ -3,6 +3,7 @@ import { AppCategory } from "./components/sidebar/types";
 import { Memo } from "./features/memo";
 import { YearCalendar } from "./features/year-calendar";
 import { KanbanBoard } from "./features/task";
+import { InboxView } from "./features/inbox";
 
 interface AppContentProps {
   /** The currently active category to display. */
@@ -15,6 +16,8 @@ interface AppContentProps {
  */
 export function AppContent({ activeCategory }: AppContentProps) {
   switch (activeCategory) {
+    case "inbox":
+      return <InboxView />;
     case "memo":
       return <Memo />;
     case "year":

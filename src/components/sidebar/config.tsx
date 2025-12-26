@@ -1,4 +1,4 @@
-import { Calendar, Kanban, Settings, StickyNote } from "lucide-react";
+import { Calendar, Inbox, Kanban, Settings, StickyNote } from "lucide-react";
 import { AppCategory } from "./types";
 import { SIDEBAR_ICON_SIZE, SIDEBAR_ICON_STROKE_WIDTH } from "./constants";
 
@@ -18,6 +18,11 @@ export interface SidebarConfigItem {
  * The main navigation items displayed in the top section of the sidebar.
  */
 export const sidebarConfig: SidebarConfigItem[] = [
+  {
+    id: "inbox",
+    label: "Inbox",
+    icon: <Inbox size={SIDEBAR_ICON_SIZE} strokeWidth={SIDEBAR_ICON_STROKE_WIDTH} />,
+  },
   {
     id: "memo",
     label: "Memo",

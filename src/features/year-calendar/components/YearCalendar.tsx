@@ -327,7 +327,7 @@ export function YearCalendar() {
                                 isWeekend || isHoliday
                                   ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
                                   : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
-                                "hover:bg-indigo-500/20 hover:z-0"
+                                "hover:bg-green-500/20 hover:z-0"
                               )}
                               title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${
                                 isHoliday ? " (Holiday)" : ""
@@ -361,7 +361,7 @@ export function YearCalendar() {
                               key={range.id}
                               onClick={(e) => handleRangeClick(range, e)}
                               className={cn(
-                                "rounded-sm bg-indigo-500/80 dark:bg-indigo-500/60 shadow-md ring-1 ring-indigo-400 backdrop-blur-[1px] cursor-pointer hover:bg-indigo-500 hover:scale-[1.02] transition-all z-10 pointer-events-auto",
+                                "rounded-sm bg-green-500/50 dark:bg-green-500/40 cursor-pointer hover:bg-green-500/70 hover:scale-[1.02] transition-all z-10 pointer-events-auto",
                                 "flex items-center justify-center overflow-hidden"
                               )}
                               style={{
@@ -389,7 +389,7 @@ export function YearCalendar() {
                             if (!segments) return null;
                             return (
                               <div
-                                className="rounded-sm bg-indigo-400/50 ring-2 ring-indigo-500 z-20 pointer-events-none"
+                                className="rounded-sm bg-green-400/30 z-20 pointer-events-none"
                                 style={{
                                   gridColumnStart: segments.startCol,
                                   gridColumnEnd: `span ${segments.span}`,
@@ -409,7 +409,7 @@ export function YearCalendar() {
 
       <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded-sm bg-indigo-500/80 ring-1 ring-indigo-400" />
+          <div className="w-4 h-4 rounded-sm bg-green-500/50" />
           <span>Task Range</span>
         </div>
       </div>

@@ -71,9 +71,10 @@ export const MonthGrid = memo(function MonthGrid({
                 onMouseEnter={() => onMouseEnter(dateStr)}
                 className={cn(
                   "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer",
+                  isWeekend ? "bg-neutral-100 dark:bg-neutral-800/50" : "bg-neutral-200/50 dark:bg-neutral-700/30",
                   isWeekend || isHoliday
-                    ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
-                    : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
+                    ? "text-red-500/80 dark:text-red-400/80"
+                    : "text-neutral-700 dark:text-neutral-300",
                   "hover:bg-green-500/20 hover:z-0"
                 )}
                 title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${isHoliday ? " (Holiday)" : ""}`}

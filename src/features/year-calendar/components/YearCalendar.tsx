@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import {
   useYearCalendarRanges,
   useUpsertYearCalendarRange,
@@ -12,7 +12,8 @@ import { MONTHS, WEEKDAY_LABELS, TOTAL_COLUMNS, getDatesInRange } from "../utils
 import { cn } from "@/lib/utils";
 
 export function YearCalendar() {
-  const [year, setYear] = useState(new Date().getFullYear());
+  // Start date of the 12-month view. Always day 1 of a month.
+  const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1));
   const { data: ranges = [] } = useYearCalendarRanges();
   const upsertRangeMutation = useUpsertYearCalendarRange();
   const deleteRangeMutation = useDeleteYearCalendarRange();
@@ -40,13 +41,38 @@ export function YearCalendar() {
     return null;
   }, [isDragging, dragStart, dragCurrent]);
 
-  useEffect(() => {
-    if (window.electron?.yearCalendar) {
-      window.electron.yearCalendar.getHolidays(year).then((data: Record<string, string>) => {
-        setHolidays(data);
+  // Generate the 12 months to display
+  const monthsToRender = useMemo(() => {
+    const months: { year: number; monthIndex: number; name: string; key: string }[] = [];
+    const currentYear = startDate.getFullYear();
+    const currentMonth = startDate.getMonth();
+
+    for (let i = 0; i < 12; i++) {
+      // Create date for each month
+      // Note: Date(year, month + i, 1) handles year overflow automatically
+      const d = new Date(currentYear, currentMonth + i, 1);
+      months.push({
+        year: d.getFullYear(),
+        monthIndex: d.getMonth(), // 0-11
+        name: MONTHS[d.getMonth()],
+        key: `${d.getFullYear()}-${d.getMonth()}`,
       });
     }
-  }, [year]);
+    return months;
+  }, [startDate]);
+
+  // Fetch holidays for all years in view
+  useEffect(() => {
+    if (window.electron?.yearCalendar) {
+      const years = Array.from(new Set(monthsToRender.map((m) => m.year)));
+      Promise.all(years.map((y) => window.electron.yearCalendar.getHolidays(y))).then(
+        (results: Array<Record<string, string>>) => {
+          const merged = Object.assign({}, ...results);
+          setHolidays(merged);
+        }
+      );
+    }
+  }, [monthsToRender]); // Re-run when view changes
 
   const finishDrag = useCallback(() => {
     if (dragStart && dragCurrent) {
@@ -74,8 +100,11 @@ export function YearCalendar() {
     return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
   }, [isDragging, finishDrag]);
 
-  const handlePrevYear = () => setYear((y) => y - 1);
-  const handleNextYear = () => setYear((y) => y + 1);
+  const handlePrevYear = () => setStartDate((d) => new Date(d.getFullYear() - 1, d.getMonth(), 1));
+  const handleNextYear = () => setStartDate((d) => new Date(d.getFullYear() + 1, d.getMonth(), 1));
+
+  const handlePrevMonth = () => setStartDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  const handleNextMonth = () => setStartDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
 
   // Drag Handlers
   const handleMouseDown = useCallback((dateStr: string) => {
@@ -130,24 +159,43 @@ export function YearCalendar() {
     setIsModalOpen(true);
   }, []);
 
+  const years = Array.from(new Set(monthsToRender.map((m) => m.year)));
+  const yearDisplay = years.length > 1 ? `${years[0]} - ${years[1]}` : `${years[0]}`;
+
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
       {/* Header */}
       <div className="flex items-center justify-end px-2">
         <div className="flex items-center gap-4 bg-white dark:bg-neutral-800 rounded-full p-1 pl-4 pr-1 shadow-sm border border-neutral-200 dark:border-neutral-700">
-          <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200">{year}</span>
+          <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200">{yearDisplay}</span>
           <div className="flex gap-1">
             <button
               onClick={handlePrevYear}
               className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
+              title="Previous Year"
+            >
+              <ChevronsLeft size={18} />
+            </button>
+            <button
+              onClick={handlePrevMonth}
+              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
+              title="Previous Month"
             >
               <ChevronLeft size={18} />
             </button>
             <button
-              onClick={handleNextYear}
+              onClick={handleNextMonth}
               className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
+              title="Next Month"
             >
               <ChevronRight size={18} />
+            </button>
+            <button
+              onClick={handleNextYear}
+              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
+              title="Next Year"
+            >
+              <ChevronsRight size={18} />
             </button>
           </div>
         </div>
@@ -182,12 +230,12 @@ export function YearCalendar() {
 
             {/* Months Rows */}
             <div className="flex flex-col gap-3">
-              {MONTHS.map((monthName, monthIndex) => (
+              {monthsToRender.map((month) => (
                 <MonthGrid
-                  key={monthName}
-                  monthName={monthName}
-                  monthIndex={monthIndex}
-                  year={year}
+                  key={month.key}
+                  monthName={month.name}
+                  monthIndex={month.monthIndex}
+                  year={month.year}
                   holidays={holidays}
                   ranges={ranges}
                   dragSelection={dragSelection}

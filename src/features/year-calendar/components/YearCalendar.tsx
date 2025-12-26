@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUp, ChevronsDown } from "lucide-react";
 import {
   useYearCalendarRanges,
   useUpsertYearCalendarRange,
@@ -164,51 +164,41 @@ export function YearCalendar() {
 
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
-      {/* Header */}
-      <div className="flex items-center justify-end px-2">
-        <div className="flex items-center gap-4 bg-white dark:bg-neutral-800 rounded-full p-1 pl-4 pr-1 shadow-sm border border-neutral-200 dark:border-neutral-700">
+      {/* Header Area */}
+      <div className="grid grid-cols-[32px_1fr] gap-6 px-6 pb-2 border-b border-neutral-300 dark:border-neutral-700">
+        {/* Top Left: Up Buttons */}
+        <div className="flex flex-col items-center gap-1">
+          <button
+            onClick={handlePrevYear}
+            className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+            title="Previous Year"
+          >
+            <ChevronsUp size={16} />
+          </button>
+          <button
+            onClick={handlePrevMonth}
+            className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+            title="Previous Month"
+          >
+            <ChevronUp size={16} />
+          </button>
+        </div>
+
+        {/* Top Center: Year Text */}
+        <div className="flex items-end justify-center pb-1">
           <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200">{yearDisplay}</span>
-          <div className="flex gap-1">
-            <button
-              onClick={handlePrevYear}
-              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
-              title="Previous Year"
-            >
-              <ChevronsLeft size={18} />
-            </button>
-            <button
-              onClick={handlePrevMonth}
-              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
-              title="Previous Month"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              onClick={handleNextMonth}
-              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
-              title="Next Month"
-            >
-              <ChevronRight size={18} />
-            </button>
-            <button
-              onClick={handleNextYear}
-              className="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-neutral-600 dark:text-neutral-400"
-              title="Next Year"
-            >
-              <ChevronsRight size={18} />
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Calendar Grid Container */}
-      <div className="flex-1 overflow-hidden flex flex-col border-y border-neutral-300 dark:border-neutral-700">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {/* Scrollable Area */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 pt-2">
           <div>
             {/* Grid Header (Weekdays) */}
-            <div className="flex mb-4 gap-6">
-              <div className="w-8 shrink-0" />
+            {/* We need to align this with the grid below, keeping the left spacer for the month numbers/buttons */}
+            <div className="flex mb-2 gap-6">
+              <div className="w-8 shrink-0" /> {/* Spacer for Month Numbers column */}
               <div className="flex-1 grid grid-cols-37 gap-1 mr-2 min-w-0">
                 {Array.from({ length: TOTAL_COLUMNS }).map((_, i) => {
                   const isWeekend = i % 7 === 5 || i % 7 === 6;
@@ -216,7 +206,7 @@ export function YearCalendar() {
                     <div key={i} className="text-center">
                       <span
                         className={cn(
-                          "text-xs font-bold",
+                          "text-[10px] font-bold",
                           isWeekend ? "text-red-400 dark:text-red-400/80" : "text-neutral-400 dark:text-neutral-500"
                         )}
                       >
@@ -245,6 +235,27 @@ export function YearCalendar() {
                 />
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Footer Area (Down Buttons) */}
+        {/* Aligned with the left column */}
+        <div className="px-6 pt-2 pb-4 border-t border-neutral-300 dark:border-neutral-700">
+          <div className="flex flex-col items-center w-8 gap-1">
+            <button
+              onClick={handleNextMonth}
+              className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+              title="Next Month"
+            >
+              <ChevronDown size={16} />
+            </button>
+            <button
+              onClick={handleNextYear}
+              className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+              title="Next Year"
+            >
+              <ChevronsDown size={16} />
+            </button>
           </div>
         </div>
       </div>

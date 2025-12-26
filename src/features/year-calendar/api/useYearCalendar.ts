@@ -53,9 +53,15 @@ export function useUpsertYearCalendarRange() {
         user_id: profile.user_int_id,
         start_date: startDate,
         end_date: endDate,
-        task: task ?? null, // Handle optional string
+        task: task ? task.slice(0, 500) : null, // Limit task length to 500 chars
         color: color || "indigo",
       };
+
+      // Validate Date Format YYYY-MM-DD
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        throw new Error("Invalid date format");
+      }
 
       if (id) {
         const { data, error } = await supabase

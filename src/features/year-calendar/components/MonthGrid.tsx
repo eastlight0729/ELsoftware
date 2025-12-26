@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 import { CalendarRange } from "../api/useYearCalendar";
 import { getDaysInMonth, getRangeSegmentsForMonth, getStartDayOfMonth, formatDate, TOTAL_COLUMNS } from "../utils";
@@ -14,7 +15,7 @@ interface MonthGridProps {
   onRangeClick: (range: CalendarRange, e: React.MouseEvent) => void;
 }
 
-export function MonthGrid({
+export const MonthGrid = memo(function MonthGrid({
   year,
   monthIndex,
   monthName,
@@ -135,4 +136,4 @@ export function MonthGrid({
       </div>
     </div>
   );
-}
+});

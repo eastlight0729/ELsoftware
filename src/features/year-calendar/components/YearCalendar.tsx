@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useYearCalendarRanges,
@@ -48,33 +48,7 @@ export function YearCalendar() {
     }
   }, [year]);
 
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      if (isDragging) {
-        finishDrag();
-      }
-    };
-    window.addEventListener("mouseup", handleGlobalMouseUp);
-    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
-  }, [isDragging, dragStart, dragCurrent]);
-
-  const handlePrevYear = () => setYear((y) => y - 1);
-  const handleNextYear = () => setYear((y) => y + 1);
-
-  // Drag Handlers
-  const handleMouseDown = (dateStr: string) => {
-    setIsDragging(true);
-    setDragStart(dateStr);
-    setDragCurrent(dateStr);
-  };
-
-  const handleMouseEnter = (dateStr: string) => {
-    if (isDragging) {
-      setDragCurrent(dateStr);
-    }
-  };
-
-  const finishDrag = () => {
+  const finishDrag = useCallback(() => {
     if (dragStart && dragCurrent) {
       // Prepare to open modal provided valid range
       const start = new Date(dragStart);
@@ -88,7 +62,36 @@ export function YearCalendar() {
     setIsDragging(false);
     setDragStart(null);
     setDragCurrent(null);
-  };
+  }, [dragStart, dragCurrent]);
+
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        finishDrag();
+      }
+    };
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
+  }, [isDragging, finishDrag]);
+
+  const handlePrevYear = () => setYear((y) => y - 1);
+  const handleNextYear = () => setYear((y) => y + 1);
+
+  // Drag Handlers
+  const handleMouseDown = useCallback((dateStr: string) => {
+    setIsDragging(true);
+    setDragStart(dateStr);
+    setDragCurrent(dateStr);
+  }, []);
+
+  const handleMouseEnter = useCallback(
+    (dateStr: string) => {
+      if (isDragging) {
+        setDragCurrent(dateStr);
+      }
+    },
+    [isDragging]
+  );
 
   const handleSaveTask = (task: string) => {
     if (selectedRange) {
@@ -116,7 +119,7 @@ export function YearCalendar() {
     setSelectedRange(null);
   };
 
-  const handleRangeClick = (range: CalendarRange, e: React.MouseEvent) => {
+  const handleRangeClick = useCallback((range: CalendarRange, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedRange({
       start: range.start_date,
@@ -125,7 +128,7 @@ export function YearCalendar() {
       task: range.task || "", // Handle null task
     });
     setIsModalOpen(true);
-  };
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">

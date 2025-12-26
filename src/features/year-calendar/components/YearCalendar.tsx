@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { useYearCalendarMarks, useToggleYearCalendarMark, migrateLegacyMarks } from "../api/useYearCalendar";
+import {
+  useYearCalendarMarks,
+  useSaveYearCalendarTask,
+  useDeleteYearCalendarMark,
+  migrateLegacyMarks,
+} from "../api/useYearCalendar";
+import { TaskModal } from "./TaskModal";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,10 +36,12 @@ const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
   const { data: marks = {} } = useYearCalendarMarks();
-  const toggleMutation = useToggleYearCalendarMark();
+  const saveTaskMutation = useSaveYearCalendarTask();
+  const deleteTaskMutation = useDeleteYearCalendarMark();
+
   const [holidays, setHolidays] = useState<Set<string>>(new Set());
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [pendingDateToRemove, setPendingDateToRemove] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
   const today = new Date();
 
   useEffect(() => {
@@ -85,27 +92,22 @@ export function YearCalendar() {
   const handlePrevYear = () => setYear((y) => y - 1);
   const handleNextYear = () => setYear((y) => y + 1);
 
-  const handleDayClick = async (monthIndex: number, day: number) => {
+  const handleDayClick = (monthIndex: number, day: number) => {
     const dateStr = formatDate(year, monthIndex, day);
-    const isMarked = marks[dateStr];
+    setSelectedDate(dateStr);
+  };
 
-    if (isMarked) {
-      // Ask for confirmation before removing
-      setPendingDateToRemove(dateStr);
-      setConfirmModalOpen(true);
-    } else {
-      // Add mark immediately
-      toggleMark(dateStr);
+  const handleSaveTask = (task: string) => {
+    if (selectedDate) {
+      saveTaskMutation.mutate({ date: selectedDate, task });
+      setSelectedDate(null);
     }
   };
 
-  const toggleMark = async (dateStr: string) => {
-    toggleMutation.mutate(dateStr);
-  };
-
-  const handleConfirmRemove = () => {
-    if (pendingDateToRemove) {
-      toggleMark(pendingDateToRemove);
+  const handleRemoveTask = () => {
+    if (selectedDate) {
+      deleteTaskMutation.mutate(selectedDate);
+      setSelectedDate(null);
     }
   };
 
@@ -172,8 +174,6 @@ export function YearCalendar() {
                 const startDay = getStartDayOfMonth(monthIndex, year);
 
                 // Create an array representing the cells for this row
-                // 1. Empty cells for offset
-                // 2. Day numbers
                 const cells = [
                   ...Array.from({ length: startDay }, () => null),
                   ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
@@ -190,9 +190,7 @@ export function YearCalendar() {
 
                     {/* Days Grid */}
                     <div className="flex-1 grid grid-cols-37 gap-1">
-                      {/* Render valid cells (blanks + days) */}
                       {cells.map((day, cellIndex) => {
-                        // Global column index determines weekday
                         const isWeekend = cellIndex % 7 === 5 || cellIndex % 7 === 6;
 
                         if (day === null) {
@@ -203,7 +201,8 @@ export function YearCalendar() {
                           year === today.getFullYear() && monthIndex === today.getMonth() && day === today.getDate();
 
                         const dateStr = formatDate(year, monthIndex, day);
-                        const isMarked = marks[dateStr];
+                        const mark = marks[dateStr];
+                        const isMarked = !!mark;
                         const isHoliday = holidays.has(dateStr);
 
                         return (
@@ -226,7 +225,7 @@ export function YearCalendar() {
                             )}
                             title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${
                               isHoliday ? " (Holiday)" : ""
-                            }`}
+                            }${isMarked ? ` - ${mark.task}` : ""}`}
                           >
                             <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>
                               {day}
@@ -238,7 +237,7 @@ export function YearCalendar() {
                         );
                       })}
 
-                      {/* Render remaining empty cells to maintain grid structure (optional but helps with hover effects sometimes) */}
+                      {/* Render remaining empty cells */}
                       {Array.from({ length: TOTAL_COLUMNS - cells.length }).map((_, i) => (
                         <div
                           key={`scratch-${i}`}
@@ -277,14 +276,16 @@ export function YearCalendar() {
         </div>
       </div>
 
-      <ConfirmModal
-        isOpen={confirmModalOpen}
-        onClose={() => setConfirmModalOpen(false)}
-        onConfirm={handleConfirmRemove}
-        title="Remove Mark"
-        message="Are you sure you want to remove this mark from your schedule?"
-        confirmLabel="Remove"
-      />
+      {selectedDate && (
+        <TaskModal
+          isOpen={!!selectedDate}
+          date={selectedDate}
+          initialTask={marks[selectedDate]?.task || null}
+          onSave={handleSaveTask}
+          onRemove={handleRemoveTask}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
     </div>
   );
 }

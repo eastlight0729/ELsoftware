@@ -1,13 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../lib/supabase";
+import { Tables } from "../../../lib/database.types";
 
-export interface CalendarRange {
-  id: string;
-  start_date: string;
-  end_date: string;
-  task: string;
-  color: string;
-}
+export type CalendarRange = Tables<"year_calendar_ranges">;
 
 export const calendarKeys = {
   all: ["year-calendar"] as const,
@@ -24,7 +19,7 @@ export function useYearCalendarRanges() {
         .order("start_date", { ascending: true });
 
       if (error) throw error;
-      return data as CalendarRange[];
+      return data;
     },
   });
 }
@@ -43,20 +38,21 @@ export function useUpsertYearCalendarRange() {
       id?: string;
       startDate: string;
       endDate: string;
-      task: string;
+      task?: string;
       color?: string;
     }) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error("Not authenticated");
 
       const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
+
       if (!profile || !profile.user_int_id) throw new Error("User profile not found");
 
       const payload = {
         user_id: profile.user_int_id,
         start_date: startDate,
         end_date: endDate,
-        task,
+        task: task ?? null, // Handle optional string
         color: color || "indigo",
       };
 
@@ -68,11 +64,11 @@ export function useUpsertYearCalendarRange() {
           .select()
           .single();
         if (error) throw error;
-        return data as CalendarRange;
+        return data;
       } else {
         const { data, error } = await supabase.from("year_calendar_ranges").insert(payload).select().single();
         if (error) throw error;
-        return data as CalendarRange;
+        return data;
       }
     },
     onMutate: async (newRange) => {
@@ -84,21 +80,24 @@ export function useUpsertYearCalendarRange() {
         if (newRange.id) {
           const index = list.findIndex((r) => r.id === newRange.id);
           if (index !== -1) {
+            // Optimistically update existing
             list[index] = {
               ...list[index],
               start_date: newRange.startDate,
               end_date: newRange.endDate,
-              task: newRange.task,
+              task: newRange.task ?? null,
               color: newRange.color || list[index].color,
             };
           }
         } else {
-          // Optimistic ID? Might be tricky for delete, but okay for display
+          // Optimistically add new
           list.push({
             id: "temp-" + Date.now(),
+            created_at: new Date().toISOString(),
+            user_id: 0, // temporary
             start_date: newRange.startDate,
             end_date: newRange.endDate,
-            task: newRange.task,
+            task: newRange.task ?? null,
             color: newRange.color || "indigo",
           });
         }

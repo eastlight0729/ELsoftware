@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { ChevronUp, ChevronDown, ChevronsUp, ChevronsDown } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUp, ChevronsDown, RotateCcw } from "lucide-react";
 import {
   useYearCalendarRanges,
   useUpsertYearCalendarRange,
@@ -123,6 +123,12 @@ export function YearCalendar() {
   const handlePrevMonth = () => setStartDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
   const handleNextMonth = () => setStartDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
 
+  const handleGoToToday = useCallback(() => {
+    const today = new Date();
+    // Set start date to 5 months before current month so current month appears at index 5 (6th position)
+    setStartDate(new Date(today.getFullYear(), today.getMonth() - 5, 1));
+  }, []);
+
   // Drag Handlers
   const handleMouseDown = useCallback((dateStr: string) => {
     setIsDragging(true);
@@ -176,6 +182,13 @@ export function YearCalendar() {
     setIsModalOpen(true);
   }, []);
 
+  const isTodayVisible = useMemo(() => {
+    const today = new Date();
+    const tYear = today.getFullYear();
+    const tMonth = today.getMonth();
+    return monthsToRender.some((m) => m.year === tYear && m.monthIndex === tMonth);
+  }, [monthsToRender]);
+
   const years = Array.from(new Set(monthsToRender.map((m) => m.year)));
   const yearDisplay = years.length > 1 ? `${years[0]} - ${years[1]}` : `${years[0]}`;
 
@@ -201,9 +214,20 @@ export function YearCalendar() {
           </button>
         </div>
 
-        {/* Top Center: Year Text */}
-        <div className="flex items-end justify-center pb-1">
-          <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200">{yearDisplay}</span>
+        {/* Top Center: Year Text & Reset Button */}
+        <div className="flex items-center justify-center pb-1 gap-4">
+          <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200 leading-none">
+            {yearDisplay}
+          </span>
+          {!isTodayVisible && (
+            <button
+              onClick={handleGoToToday}
+              className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+              title="Go to Today"
+            >
+              <RotateCcw size={16} />
+            </button>
+          )}
         </div>
       </div>
 

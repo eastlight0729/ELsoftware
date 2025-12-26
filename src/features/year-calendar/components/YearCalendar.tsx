@@ -158,7 +158,7 @@ export function YearCalendar() {
       </div>
 
       {/* Calendar Grid Container */}
-      <div className="flex-1 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-xl overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-hidden flex flex-col border-y border-neutral-300 dark:border-neutral-700">
         {/* Scrollable Area */}
         <div className="flex-1 overflow-auto p-6">
           <div className="inline-block min-w-full">

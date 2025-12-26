@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MONTHS } from "../utils";
 import { useYearCalendarRanges, useUpsertYearCalendarRange, useDeleteYearCalendarRange } from "../api/useYearCalendar";
+import { useYearCalendarHolidays } from "./useYearCalendarHolidays";
 
 export function useYearCalendarState() {
   // 1. Date State & Persistence
@@ -67,19 +68,8 @@ export function useYearCalendarState() {
   const upsertRangeMutation = useUpsertYearCalendarRange();
   const deleteRangeMutation = useDeleteYearCalendarRange();
 
-  const [holidays, setHolidays] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (window.electron?.yearCalendar) {
-      const yearsToFetch = Array.from(new Set(monthsToRender.map((m) => m.year)));
-      Promise.all(yearsToFetch.map((y) => window.electron.yearCalendar.getHolidays(y))).then(
-        (results: Array<Record<string, string>>) => {
-          const merged = Object.assign({}, ...results);
-          setHolidays(merged);
-        }
-      );
-    }
-  }, [monthsToRender]);
+  // Use the new holiday caching hook
+  const holidays = useYearCalendarHolidays(years);
 
   return {
     startDate,

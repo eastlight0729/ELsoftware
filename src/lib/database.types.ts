@@ -172,6 +172,44 @@ export type Database = {
           }
         ];
       };
+      year_calendar_ranges: {
+        Row: {
+          color: string | null;
+          created_at: string | null;
+          end_date: string;
+          id: string;
+          start_date: string;
+          task: string | null;
+          user_id: number;
+        };
+        Insert: {
+          color?: string | null;
+          created_at?: string | null;
+          end_date: string;
+          id?: string;
+          start_date: string;
+          task?: string | null;
+          user_id: number;
+        };
+        Update: {
+          color?: string | null;
+          created_at?: string | null;
+          end_date?: string;
+          id?: string;
+          start_date?: string;
+          task?: string | null;
+          user_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "year_calendar_ranges_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["user_int_id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

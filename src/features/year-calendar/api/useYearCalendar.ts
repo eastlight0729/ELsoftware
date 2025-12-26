@@ -1,165 +1,149 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../lib/supabase";
 
-export interface CalendarMark {
-  task: string | null;
+export interface CalendarRange {
+  id: string;
+  start_date: string;
+  end_date: string;
+  task: string;
+  color: string;
 }
-
-export type CalendarMarks = Record<string, CalendarMark>;
 
 export const calendarKeys = {
   all: ["year-calendar"] as const,
-  marks: () => [...calendarKeys.all, "marks"] as const,
+  ranges: () => [...calendarKeys.all, "ranges"] as const,
 };
 
-export function useYearCalendarMarks() {
+export function useYearCalendarRanges() {
   return useQuery({
-    queryKey: calendarKeys.marks(),
+    queryKey: calendarKeys.ranges(),
     queryFn: async () => {
-      const { data, error } = await supabase.from("year_calendar_marks").select("date, task");
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from("year_calendar_ranges")
+        .select("*")
+        .order("start_date", { ascending: true });
 
-      const marks: CalendarMarks = {};
-      data?.forEach((row) => {
-        marks[row.date] = { task: row.task };
-      });
-      return marks;
+      if (error) throw error;
+      return data as CalendarRange[];
     },
   });
 }
 
-export function useSaveYearCalendarTasks() {
+export function useUpsertYearCalendarRange() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ dates, task }: { dates: string[]; task: string }) => {
+    mutationFn: async ({
+      id,
+      startDate,
+      endDate,
+      task,
+      color,
+    }: {
+      id?: string;
+      startDate: string;
+      endDate: string;
+      task: string;
+      color?: string;
+    }) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error("Not authenticated");
 
       const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
       if (!profile || !profile.user_int_id) throw new Error("User profile not found");
 
-      // 1. Delete existing for these dates to avoid conflicts or duplicates
-      // (This serves as a crude upsert strategy without relying on unique key constraints)
-      const { error: deleteError } = await supabase
-        .from("year_calendar_marks")
-        .delete()
-        .eq("user_id", profile.user_int_id)
-        .in("date", dates);
-
-      if (deleteError) throw deleteError;
-
-      // 2. Insert new
-      const toInsert = dates.map((date) => ({
-        date,
+      const payload = {
+        user_id: profile.user_int_id,
+        start_date: startDate,
+        end_date: endDate,
         task,
-        user_id: profile.user_int_id!,
-      }));
+        color: color || "indigo",
+      };
 
-      if (toInsert.length > 0) {
-        const { error: insertError } = await supabase.from("year_calendar_marks").insert(toInsert);
-        if (insertError) throw insertError;
+      if (id) {
+        const { data, error } = await supabase
+          .from("year_calendar_ranges")
+          .update(payload)
+          .eq("id", id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data as CalendarRange;
+      } else {
+        const { data, error } = await supabase.from("year_calendar_ranges").insert(payload).select().single();
+        if (error) throw error;
+        return data as CalendarRange;
       }
-
-      return { dates, task };
     },
-    onMutate: async ({ dates, task }) => {
-      await queryClient.cancelQueries({ queryKey: calendarKeys.marks() });
-      const previousMarks = queryClient.getQueryData<CalendarMarks>(calendarKeys.marks());
+    onMutate: async (newRange) => {
+      await queryClient.cancelQueries({ queryKey: calendarKeys.ranges() });
+      const previousRanges = queryClient.getQueryData<CalendarRange[]>(calendarKeys.ranges());
 
-      queryClient.setQueryData<CalendarMarks>(calendarKeys.marks(), (old) => {
-        const newMarks = { ...(old || {}) };
-        dates.forEach((date) => {
-          newMarks[date] = { task };
-        });
-        return newMarks;
+      queryClient.setQueryData<CalendarRange[]>(calendarKeys.ranges(), (old) => {
+        const list = old ? [...old] : [];
+        if (newRange.id) {
+          const index = list.findIndex((r) => r.id === newRange.id);
+          if (index !== -1) {
+            list[index] = {
+              ...list[index],
+              start_date: newRange.startDate,
+              end_date: newRange.endDate,
+              task: newRange.task,
+              color: newRange.color || list[index].color,
+            };
+          }
+        } else {
+          // Optimistic ID? Might be tricky for delete, but okay for display
+          list.push({
+            id: "temp-" + Date.now(),
+            start_date: newRange.startDate,
+            end_date: newRange.endDate,
+            task: newRange.task,
+            color: newRange.color || "indigo",
+          });
+        }
+        return list;
       });
 
-      return { previousMarks };
+      return { previousRanges };
     },
-    onError: (_err, _variables, context) => {
-      if (context?.previousMarks) {
-        queryClient.setQueryData(calendarKeys.marks(), context.previousMarks);
+    onError: (_err, _vars, context) => {
+      if (context?.previousRanges) {
+        queryClient.setQueryData(calendarKeys.ranges(), context.previousRanges);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: calendarKeys.marks() });
+      queryClient.invalidateQueries({ queryKey: calendarKeys.ranges() });
     },
   });
 }
 
-export function useDeleteYearCalendarMarks() {
+export function useDeleteYearCalendarRange() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (dates: string[]) => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
-      if (!profile || !profile.user_int_id) throw new Error("Profile not found");
-
-      const { error } = await supabase
-        .from("year_calendar_marks")
-        .delete()
-        .eq("user_id", profile.user_int_id)
-        .in("date", dates);
-
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("year_calendar_ranges").delete().eq("id", id);
       if (error) throw error;
-      return dates;
+      return id;
     },
-    onMutate: async (dates) => {
-      await queryClient.cancelQueries({ queryKey: calendarKeys.marks() });
-      const previousMarks = queryClient.getQueryData<CalendarMarks>(calendarKeys.marks());
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: calendarKeys.ranges() });
+      const previousRanges = queryClient.getQueryData<CalendarRange[]>(calendarKeys.ranges());
 
-      queryClient.setQueryData<CalendarMarks>(calendarKeys.marks(), (old) => {
-        const newMarks = { ...(old || {}) };
-        dates.forEach((date) => {
-          delete newMarks[date];
-        });
-        return newMarks;
+      queryClient.setQueryData<CalendarRange[]>(calendarKeys.ranges(), (old) => {
+        return old?.filter((r) => r.id !== id) || [];
       });
 
-      return { previousMarks };
+      return { previousRanges };
     },
-    onError: (_err, _date, context) => {
-      if (context?.previousMarks) {
-        queryClient.setQueryData(calendarKeys.marks(), context.previousMarks);
+    onError: (_err, _id, context) => {
+      if (context?.previousRanges) {
+        queryClient.setQueryData(calendarKeys.ranges(), context.previousRanges);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: calendarKeys.marks() });
+      queryClient.invalidateQueries({ queryKey: calendarKeys.ranges() });
     },
   });
-}
-
-export async function migrateLegacyMarks(legacyMarks: Record<string, boolean>) {
-  const { data: user } = await supabase.auth.getUser();
-  if (!user.user) return;
-
-  const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
-
-  if (!profile || !profile.user_int_id) return;
-
-  const dates = Object.keys(legacyMarks);
-  if (dates.length === 0) return;
-
-  const { data: currentMarks } = await supabase.from("year_calendar_marks").select("date");
-
-  const existingDates = new Set(currentMarks?.map((m) => m.date) || []);
-  const toInsert = dates
-    .filter((d) => !existingDates.has(d))
-    .map((date) => ({
-      date,
-      task: "", // Default empty task for migration
-      user_id: profile.user_int_id,
-    }));
-
-  if (toInsert.length > 0) {
-    const { error } = await supabase.from("year_calendar_marks").insert(toInsert);
-    if (error) {
-      console.error("Migration partial failure", error);
-      throw error;
-    }
-  }
 }

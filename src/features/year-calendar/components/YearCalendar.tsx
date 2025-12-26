@@ -3,10 +3,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
-  useYearCalendarMarks,
-  useSaveYearCalendarTasks,
-  useDeleteYearCalendarMarks,
-  migrateLegacyMarks,
+  useYearCalendarRanges,
+  useUpsertYearCalendarRange,
+  useDeleteYearCalendarRange,
+  CalendarRange,
 } from "../api/useYearCalendar";
 import { TaskModal } from "./TaskModal";
 
@@ -34,9 +34,9 @@ const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
-  const { data: marks = {} } = useYearCalendarMarks();
-  const saveTasksMutation = useSaveYearCalendarTasks();
-  const deleteTasksMutation = useDeleteYearCalendarMarks();
+  const { data: ranges = [] } = useYearCalendarRanges();
+  const upsertRangeMutation = useUpsertYearCalendarRange();
+  const deleteRangeMutation = useDeleteYearCalendarRange();
 
   const [holidays, setHolidays] = useState<Set<string>>(new Set());
 
@@ -44,29 +44,24 @@ export function YearCalendar() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const [dragCurrent, setDragCurrent] = useState<string | null>(null);
-  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+
+  // Selected Range for Modal
+  const [selectedRange, setSelectedRange] = useState<{ start: string; end: string; id?: string; task?: string } | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const today = new Date();
+  // Determine current effective drag selection for highlighting temporary overlay
+  const dragSelection = useMemo(() => {
+    if (isDragging && dragStart && dragCurrent) {
+      const start = new Date(dragStart);
+      const end = new Date(dragCurrent);
+      return start < end ? { start: dragStart, end: dragCurrent } : { start: dragCurrent, end: dragStart };
+    }
+    return null;
+  }, [isDragging, dragStart, dragCurrent]);
 
-  useEffect(() => {
-    const migrate = async () => {
-      if (window.electron?.yearCalendar) {
-        try {
-          const legacyMarks = await window.electron.yearCalendar.getMarks();
-          if (Object.keys(legacyMarks).length > 0) {
-            console.log("Migrating legacy marks...");
-            await migrateLegacyMarks(legacyMarks);
-            await window.electron.yearCalendar.clearMarks();
-            console.log("Migration complete.");
-          }
-        } catch (e) {
-          console.error("Migration failed:", e);
-        }
-      }
-    };
-    migrate();
-  }, []);
+  const today = new Date();
 
   useEffect(() => {
     if (window.electron?.yearCalendar) {
@@ -76,7 +71,6 @@ export function YearCalendar() {
     }
   }, [year]);
 
-  // Global mouse up to end drag if user releases outside
   useEffect(() => {
     const handleGlobalMouseUp = () => {
       if (isDragging) {
@@ -112,7 +106,6 @@ export function YearCalendar() {
     const current = new Date(min);
 
     while (current <= max) {
-      // Format manually to avoid timezone issues or use exact YYYY-MM-DD
       const y = current.getFullYear();
       const m = current.getMonth();
       const d = current.getDate();
@@ -128,6 +121,7 @@ export function YearCalendar() {
 
   // Drag Handlers
   const handleMouseDown = (dateStr: string) => {
+    // Only start drag if we aren't clicking an existing range (handled by stopPropagation on range overlay)
     setIsDragging(true);
     setDragStart(dateStr);
     setDragCurrent(dateStr);
@@ -141,8 +135,13 @@ export function YearCalendar() {
 
   const finishDrag = () => {
     if (dragStart && dragCurrent) {
-      const range = getDatesInRange(dragStart, dragCurrent);
-      setSelectedDates(range);
+      // Prepare to open modal provided valid range
+      const start = new Date(dragStart);
+      const end = new Date(dragCurrent);
+      const s = start < end ? dragStart : dragCurrent;
+      const e = start < end ? dragCurrent : dragStart;
+
+      setSelectedRange({ start: s, end: e });
       setIsModalOpen(true);
     }
     setIsDragging(false);
@@ -151,33 +150,77 @@ export function YearCalendar() {
   };
 
   const handleSaveTask = (task: string) => {
-    if (selectedDates.length > 0) {
-      saveTasksMutation.mutate({ dates: selectedDates, task });
+    if (selectedRange) {
+      upsertRangeMutation.mutate({
+        id: selectedRange.id,
+        startDate: selectedRange.start,
+        endDate: selectedRange.end,
+        task,
+      });
       setIsModalOpen(false);
-      setSelectedDates([]);
+      setSelectedRange(null);
     }
   };
 
   const handleRemoveTask = () => {
-    if (selectedDates.length > 0) {
-      deleteTasksMutation.mutate(selectedDates);
+    if (selectedRange?.id) {
+      deleteRangeMutation.mutate(selectedRange.id);
       setIsModalOpen(false);
-      setSelectedDates([]);
+      setSelectedRange(null);
     }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedDates([]);
+    setSelectedRange(null);
   };
 
-  // Determine current effective selection for highlighting
-  const currentSelection = useMemo(() => {
-    if (isDragging && dragStart && dragCurrent) {
-      return new Set(getDatesInRange(dragStart, dragCurrent));
-    }
-    return new Set<string>();
-  }, [isDragging, dragStart, dragCurrent]);
+  const handleRangeClick = (range: CalendarRange, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedRange({
+      start: range.start_date,
+      end: range.end_date,
+      id: range.id,
+      task: range.task,
+    });
+    setIsModalOpen(true);
+  };
+
+  // Helper to calculate segments for overlays
+  const getRangeSegmentsForMonth = (
+    startStr: string,
+    endStr: string,
+    monthIndex: number,
+    year: number
+  ): { startCol: number; span: number } | null => {
+    const rangeStart = new Date(startStr);
+    const rangeEnd = new Date(endStr);
+
+    // Month boundaries
+    const monthStart = new Date(year, monthIndex, 1);
+    const monthEnd = new Date(year, monthIndex + 1, 0);
+
+    // Check intersection
+    if (rangeEnd < monthStart || rangeStart > monthEnd) return null;
+
+    // Calculate effective start/end within this month
+    const effectiveStart = rangeStart < monthStart ? monthStart : rangeStart;
+    const effectiveEnd = rangeEnd > monthEnd ? monthEnd : rangeEnd;
+
+    // Calculate Grid Positions
+    const startDayOfMonth = getStartDayOfMonth(monthIndex, year); // e.g., 0 for Mon
+    // Day of month (1-based)
+    const startDay = effectiveStart.getDate();
+    const endDay = effectiveEnd.getDate();
+
+    // Grid Column Start = offset + day
+    const startCol = startDayOfMonth + startDay;
+
+    // Span = (end - start) + 1
+    const span = endDay - startDay + 1;
+
+    return { startCol, span };
+  };
 
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
@@ -239,82 +282,122 @@ export function YearCalendar() {
                 const daysInMonth = getDaysInMonth(monthIndex, year);
                 const startDay = getStartDayOfMonth(monthIndex, year);
 
+                // Cells for Grid
                 const cells = [
                   ...Array.from({ length: startDay }, () => null),
                   ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
                 ];
 
                 return (
-                  <div key={monthName} className="flex items-center group gap-6">
+                  <div key={monthName} className="flex items-center group gap-6 relative">
                     <div className="w-8 shrink-0 flex justify-end pr-3">
                       <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors">
                         {monthIndex + 1}
                       </span>
                     </div>
 
-                    <div className="flex-1 grid grid-cols-37 gap-1">
-                      {cells.map((day, cellIndex) => {
-                        const isWeekend = cellIndex % 7 === 5 || cellIndex % 7 === 6;
+                    <div className="flex-1 relative">
+                      {/* Day Grid (Bottom Layer) */}
+                      <div className="grid grid-cols-37 gap-1">
+                        {cells.map((day, cellIndex) => {
+                          const isWeekend = cellIndex % 7 === 5 || cellIndex % 7 === 6;
 
-                        if (day === null) {
-                          return <div key={`blank-${cellIndex}`} className="aspect-square rounded-sm bg-transparent" />;
-                        }
+                          if (day === null) {
+                            return (
+                              <div
+                                key={`blank-${cellIndex}`}
+                                className="aspect-square rounded-sm bg-transparent pointer-events-none"
+                              />
+                            );
+                          }
 
-                        const isToday =
-                          year === today.getFullYear() && monthIndex === today.getMonth() && day === today.getDate();
+                          const isToday =
+                            year === today.getFullYear() && monthIndex === today.getMonth() && day === today.getDate();
 
-                        const dateStr = formatDate(year, monthIndex, day);
-                        const mark = marks[dateStr];
-                        const isMarked = !!mark;
-                        const isHoliday = holidays.has(dateStr);
+                          const dateStr = formatDate(year, monthIndex, day);
+                          const isHoliday = holidays.has(dateStr);
 
-                        const isSelected = currentSelection.has(dateStr);
-
-                        return (
+                          return (
+                            <div
+                              key={`day-${day}`}
+                              onMouseDown={() => handleMouseDown(dateStr)}
+                              onMouseEnter={() => handleMouseEnter(dateStr)}
+                              className={cn(
+                                "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer",
+                                isWeekend || isHoliday
+                                  ? "bg-neutral-100 dark:bg-neutral-800/50 text-red-500/80 dark:text-red-400/80"
+                                  : "bg-neutral-200/50 dark:bg-neutral-700/30 text-neutral-700 dark:text-neutral-300",
+                                "hover:bg-indigo-500/20 hover:z-0"
+                              )}
+                              title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${
+                                isHoliday ? " (Holiday)" : ""
+                              }`}
+                            >
+                              <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>
+                                {day}
+                              </span>
+                              {isToday && (
+                                <div className="absolute inset-0 border-2 border-indigo-600 dark:border-indigo-500 rounded-sm pointer-events-none" />
+                              )}
+                            </div>
+                          );
+                        })}
+                        {Array.from({ length: TOTAL_COLUMNS - cells.length }).map((_, i) => (
                           <div
-                            key={`day-${day}`}
-                            onMouseDown={() => handleMouseDown(dateStr)}
-                            onMouseEnter={() => handleMouseEnter(dateStr)}
-                            className={cn(
-                              "aspect-square rounded-sm transition-all duration-100 relative group/cell flex items-center justify-center",
-                              "cursor-pointer",
-                              isSelected
-                                ? "bg-indigo-500/80 text-white ring-2 ring-indigo-300 z-10 scale-110 shadow-md"
-                                : isMarked
-                                ? "bg-emerald-100 dark:bg-emerald-900/40 ring-1 ring-emerald-500/50"
-                                : isWeekend || isHoliday
-                                ? "bg-neutral-100 dark:bg-neutral-800/50"
-                                : "bg-neutral-200/50 dark:bg-neutral-700/30",
+                            key={`scratch-${i}`}
+                            className="aspect-square rounded-sm bg-transparent pointer-events-none"
+                          />
+                        ))}
+                      </div>
 
-                              (isWeekend || isHoliday) && !isSelected
-                                ? "text-red-500/80 dark:text-red-400/80"
-                                : !isSelected && "text-neutral-700 dark:text-neutral-300",
+                      {/* Range Overlays (Top Layer) */}
+                      <div className="absolute inset-0 grid grid-cols-37 gap-1 pointer-events-none">
+                        {/* Render Saved Ranges */}
+                        {ranges.map((range) => {
+                          const segments = getRangeSegmentsForMonth(range.start_date, range.end_date, monthIndex, year);
+                          if (!segments) return null;
+                          return (
+                            <div
+                              key={range.id}
+                              onClick={(e) => handleRangeClick(range, e)}
+                              className={cn(
+                                "rounded-sm bg-indigo-500/80 dark:bg-indigo-500/60 shadow-md ring-1 ring-indigo-400 backdrop-blur-[1px] cursor-pointer hover:bg-indigo-500 hover:scale-[1.02] transition-all z-10 pointer-events-auto",
+                                "flex items-center justify-center overflow-hidden"
+                              )}
+                              style={{
+                                gridColumnStart: segments.startCol,
+                                gridColumnEnd: `span ${segments.span}`,
+                              }}
+                              title={range.task}
+                            >
+                              <span className="text-[10px] text-white truncate px-1 font-medium opacity-0 hover:opacity-100 transition-opacity">
+                                {range.task}
+                              </span>
+                            </div>
+                          );
+                        })}
 
-                              !isMarked &&
-                                !isSelected &&
-                                !isDragging &&
-                                "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700 hover:z-20 hover:scale-125 hover:shadow-lg"
-                            )}
-                            title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${
-                              isHoliday ? " (Holiday)" : ""
-                            }${isMarked ? ` - ${mark.task}` : ""}`}
-                          >
-                            <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>
-                              {day}
-                            </span>
-                            {isToday && (
-                              <div className="absolute inset-0 border-2 border-indigo-600 dark:border-indigo-500 rounded-sm pointer-events-none" />
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {Array.from({ length: TOTAL_COLUMNS - cells.length }).map((_, i) => (
-                        <div
-                          key={`scratch-${i}`}
-                          className="aspect-square rounded-sm bg-transparent pointer-events-none"
-                        />
-                      ))}
+                        {/* Render Drag Preview Range */}
+                        {dragSelection &&
+                          (() => {
+                            const segments = getRangeSegmentsForMonth(
+                              dragSelection.start,
+                              dragSelection.end,
+                              monthIndex,
+                              year
+                            );
+                            if (!segments) return null;
+                            return (
+                              <div
+                                className="rounded-sm bg-indigo-400/50 ring-2 ring-indigo-500 z-20 pointer-events-none"
+                                style={{
+                                  gridColumnStart: segments.startCol,
+                                  gridColumnEnd: `span ${segments.span}`,
+                                }}
+                              />
+                            );
+                          })()}
+                      </div>
                     </div>
                   </div>
                 );
@@ -326,31 +409,16 @@ export function YearCalendar() {
 
       <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-neutral-200/50 dark:bg-neutral-700/30" />
-          <span>Weekday</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-neutral-100 dark:bg-neutral-800/50" />
-          <span>Weekend</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-emerald-100 dark:bg-emerald-900/40 ring-1 ring-emerald-500/50" />
-          <span>Marked</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm border-2 border-indigo-600 dark:border-indigo-500" />
-          <span>Today</span>
-        </div>
-        <div className="flex items-center gap-2 ml-4">
-          <span className="text-neutral-300 dark:text-neutral-600">S M T ... represents Weekdays</span>
+          <div className="w-4 h-4 rounded-sm bg-indigo-500/80 ring-1 ring-indigo-400" />
+          <span>Task Range</span>
         </div>
       </div>
 
-      {isModalOpen && selectedDates.length > 0 && (
+      {isModalOpen && selectedRange && (
         <TaskModal
           isOpen={isModalOpen}
-          dates={selectedDates}
-          initialTask={selectedDates.length === 1 ? marks[selectedDates[0]]?.task || null : null}
+          dates={getDatesInRange(selectedRange.start, selectedRange.end)}
+          initialTask={selectedRange.task || null}
           onSave={handleSaveTask}
           onRemove={handleRemoveTask}
           onClose={handleCloseModal}

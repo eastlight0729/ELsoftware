@@ -1,109 +1,155 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../lib/supabase";
+import { Tables } from "../../../lib/database.types";
+
+export type CalendarRange = Tables<"year_calendar_ranges">;
 
 export const calendarKeys = {
   all: ["year-calendar"] as const,
-  marks: () => [...calendarKeys.all, "marks"] as const,
+  ranges: () => [...calendarKeys.all, "ranges"] as const,
 };
 
-export function useYearCalendarMarks() {
+export function useYearCalendarRanges() {
   return useQuery({
-    queryKey: calendarKeys.marks(),
+    queryKey: calendarKeys.ranges(),
     queryFn: async () => {
-      const { data, error } = await supabase.from("year_calendar_marks").select("date");
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from("year_calendar_ranges")
+        .select("*")
+        .order("start_date", { ascending: true });
 
-      const marks: Record<string, boolean> = {};
-      data?.forEach((row) => {
-        marks[row.date] = true;
-      });
-      return marks;
+      if (error) throw error;
+      return data;
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
-export function useToggleYearCalendarMark() {
+export function useUpsertYearCalendarRange() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (date: string) => {
-      // Check if it exists
-      const { data: existing } = await supabase.from("year_calendar_marks").select("id").eq("date", date).maybeSingle();
+    mutationFn: async ({
+      id,
+      startDate,
+      endDate,
+      task,
+      color,
+    }: {
+      id?: string;
+      startDate: string;
+      endDate: string;
+      task?: string;
+      color?: string;
+    }) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error("Not authenticated");
 
-      if (existing) {
-        const { error } = await supabase.from("year_calendar_marks").delete().eq("id", existing.id);
+      const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
+
+      if (!profile || !profile.user_int_id) throw new Error("User profile not found");
+
+      const payload = {
+        user_id: profile.user_int_id,
+        start_date: startDate,
+        end_date: endDate,
+        task: task ? task.slice(0, 500) : null, // Limit task length to 500 chars
+        color: color || "indigo",
+      };
+
+      // Validate Date Format YYYY-MM-DD
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        throw new Error("Invalid date format");
+      }
+
+      if (id) {
+        const { data, error } = await supabase
+          .from("year_calendar_ranges")
+          .update(payload)
+          .eq("id", id)
+          .select()
+          .single();
         if (error) throw error;
-        return { date, active: false };
+        return data;
       } else {
-        // Fetch the user's integer ID from profiles
-        const { data: user } = await supabase.auth.getUser();
-        if (!user.user) throw new Error("Not authenticated");
-
-        const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
-
-        if (!profile || !profile.user_int_id) {
-          throw new Error("User profile not found or missing integer ID");
-        }
-
-        const { error } = await supabase.from("year_calendar_marks").insert({ date, user_id: profile.user_int_id });
+        const { data, error } = await supabase.from("year_calendar_ranges").insert(payload).select().single();
         if (error) throw error;
-        return { date, active: true };
+        return data;
       }
     },
-    onMutate: async (date) => {
-      await queryClient.cancelQueries({ queryKey: calendarKeys.marks() });
-      const previousMarks = queryClient.getQueryData<Record<string, boolean>>(calendarKeys.marks());
+    onMutate: async (newRange) => {
+      await queryClient.cancelQueries({ queryKey: calendarKeys.ranges() });
+      const previousRanges = queryClient.getQueryData<CalendarRange[]>(calendarKeys.ranges());
 
-      queryClient.setQueryData<Record<string, boolean>>(calendarKeys.marks(), (old) => {
-        const newMarks = { ...(old || {}) };
-        if (newMarks[date]) {
-          delete newMarks[date];
+      queryClient.setQueryData<CalendarRange[]>(calendarKeys.ranges(), (old) => {
+        const list = old ? [...old] : [];
+        if (newRange.id) {
+          const index = list.findIndex((r) => r.id === newRange.id);
+          if (index !== -1) {
+            // Optimistically update existing
+            list[index] = {
+              ...list[index],
+              start_date: newRange.startDate,
+              end_date: newRange.endDate,
+              task: newRange.task ?? null,
+              color: newRange.color || list[index].color,
+            };
+          }
         } else {
-          newMarks[date] = true;
+          // Optimistically add new
+          list.push({
+            id: "temp-" + Date.now(),
+            created_at: new Date().toISOString(),
+            user_id: 0, // temporary
+            start_date: newRange.startDate,
+            end_date: newRange.endDate,
+            task: newRange.task ?? null,
+            color: newRange.color || "indigo",
+          });
         }
-        return newMarks;
+        return list;
       });
 
-      return { previousMarks };
+      return { previousRanges };
     },
-    onError: (_err, _newTodo, context) => {
-      if (context?.previousMarks) {
-        queryClient.setQueryData(calendarKeys.marks(), context.previousMarks);
+    onError: (_err, _vars, context) => {
+      if (context?.previousRanges) {
+        queryClient.setQueryData(calendarKeys.ranges(), context.previousRanges);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: calendarKeys.marks() });
+      queryClient.invalidateQueries({ queryKey: calendarKeys.ranges() });
     },
   });
 }
 
-export async function migrateLegacyMarks(legacyMarks: Record<string, boolean>) {
-  const { data: user } = await supabase.auth.getUser();
-  if (!user.user) return; // Cannot migrate if not logged in
+export function useDeleteYearCalendarRange() {
+  const queryClient = useQueryClient();
 
-  const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("year_calendar_ranges").delete().eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: calendarKeys.ranges() });
+      const previousRanges = queryClient.getQueryData<CalendarRange[]>(calendarKeys.ranges());
 
-  if (!profile || !profile.user_int_id) return; // Cannot migrate without profile ID
+      queryClient.setQueryData<CalendarRange[]>(calendarKeys.ranges(), (old) => {
+        return old?.filter((r) => r.id !== id) || [];
+      });
 
-  const dates = Object.keys(legacyMarks);
-  if (dates.length === 0) return;
-
-  // Batch insert
-  const { data: currentMarks } = await supabase.from("year_calendar_marks").select("date");
-
-  const existingDates = new Set(currentMarks?.map((m) => m.date) || []);
-  const toInsert = dates
-    .filter((d) => !existingDates.has(d))
-    .map((date) => ({
-      date,
-      user_id: profile.user_int_id,
-    }));
-
-  if (toInsert.length > 0) {
-    const { error } = await supabase.from("year_calendar_marks").insert(toInsert);
-    if (error) {
-      console.error("Migration partial failure", error);
-      throw error;
-    }
-  }
+      return { previousRanges };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previousRanges) {
+        queryClient.setQueryData(calendarKeys.ranges(), context.previousRanges);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: calendarKeys.ranges() });
+    },
+  });
 }

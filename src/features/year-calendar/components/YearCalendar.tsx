@@ -133,11 +133,7 @@ export function YearCalendar() {
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-2">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-neutral-800 to-neutral-500 dark:from-neutral-100 dark:to-neutral-400">
-          Year Calendar
-        </h1>
-
+      <div className="flex items-center justify-end px-2">
         <div className="flex items-center gap-4 bg-white dark:bg-neutral-800 rounded-full p-1 pl-4 pr-1 shadow-sm border border-neutral-200 dark:border-neutral-700">
           <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200">{year}</span>
           <div className="flex gap-1">

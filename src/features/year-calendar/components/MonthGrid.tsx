@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { CalendarRange } from "../api/useYearCalendar";
 import { getDaysInMonth, getRangeSegmentsForMonth, getStartDayOfMonth, formatDate, TOTAL_COLUMNS } from "../utils";
@@ -29,6 +29,12 @@ export const MonthGrid = memo(function MonthGrid({
   const daysInMonth = getDaysInMonth(monthIndex, year);
   const startDay = getStartDayOfMonth(monthIndex, year);
   const today = new Date();
+
+  const monthRanges = useMemo(() => {
+    const start = formatDate(year, monthIndex, 1);
+    const end = formatDate(year, monthIndex, daysInMonth);
+    return ranges.filter((r) => r.start_date <= end && r.end_date >= start);
+  }, [ranges, year, monthIndex, daysInMonth]);
 
   // Cells for Grid
   const cells = [
@@ -64,6 +70,10 @@ export const MonthGrid = memo(function MonthGrid({
             const dateStr = formatDate(year, monthIndex, day);
             const isHoliday = holidays.has(dateStr);
 
+            const isCovered =
+              (dragSelection && dateStr >= dragSelection.start && dateStr <= dragSelection.end) ||
+              monthRanges.some((r) => dateStr >= r.start_date && dateStr <= r.end_date);
+
             return (
               <div
                 key={`day-${day}`}
@@ -71,7 +81,11 @@ export const MonthGrid = memo(function MonthGrid({
                 onMouseEnter={() => onMouseEnter(dateStr)}
                 className={cn(
                   "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer",
-                  isWeekend ? "bg-neutral-100 dark:bg-neutral-800/50" : "bg-neutral-200/50 dark:bg-neutral-700/30",
+                  isCovered
+                    ? "bg-transparent"
+                    : isWeekend
+                    ? "bg-neutral-100 dark:bg-neutral-800/50"
+                    : "bg-neutral-200/50 dark:bg-neutral-700/30",
                   isWeekend || isHoliday
                     ? "text-red-500/80 dark:text-red-400/80"
                     : "text-neutral-700 dark:text-neutral-300",

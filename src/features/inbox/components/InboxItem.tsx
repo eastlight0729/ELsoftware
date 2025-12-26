@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Trash2 } from "lucide-react";
 import { useDeleteInboxItem } from "../hooks/useInbox";
 import type { InboxItem as InboxItemType } from "../api";
@@ -6,7 +7,7 @@ interface InboxItemProps {
   item: InboxItemType;
 }
 
-export const InboxItem = ({ item }: InboxItemProps) => {
+export const InboxItem = memo(({ item }: InboxItemProps) => {
   const { mutate: deleteItem } = useDeleteInboxItem();
 
   return (
@@ -21,4 +22,6 @@ export const InboxItem = ({ item }: InboxItemProps) => {
       </button>
     </div>
   );
-};
+});
+
+InboxItem.displayName = "InboxItem";

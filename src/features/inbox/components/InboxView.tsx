@@ -3,7 +3,8 @@ import { Plus } from "lucide-react";
 import { useInboxItems, useCreateInboxItem } from "../hooks/useInbox";
 import { InboxItem } from "./InboxItem";
 
-export const InboxView = () => {
+// Extract Logic to a Custom Hook (View Model)
+const useInboxViewModel = () => {
   const { data: items, isLoading } = useInboxItems();
   const { mutate: createItem } = useCreateInboxItem();
   const [inputValue, setInputValue] = useState("");
@@ -14,6 +15,18 @@ export const InboxView = () => {
     createItem(inputValue.trim());
     setInputValue("");
   };
+
+  return {
+    items,
+    isLoading,
+    inputValue,
+    setInputValue,
+    handleSubmit,
+  };
+};
+
+export const InboxView = () => {
+  const { items, isLoading, inputValue, setInputValue, handleSubmit } = useInboxViewModel();
 
   return (
     <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
@@ -30,6 +43,7 @@ export const InboxView = () => {
           placeholder="Add a new item..."
           className="w-full p-4 pl-5 pr-12 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600 transition-all text-lg placeholder:text-neutral-400"
           autoFocus
+          maxLength={500}
         />
         <button
           type="submit"

@@ -30,11 +30,12 @@ export const MonthGrid = memo(function MonthGrid({
   const startDay = getStartDayOfMonth(monthIndex, year);
   const today = new Date();
 
+  const monthStartStr = formatDate(year, monthIndex, 1);
+  const monthEndStr = formatDate(year, monthIndex, daysInMonth);
+
   const monthRanges = useMemo(() => {
-    const start = formatDate(year, monthIndex, 1);
-    const end = formatDate(year, monthIndex, daysInMonth);
-    return ranges.filter((r) => r.start_date <= end && r.end_date >= start);
-  }, [ranges, year, monthIndex, daysInMonth]);
+    return ranges.filter((r) => r.start_date <= monthEndStr && r.end_date >= monthStartStr);
+  }, [ranges, monthStartStr, monthEndStr]);
 
   // Cells for Grid
   const cells = [
@@ -56,10 +57,21 @@ export const MonthGrid = memo(function MonthGrid({
           {ranges.map((range) => {
             const segments = getRangeSegmentsForMonth(range.start_date, range.end_date, monthIndex, year);
             if (!segments) return null;
+
+            const isStart = range.start_date >= monthStartStr;
+            const isEnd = range.end_date <= monthEndStr;
+
             return (
               <div
                 key={`bg-${range.id}`}
-                className="rounded-sm bg-green-300 dark:bg-green-700"
+                className={cn(
+                  "rounded-sm relative",
+                  "bg-green-300 dark:bg-green-700",
+                  !isStart &&
+                    "rounded-l-none before:content-[''] before:absolute before:right-full before:top-0 before:bottom-0 before:w-6 before:bg-linear-to-r before:from-transparent before:to-green-300 dark:before:to-green-700",
+                  !isEnd &&
+                    "rounded-r-none after:content-[''] after:absolute after:left-full after:top-0 after:bottom-0 after:w-6 after:bg-linear-to-r after:from-green-300 after:to-transparent dark:after:from-green-700"
+                )}
                 style={{
                   gridColumnStart: segments.startCol,
                   gridColumnEnd: `span ${segments.span}`,
@@ -125,13 +137,19 @@ export const MonthGrid = memo(function MonthGrid({
           {ranges.map((range) => {
             const segments = getRangeSegmentsForMonth(range.start_date, range.end_date, monthIndex, year);
             if (!segments) return null;
+
+            const isStart = range.start_date >= monthStartStr;
+            const isEnd = range.end_date <= monthEndStr;
+
             return (
               <div
                 key={range.id}
                 onClick={(e) => onRangeClick(range, e)}
                 className={cn(
                   "rounded-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/10 transition-colors pointer-events-auto",
-                  "flex items-center justify-center overflow-hidden"
+                  "flex items-center justify-center overflow-hidden",
+                  !isEnd && "rounded-r-none",
+                  !isStart && "rounded-l-none"
                 )}
                 style={{
                   gridColumnStart: segments.startCol,
@@ -151,9 +169,20 @@ export const MonthGrid = memo(function MonthGrid({
             (() => {
               const segments = getRangeSegmentsForMonth(dragSelection.start, dragSelection.end, monthIndex, year);
               if (!segments) return null;
+
+              const isStart = dragSelection.start >= monthStartStr;
+              const isEnd = dragSelection.end <= monthEndStr;
+
               return (
                 <div
-                  className="rounded-sm bg-green-400/30 pointer-events-none"
+                  className={cn(
+                    "rounded-sm relative",
+                    "bg-green-400/30",
+                    !isStart &&
+                      "rounded-l-none before:content-[''] before:absolute before:right-full before:top-0 before:bottom-0 before:w-6 before:bg-linear-to-r before:from-transparent before:to-green-400/30",
+                    !isEnd &&
+                      "rounded-r-none after:content-[''] after:absolute after:left-full after:top-0 after:bottom-0 after:w-6 after:bg-linear-to-r after:from-green-400/30 after:to-transparent"
+                  )}
                   style={{
                     gridColumnStart: segments.startCol,
                     gridColumnEnd: `span ${segments.span}`,

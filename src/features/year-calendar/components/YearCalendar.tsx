@@ -17,7 +17,7 @@ export function YearCalendar() {
   const upsertRangeMutation = useUpsertYearCalendarRange();
   const deleteRangeMutation = useDeleteYearCalendarRange();
 
-  const [holidays, setHolidays] = useState<Set<string>>(new Set());
+  const [holidays, setHolidays] = useState<Record<string, string>>({});
 
   // Selection / Dragging state
   const [isDragging, setIsDragging] = useState(false);
@@ -42,8 +42,8 @@ export function YearCalendar() {
 
   useEffect(() => {
     if (window.electron?.yearCalendar) {
-      window.electron.yearCalendar.getHolidays(year).then((data: string[]) => {
-        setHolidays(new Set(data));
+      window.electron.yearCalendar.getHolidays(year).then((data: Record<string, string>) => {
+        setHolidays(data);
       });
     }
   }, [year]);
@@ -133,11 +133,7 @@ export function YearCalendar() {
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-2">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-neutral-800 to-neutral-500 dark:from-neutral-100 dark:to-neutral-400">
-          Year Calendar
-        </h1>
-
+      <div className="flex items-center justify-end px-2">
         <div className="flex items-center gap-4 bg-white dark:bg-neutral-800 rounded-full p-1 pl-4 pr-1 shadow-sm border border-neutral-200 dark:border-neutral-700">
           <span className="text-xl font-mono font-medium text-neutral-700 dark:text-neutral-200">{year}</span>
           <div className="flex gap-1">
@@ -158,14 +154,14 @@ export function YearCalendar() {
       </div>
 
       {/* Calendar Grid Container */}
-      <div className="flex-1 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-xl overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-hidden flex flex-col border-y border-neutral-300 dark:border-neutral-700">
         {/* Scrollable Area */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="inline-block min-w-full">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
+          <div>
             {/* Grid Header (Weekdays) */}
             <div className="flex mb-4 gap-6">
               <div className="w-8 shrink-0" />
-              <div className="flex-1 grid grid-cols-37 gap-1">
+              <div className="flex-1 grid grid-cols-37 gap-1 mr-2 min-w-0">
                 {Array.from({ length: TOTAL_COLUMNS }).map((_, i) => {
                   const isWeekend = i % 7 === 5 || i % 7 === 6;
                   return (

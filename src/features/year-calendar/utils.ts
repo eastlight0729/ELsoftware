@@ -16,6 +16,11 @@ export const MONTHS = [
 export const TOTAL_COLUMNS = 37;
 export const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
+const parseDateLocal = (dateStr: string) => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const getDaysInMonth = (monthIndex: number, year: number) => {
   return new Date(year, monthIndex + 1, 0).getDate();
 };
@@ -30,8 +35,8 @@ export const formatDate = (y: number, m: number, d: number) => {
 };
 
 export const getDatesInRange = (startStr: string, endStr: string) => {
-  const start = new Date(startStr);
-  const end = new Date(endStr);
+  const start = parseDateLocal(startStr);
+  const end = parseDateLocal(endStr);
 
   // Normalize
   const min = start < end ? start : end;
@@ -57,8 +62,8 @@ export const getRangeSegmentsForMonth = (
   monthIndex: number,
   year: number
 ): { startCol: number; span: number } | null => {
-  const rangeStart = new Date(startStr);
-  const rangeEnd = new Date(endStr);
+  const rangeStart = parseDateLocal(startStr);
+  const rangeEnd = parseDateLocal(endStr);
 
   // Month boundaries
   const monthStart = new Date(year, monthIndex, 1);

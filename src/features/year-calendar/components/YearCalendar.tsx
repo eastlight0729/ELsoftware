@@ -13,7 +13,24 @@ import { cn } from "@/lib/utils";
 
 export function YearCalendar() {
   // Start date of the 12-month view. Always day 1 of a month.
-  const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1));
+  const [startDate, setStartDate] = useState(() => {
+    try {
+      const saved = localStorage.getItem("active_year_calendar_date");
+      if (saved) {
+        const date = new Date(saved);
+        if (!isNaN(date.getTime())) {
+          return new Date(date.getFullYear(), date.getMonth(), 1);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to parse saved calendar date", e);
+    }
+    return new Date(new Date().getFullYear(), 0, 1);
+  });
+
+  useEffect(() => {
+    localStorage.setItem("active_year_calendar_date", startDate.toISOString());
+  }, [startDate]);
   const { data: ranges = [] } = useYearCalendarRanges();
   const upsertRangeMutation = useUpsertYearCalendarRange();
   const deleteRangeMutation = useDeleteYearCalendarRange();

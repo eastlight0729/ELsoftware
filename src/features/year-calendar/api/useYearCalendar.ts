@@ -50,12 +50,16 @@ export function useUpsertYearCalendarRange() {
 
       if (!profile || !profile.user_int_id) throw new Error("User profile not found");
 
+      // Permitted colors only.
+      const ALLOWED_COLORS = ["indigo", "green", "red", "blue", "yellow", "purple", "gray"];
+      const cleanColor = ALLOWED_COLORS.includes(color || "") ? color : "indigo";
+
       const payload = {
         user_id: profile.user_int_id,
         start_date: startDate,
         end_date: endDate,
-        task: task ? task.slice(0, 500) : null, // Limit task length to 500 chars
-        color: color || "indigo",
+        task: task ? task.trim().slice(0, 500) : null, // Trim & Limit
+        color: cleanColor,
       };
 
       // Validate Date Format YYYY-MM-DD

@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
   useYearCalendarMarks,
-  useSaveYearCalendarTask,
-  useDeleteYearCalendarMark,
+  useSaveYearCalendarTasks,
+  useDeleteYearCalendarMarks,
   migrateLegacyMarks,
 } from "../api/useYearCalendar";
 import { TaskModal } from "./TaskModal";
@@ -29,18 +29,23 @@ const MONTHS = [
   "December",
 ];
 
-// Maximum columns needed: 6 (max start offset) + 31 (max days) = 37
 const TOTAL_COLUMNS = 37;
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function YearCalendar() {
   const [year, setYear] = useState(new Date().getFullYear());
   const { data: marks = {} } = useYearCalendarMarks();
-  const saveTaskMutation = useSaveYearCalendarTask();
-  const deleteTaskMutation = useDeleteYearCalendarMark();
+  const saveTasksMutation = useSaveYearCalendarTasks();
+  const deleteTasksMutation = useDeleteYearCalendarMarks();
 
   const [holidays, setHolidays] = useState<Set<string>>(new Set());
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  // Selection / Dragging state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<string | null>(null);
+  const [dragCurrent, setDragCurrent] = useState<string | null>(null);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const today = new Date();
 
@@ -64,7 +69,6 @@ export function YearCalendar() {
   }, []);
 
   useEffect(() => {
-    // Load holidays for the current year
     if (window.electron?.yearCalendar) {
       window.electron.yearCalendar.getHolidays(year).then((data: string[]) => {
         setHolidays(new Set(data));
@@ -72,16 +76,23 @@ export function YearCalendar() {
     }
   }, [year]);
 
+  // Global mouse up to end drag if user releases outside
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        finishDrag();
+      }
+    };
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
+  }, [isDragging, dragStart, dragCurrent]);
+
   const getDaysInMonth = (monthIndex: number, year: number) => {
     return new Date(year, monthIndex + 1, 0).getDate();
   };
 
   const getStartDayOfMonth = (monthIndex: number, year: number) => {
-    // 0 = Monday, ..., 6 = Sunday
     const day = new Date(year, monthIndex, 1).getDay();
-    // Convert 0(Sun)..6(Sat) to 0(Mon)..6(Sun)
-    // Sun(0) -> 6
-    // Mon(1) -> 0
     return (day + 6) % 7;
   };
 
@@ -89,30 +100,87 @@ export function YearCalendar() {
     return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   };
 
+  const getDatesInRange = (startStr: string, endStr: string) => {
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+
+    // Normalize
+    const min = start < end ? start : end;
+    const max = start < end ? end : start;
+
+    const dates: string[] = [];
+    const current = new Date(min);
+
+    while (current <= max) {
+      // Format manually to avoid timezone issues or use exact YYYY-MM-DD
+      const y = current.getFullYear();
+      const m = current.getMonth();
+      const d = current.getDate();
+      dates.push(formatDate(y, m, d));
+
+      current.setDate(current.getDate() + 1);
+    }
+    return dates;
+  };
+
   const handlePrevYear = () => setYear((y) => y - 1);
   const handleNextYear = () => setYear((y) => y + 1);
 
-  const handleDayClick = (monthIndex: number, day: number) => {
-    const dateStr = formatDate(year, monthIndex, day);
-    setSelectedDate(dateStr);
+  // Drag Handlers
+  const handleMouseDown = (dateStr: string) => {
+    setIsDragging(true);
+    setDragStart(dateStr);
+    setDragCurrent(dateStr);
+  };
+
+  const handleMouseEnter = (dateStr: string) => {
+    if (isDragging) {
+      setDragCurrent(dateStr);
+    }
+  };
+
+  const finishDrag = () => {
+    if (dragStart && dragCurrent) {
+      const range = getDatesInRange(dragStart, dragCurrent);
+      setSelectedDates(range);
+      setIsModalOpen(true);
+    }
+    setIsDragging(false);
+    setDragStart(null);
+    setDragCurrent(null);
   };
 
   const handleSaveTask = (task: string) => {
-    if (selectedDate) {
-      saveTaskMutation.mutate({ date: selectedDate, task });
-      setSelectedDate(null);
+    if (selectedDates.length > 0) {
+      saveTasksMutation.mutate({ dates: selectedDates, task });
+      setIsModalOpen(false);
+      setSelectedDates([]);
     }
   };
 
   const handleRemoveTask = () => {
-    if (selectedDate) {
-      deleteTaskMutation.mutate(selectedDate);
-      setSelectedDate(null);
+    if (selectedDates.length > 0) {
+      deleteTasksMutation.mutate(selectedDates);
+      setIsModalOpen(false);
+      setSelectedDates([]);
     }
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedDates([]);
+  };
+
+  // Determine current effective selection for highlighting
+  const currentSelection = useMemo(() => {
+    if (isDragging && dragStart && dragCurrent) {
+      return new Set(getDatesInRange(dragStart, dragCurrent));
+    }
+    return new Set<string>();
+  }, [isDragging, dragStart, dragCurrent]);
+
   return (
-    <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500">
+    <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
       {/* Header */}
       <div className="flex items-center justify-between px-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-neutral-800 to-neutral-500 dark:from-neutral-100 dark:to-neutral-400">
@@ -145,9 +213,7 @@ export function YearCalendar() {
           <div className="inline-block min-w-full">
             {/* Grid Header (Weekdays) */}
             <div className="flex mb-4 gap-6">
-              {/* Month Label Spacer */}
               <div className="w-8 shrink-0" />
-              {/* Columns */}
               <div className="flex-1 grid grid-cols-37 gap-1">
                 {Array.from({ length: TOTAL_COLUMNS }).map((_, i) => {
                   const isWeekend = i % 7 === 5 || i % 7 === 6;
@@ -173,7 +239,6 @@ export function YearCalendar() {
                 const daysInMonth = getDaysInMonth(monthIndex, year);
                 const startDay = getStartDayOfMonth(monthIndex, year);
 
-                // Create an array representing the cells for this row
                 const cells = [
                   ...Array.from({ length: startDay }, () => null),
                   ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
@@ -181,14 +246,12 @@ export function YearCalendar() {
 
                 return (
                   <div key={monthName} className="flex items-center group gap-6">
-                    {/* Month Number */}
                     <div className="w-8 shrink-0 flex justify-end pr-3">
                       <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors">
                         {monthIndex + 1}
                       </span>
                     </div>
 
-                    {/* Days Grid */}
                     <div className="flex-1 grid grid-cols-37 gap-1">
                       {cells.map((day, cellIndex) => {
                         const isWeekend = cellIndex % 7 === 5 || cellIndex % 7 === 6;
@@ -205,23 +268,32 @@ export function YearCalendar() {
                         const isMarked = !!mark;
                         const isHoliday = holidays.has(dateStr);
 
+                        const isSelected = currentSelection.has(dateStr);
+
                         return (
                           <div
                             key={`day-${day}`}
-                            onClick={() => handleDayClick(monthIndex, day)}
+                            onMouseDown={() => handleMouseDown(dateStr)}
+                            onMouseEnter={() => handleMouseEnter(dateStr)}
                             className={cn(
-                              "aspect-square rounded-sm transition-all duration-200 relative group/cell flex items-center justify-center",
-                              "hover:scale-125 hover:z-10 hover:shadow-lg cursor-pointer",
-                              isMarked
+                              "aspect-square rounded-sm transition-all duration-100 relative group/cell flex items-center justify-center",
+                              "cursor-pointer",
+                              isSelected
+                                ? "bg-indigo-500/80 text-white ring-2 ring-indigo-300 z-10 scale-110 shadow-md"
+                                : isMarked
                                 ? "bg-emerald-100 dark:bg-emerald-900/40 ring-1 ring-emerald-500/50"
                                 : isWeekend || isHoliday
                                 ? "bg-neutral-100 dark:bg-neutral-800/50"
                                 : "bg-neutral-200/50 dark:bg-neutral-700/30",
-                              isWeekend || isHoliday
+
+                              (isWeekend || isHoliday) && !isSelected
                                 ? "text-red-500/80 dark:text-red-400/80"
-                                : "text-neutral-700 dark:text-neutral-300",
+                                : !isSelected && "text-neutral-700 dark:text-neutral-300",
+
                               !isMarked &&
-                                "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700"
+                                !isSelected &&
+                                !isDragging &&
+                                "hover:bg-indigo-500 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white hover:ring-2 ring-indigo-300 dark:ring-indigo-700 hover:z-20 hover:scale-125 hover:shadow-lg"
                             )}
                             title={`${monthName} ${day}, ${year}${isToday ? " (Today)" : ""}${
                               isHoliday ? " (Holiday)" : ""
@@ -237,7 +309,6 @@ export function YearCalendar() {
                         );
                       })}
 
-                      {/* Render remaining empty cells */}
                       {Array.from({ length: TOTAL_COLUMNS - cells.length }).map((_, i) => (
                         <div
                           key={`scratch-${i}`}
@@ -253,7 +324,6 @@ export function YearCalendar() {
         </div>
       </div>
 
-      {/* Legend / Footer */}
       <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-neutral-200/50 dark:bg-neutral-700/30" />
@@ -276,14 +346,14 @@ export function YearCalendar() {
         </div>
       </div>
 
-      {selectedDate && (
+      {isModalOpen && selectedDates.length > 0 && (
         <TaskModal
-          isOpen={!!selectedDate}
-          date={selectedDate}
-          initialTask={marks[selectedDate]?.task || null}
+          isOpen={isModalOpen}
+          dates={selectedDates}
+          initialTask={selectedDates.length === 1 ? marks[selectedDates[0]]?.task || null : null}
           onSave={handleSaveTask}
           onRemove={handleRemoveTask}
-          onClose={() => setSelectedDate(null)}
+          onClose={handleCloseModal}
         />
       )}
     </div>

@@ -3,14 +3,14 @@ import { X, Trash2 } from "lucide-react";
 
 interface TaskModalProps {
   isOpen: boolean;
-  date: string;
+  dates: string[];
   initialTask: string | null;
   onSave: (task: string) => void;
   onRemove: () => void;
   onClose: () => void;
 }
 
-export function TaskModal({ isOpen, date, initialTask, onSave, onRemove, onClose }: TaskModalProps) {
+export function TaskModal({ isOpen, dates, initialTask, onSave, onRemove, onClose }: TaskModalProps) {
   const [task, setTask] = useState(initialTask || "");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -28,11 +28,6 @@ export function TaskModal({ isOpen, date, initialTask, onSave, onRemove, onClose
 
   const handleSave = () => {
     if (!task.trim()) {
-      // If empty, treat as remove or just close?
-      // Requirement: "if user finish to input the text, then the cell is marked"
-      // If text is empty, maybe we shouldn't mark it?
-      // But if it was already marked, maybe we remove it?
-      // Let's assume empty save = remove if existing, or nothing if new.
       if (initialTask) {
         onRemove();
       } else {
@@ -42,6 +37,19 @@ export function TaskModal({ isOpen, date, initialTask, onSave, onRemove, onClose
       onSave(task);
     }
   };
+
+  const sortedDates = [...dates].sort();
+  const startDate = new Date(sortedDates[0]);
+  const endDate = new Date(sortedDates[sortedDates.length - 1]);
+  const isRange = dates.length > 1;
+
+  const formatDate = (d: Date) => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const formatFullDate = (d: Date) =>
+    d.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+  const title = isRange
+    ? `${formatDate(startDate)} - ${formatDate(endDate)} (${dates.length} days)`
+    : formatFullDate(startDate);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
@@ -54,14 +62,7 @@ export function TaskModal({ isOpen, date, initialTask, onSave, onRemove, onClose
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            {new Date(date).toLocaleDateString(undefined, {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </h3>
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{title}</h3>
           <button
             onClick={onClose}
             className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors p-1"

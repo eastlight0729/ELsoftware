@@ -28,52 +28,50 @@ export function useYearCalendarMarks() {
   });
 }
 
-export function useSaveYearCalendarTask() {
+export function useSaveYearCalendarTasks() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ date, task }: { date: string; task: string }) => {
-      // Fetch the user's integer ID from profiles
+    mutationFn: async ({ dates, task }: { dates: string[]; task: string }) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error("Not authenticated");
 
       const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
+      if (!profile || !profile.user_int_id) throw new Error("User profile not found");
 
-      if (!profile || !profile.user_int_id) {
-        throw new Error("User profile not found or missing integer ID");
-      }
-
-      // Upsert: Conflict on (user_id, date) is assumed handled by strict Unique constraint if it exists,
-      // but since we don't have a unique constraint on (user_id, date) confirmed (it likely exists from previous impl or logic),
-      // we'll try to check existence or just delete and insert, or use upsert if we have a unique index.
-      // Safest is Check -> Update or Insert.
-
-      const { data: existing } = await supabase
+      // 1. Delete existing for these dates to avoid conflicts or duplicates
+      // (This serves as a crude upsert strategy without relying on unique key constraints)
+      const { error: deleteError } = await supabase
         .from("year_calendar_marks")
-        .select("id")
+        .delete()
         .eq("user_id", profile.user_int_id)
-        .eq("date", date)
-        .maybeSingle();
+        .in("date", dates);
 
-      if (existing) {
-        const { error } = await supabase.from("year_calendar_marks").update({ task }).eq("id", existing.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("year_calendar_marks")
-          .insert({ date, task, user_id: profile.user_int_id });
-        if (error) throw error;
+      if (deleteError) throw deleteError;
+
+      // 2. Insert new
+      const toInsert = dates.map((date) => ({
+        date,
+        task,
+        user_id: profile.user_int_id!,
+      }));
+
+      if (toInsert.length > 0) {
+        const { error: insertError } = await supabase.from("year_calendar_marks").insert(toInsert);
+        if (insertError) throw insertError;
       }
 
-      return { date, task };
+      return { dates, task };
     },
-    onMutate: async ({ date, task }) => {
+    onMutate: async ({ dates, task }) => {
       await queryClient.cancelQueries({ queryKey: calendarKeys.marks() });
       const previousMarks = queryClient.getQueryData<CalendarMarks>(calendarKeys.marks());
 
       queryClient.setQueryData<CalendarMarks>(calendarKeys.marks(), (old) => {
         const newMarks = { ...(old || {}) };
-        newMarks[date] = { task };
+        dates.forEach((date) => {
+          newMarks[date] = { task };
+        });
         return newMarks;
       });
 
@@ -90,11 +88,11 @@ export function useSaveYearCalendarTask() {
   });
 }
 
-export function useDeleteYearCalendarMark() {
+export function useDeleteYearCalendarMarks() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (date: string) => {
+    mutationFn: async (dates: string[]) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error("Not authenticated");
 
@@ -105,18 +103,20 @@ export function useDeleteYearCalendarMark() {
         .from("year_calendar_marks")
         .delete()
         .eq("user_id", profile.user_int_id)
-        .eq("date", date);
+        .in("date", dates);
 
       if (error) throw error;
-      return date;
+      return dates;
     },
-    onMutate: async (date) => {
+    onMutate: async (dates) => {
       await queryClient.cancelQueries({ queryKey: calendarKeys.marks() });
       const previousMarks = queryClient.getQueryData<CalendarMarks>(calendarKeys.marks());
 
       queryClient.setQueryData<CalendarMarks>(calendarKeys.marks(), (old) => {
         const newMarks = { ...(old || {}) };
-        delete newMarks[date];
+        dates.forEach((date) => {
+          delete newMarks[date];
+        });
         return newMarks;
       });
 

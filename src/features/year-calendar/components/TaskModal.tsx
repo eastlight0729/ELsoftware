@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TaskModalProps {
@@ -75,12 +75,6 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{title}</h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">{subtitle}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg"
-          >
-            <X size={18} />
-          </button>
         </div>
 
         {/* Content */}
@@ -94,7 +88,7 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
                 className={cn(
                   "flex-1 pb-2 text-xs font-medium transition-colors duration-200 outline-none",
                   size === s.value
-                    ? "text-neutral-900 dark:text-neutral-100"
+                    ? "text-green-600 dark:text-green-500"
                     : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
                 )}
               >
@@ -102,7 +96,7 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
               </button>
             ))}
             <div
-              className="absolute -bottom-px left-0 h-0.5 w-1/4 bg-neutral-900 dark:bg-neutral-100 transition-transform duration-300 ease-out"
+              className="absolute -bottom-px left-0 h-0.5 w-1/4 bg-green-600 dark:bg-green-500 transition-transform duration-300 ease-out"
               style={{
                 transform: `translateX(${SIZES.findIndex((s) => s.value === size) * 100}%)`,
               }}
@@ -114,14 +108,11 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
             value={task}
             onChange={(e) => setTask(e.target.value)}
             placeholder="What are you planning?"
-            className="w-full h-32 p-4 bg-white dark:bg-neutral-900 rounded-xl border-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 outline-none resize-none text-neutral-700 dark:text-neutral-200 placeholder:text-neutral-400 transition-all text-base"
+            className="w-full h-32 p-4 bg-white dark:bg-neutral-900 rounded-xl border-none outline-none resize-none text-neutral-700 dark:text-neutral-200 placeholder:text-neutral-400 transition-all text-base"
           />
 
-          <div className="flex items-center justify-between text-xs text-neutral-400">
-            <span>Markdown supported</span>
-            <span className="bg-neutral-200 dark:bg-neutral-700 px-2 py-1 rounded text-neutral-600 dark:text-neutral-300">
-              ⌘ + Enter
-            </span>
+          <div className="flex items-center justify-end text-xs text-neutral-400">
+            <span className="text-neutral-500 dark:text-neutral-400">⌘ + Enter</span>
           </div>
         </div>
 
@@ -149,7 +140,7 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
             <button
               onClick={handleSave}
               disabled={!task.trim()}
-              className="px-5 py-2 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-900 rounded-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white rounded-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Schedule
             </button>

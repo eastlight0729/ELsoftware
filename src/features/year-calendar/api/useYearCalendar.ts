@@ -24,7 +24,8 @@ export function useYearCalendarRanges() {
         .order("start_date", { ascending: true });
 
       if (error) throw error;
-      return data as unknown as CalendarRange[];
+      // Force cast because `size` column exists in DB but not in generated `database.types.ts` yet.
+      return data as any as CalendarRange[];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

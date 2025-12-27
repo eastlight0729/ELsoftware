@@ -45,68 +45,73 @@ export function ActionModal({ isOpen, date, initialTask, onSave, onRemove, onClo
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-neutral-200 dark:border-neutral-800 animate-in zoom-in-95 duration-200"
+        className="bg-white dark:bg-zinc-950 rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-zinc-200 dark:border-zinc-800 animate-in zoom-in-95 duration-200"
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSave();
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-blue-50/50 dark:bg-blue-900/10">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="text-blue-500" size={20} />
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Action: {formattedDate}</h3>
+        <div className="flex items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-zinc-100 dark:bg-zinc-900 rounded-lg">
+              <CheckCircle className="text-zinc-900 dark:text-zinc-100" size={18} />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Action</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">{formattedDate}</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors p-1"
+            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* content */}
-        <div className="p-6">
+        <div className="px-6 pb-6">
           <textarea
             ref={textareaRef}
             value={task}
             onChange={(e) => setTask(e.target.value)}
-            placeholder="Write your action task here..."
-            className="w-full h-32 p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-700 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none resize-none text-neutral-700 dark:text-neutral-200 placeholder:text-neutral-400"
+            placeholder="What needs to be done?"
+            className="w-full h-32 p-4 bg-zinc-50 dark:bg-zinc-900 rounded-xl border-none focus:ring-2 focus:ring-zinc-200 dark:focus:ring-zinc-800 outline-none resize-none text-zinc-700 dark:text-zinc-200 placeholder:text-zinc-400 transition-all text-base"
           />
-          <div className="mt-2 text-xs text-neutral-400 flex justify-between">
-            <span>Markdown supported (basic)</span>
-            <span>⌘+Enter to save</span>
+          <div className="mt-3 flex items-center justify-between text-xs text-zinc-400">
+            <span>Markdown supported</span>
+            <span className="bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded text-zinc-500">⌘ + Enter</span>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 bg-neutral-50/50 dark:bg-neutral-900/50 border-t border-neutral-100 dark:border-neutral-800">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-zinc-100 dark:border-zinc-900/50">
           {initialTask ? (
             <button
               onClick={onRemove}
-              className="flex items-center gap-2 px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-sm font-medium"
             >
               <Trash2 size={16} />
-              Remove
+              <span className="hidden sm:inline">Delete</span>
             </button>
           ) : (
-            <div /> // Spacer
+            <div />
           )}
 
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors text-sm font-medium"
+              className="px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors text-sm font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={!task.trim()}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm shadow-blue-200 dark:shadow-none transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Action
             </button>

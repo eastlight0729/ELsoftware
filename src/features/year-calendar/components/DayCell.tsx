@@ -47,7 +47,7 @@ export const DayCell = memo(function DayCell({
       )}
       {hasAction && (
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1 bg-green-600 dark:bg-green-500"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-1.5 bg-green-600 dark:bg-green-500"
           style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
         />
       )}{" "}

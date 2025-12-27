@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { ChevronDown, ChevronsDown } from "lucide-react";
 import { TaskModal } from "./TaskModal";
+import { CalendarHelpModal } from "./CalendarHelpModal";
 import { MonthGrid } from "./MonthGrid";
 import { YearCalendarHeader } from "./YearCalendarHeader";
 import { WEEKDAY_LABELS, TOTAL_COLUMNS } from "../utils";
@@ -8,6 +10,7 @@ import { useYearCalendarState } from "../hooks/useYearCalendarState";
 import { useCalendarInteraction } from "../hooks/useCalendarInteraction";
 
 export function YearCalendar() {
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const {
     monthsToRender,
     yearDisplay,
@@ -33,6 +36,7 @@ export function YearCalendar() {
         onPrevYear={stateActions.handlePrevYear}
         onPrevMonth={stateActions.handlePrevMonth}
         onGoToToday={stateActions.handleGoToToday}
+        onShowHelp={() => setIsHelpOpen(true)}
       />
 
       {/* Calendar Grid Container */}
@@ -120,6 +124,8 @@ export function YearCalendar() {
           onClose={interactionHandlers.handleCloseModal}
         />
       )}
+
+      <CalendarHelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }

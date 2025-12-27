@@ -78,12 +78,15 @@ export const MonthGrid = memo(function MonthGrid({
             const isStart = range.start_date >= monthStartStr;
             const isEnd = range.end_date <= monthEndStr;
 
+            const isSmall = range.size === "1" || range.size === "2";
+
             return (
               <div
                 key={`bg-${range.id}`}
                 className={cn(
                   "rounded-sm relative",
                   "bg-green-300 dark:bg-green-700",
+                  isSmall ? "h-1.5 self-end mb-1" : "h-full",
                   !isStart &&
                     "rounded-l-none before:content-[''] before:absolute before:right-full before:top-0 before:bottom-0 before:w-6 before:bg-linear-to-r before:from-transparent before:to-green-300 dark:before:to-green-700",
                   !isEnd &&

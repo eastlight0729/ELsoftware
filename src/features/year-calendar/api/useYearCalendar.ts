@@ -2,7 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../lib/supabase";
 import { Tables } from "../../../lib/database.types";
 
-export type CalendarRange = Pick<Tables<"year_calendar_ranges">, "id" | "start_date" | "end_date" | "task" | "color">;
+// Adjusting type to manually include size until database types are regenerated
+export type CalendarRange = Pick<
+  Tables<"year_calendar_ranges">,
+  "id" | "start_date" | "end_date" | "task" | "color"
+> & { size?: string };
 
 export const calendarKeys = {
   all: ["year-calendar"] as const,
@@ -16,11 +20,11 @@ export function useYearCalendarRanges() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("year_calendar_ranges")
-        .select("id, start_date, end_date, task, color")
+        .select("id, start_date, end_date, task, color, size")
         .order("start_date", { ascending: true });
 
       if (error) throw error;
-      return data;
+      return data as unknown as CalendarRange[];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -36,12 +40,14 @@ export function useUpsertYearCalendarRange() {
       endDate,
       task,
       color,
+      size,
     }: {
       id?: string;
       startDate: string;
       endDate: string;
       task?: string;
       color?: string;
+      size?: string;
     }) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error("Not authenticated");
@@ -60,6 +66,7 @@ export function useUpsertYearCalendarRange() {
         end_date: endDate,
         task: task ? task.trim().slice(0, 500) : null, // Trim & Limit
         color: cleanColor,
+        size: size || "everyday",
       };
 
       // Validate Date Format YYYY-MM-DD
@@ -99,6 +106,7 @@ export function useUpsertYearCalendarRange() {
               end_date: newRange.endDate,
               task: newRange.task ?? null,
               color: newRange.color || list[index].color,
+              size: newRange.size || list[index].size || "everyday",
             };
           }
         } else {
@@ -109,6 +117,7 @@ export function useUpsertYearCalendarRange() {
             end_date: newRange.endDate,
             task: newRange.task ?? null,
             color: newRange.color || "indigo",
+            size: newRange.size || "everyday",
           });
         }
         return list;

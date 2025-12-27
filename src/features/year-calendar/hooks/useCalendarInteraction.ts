@@ -3,7 +3,7 @@ import { getDatesInRange } from "../utils";
 import { CalendarRange, CalendarMark } from "../api/useYearCalendar";
 
 export function useCalendarInteraction(
-  upsertRange: (vars: { id?: string; startDate: string; endDate: string; task?: string }) => void,
+  upsertRange: (vars: { id?: string; startDate: string; endDate: string; task?: string; size?: string }) => void,
   deleteRange: (id: string) => void,
   marks: CalendarMark[],
   upsertMark: (vars: { id?: number; date: string; task: string }) => void,
@@ -21,9 +21,13 @@ export function useCalendarInteraction(
 
   // Selection Data
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedRange, setSelectedRange] = useState<{ start: string; end: string; id?: string; task?: string } | null>(
-    null
-  );
+  const [selectedRange, setSelectedRange] = useState<{
+    start: string;
+    end: string;
+    id?: string;
+    task?: string;
+    size?: string;
+  } | null>(null);
 
   // Drag Handlers
   const handleMouseDown = useCallback((dateStr: string) => {
@@ -92,6 +96,7 @@ export function useCalendarInteraction(
       end: range.end_date,
       id: range.id,
       task: range.task || "",
+      size: range.size || "everyday",
     });
     setIsScheduleModalOpen(true);
   }, []);
@@ -119,13 +124,14 @@ export function useCalendarInteraction(
   };
 
   // --- Schedule/Task Handlers ---
-  const handleSaveTask = (task: string) => {
+  const handleSaveTask = (task: string, size: string) => {
     if (selectedRange) {
       upsertRange({
         id: selectedRange.id,
         startDate: selectedRange.start,
         endDate: selectedRange.end,
         task,
+        size,
       });
       setIsScheduleModalOpen(false);
       setSelectedRange(null);

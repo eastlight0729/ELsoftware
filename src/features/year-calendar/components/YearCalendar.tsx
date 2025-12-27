@@ -153,6 +153,7 @@ export function YearCalendar() {
           isOpen={isScheduleModalOpen}
           dates={modalDates}
           initialTask={selectedRange.task || null}
+          initialSize={selectedRange.size}
           onSave={interactionHandlers.handleSaveTask}
           onRemove={interactionHandlers.handleRemoveTask}
           onClose={interactionHandlers.handleCloseScheduleModal}

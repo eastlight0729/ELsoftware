@@ -86,21 +86,27 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
         {/* Content */}
         <div className="px-6 pb-6 space-y-4">
           {/* Size Selector */}
-          <div className="bg-zinc-50 dark:bg-zinc-900 p-1 rounded-xl flex gap-1">
+          <div className="relative flex w-full border-b border-zinc-200 dark:border-zinc-800">
             {SIZES.map((s) => (
               <button
                 key={s.value}
                 onClick={() => setSize(s.value)}
                 className={cn(
-                  "flex-1 py-1.5 rounded-lg text-xs font-medium transition-all duration-200",
+                  "flex-1 pb-2 text-xs font-medium transition-colors duration-200 outline-none",
                   size === s.value
-                    ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700"
-                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300"
+                    ? "text-zinc-900 dark:text-zinc-100"
+                    : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
                 )}
               >
                 {s.label}
               </button>
             ))}
+            <div
+              className="absolute -bottom-px left-0 h-0.5 w-1/4 bg-zinc-900 dark:bg-zinc-100 transition-transform duration-300 ease-out"
+              style={{
+                transform: `translateX(${SIZES.findIndex((s) => s.value === size) * 100}%)`,
+              }}
+            />
           </div>
 
           <textarea

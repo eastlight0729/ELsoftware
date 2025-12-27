@@ -1,6 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MONTHS } from "../utils";
-import { useYearCalendarRanges, useUpsertYearCalendarRange, useDeleteYearCalendarRange } from "../api/useYearCalendar";
+import {
+  useYearCalendarRanges,
+  useUpsertYearCalendarRange,
+  useDeleteYearCalendarRange,
+  useYearCalendarMarks,
+  useUpsertYearCalendarMark,
+  useDeleteYearCalendarMark,
+} from "../api/useYearCalendar";
 import { useYearCalendarHolidays } from "./useYearCalendarHolidays";
 
 export function useYearCalendarState() {
@@ -65,8 +72,11 @@ export function useYearCalendarState() {
 
   // 4. Data Loading
   const { data: ranges = [] } = useYearCalendarRanges();
+  const { data: marks = [] } = useYearCalendarMarks();
   const upsertRangeMutation = useUpsertYearCalendarRange();
   const deleteRangeMutation = useDeleteYearCalendarRange();
+  const upsertMarkMutation = useUpsertYearCalendarMark();
+  const deleteMarkMutation = useDeleteYearCalendarMark();
 
   // Use the new holiday caching hook
   const holidays = useYearCalendarHolidays(years);
@@ -78,6 +88,7 @@ export function useYearCalendarState() {
     isTodayVisible,
     holidays,
     ranges,
+    marks,
     actions: {
       handlePrevYear,
       handleNextYear,
@@ -86,6 +97,8 @@ export function useYearCalendarState() {
       handleGoToToday,
       upsertRange: upsertRangeMutation.mutate,
       deleteRange: deleteRangeMutation.mutate,
+      upsertMark: upsertMarkMutation.mutate,
+      deleteMark: deleteMarkMutation.mutate,
     },
   };
 }

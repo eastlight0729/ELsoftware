@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { CalendarRange } from "../api/useYearCalendar";
+import { CalendarRange, CalendarMark } from "../api/useYearCalendar";
 import { getDaysInMonth, getRangeSegmentsForMonth, getStartDayOfMonth, formatDate, TOTAL_COLUMNS } from "../utils";
 import { DayCell } from "./DayCell";
 
@@ -12,10 +12,12 @@ interface MonthGridProps {
   monthName: string;
   holidays: Record<string, string>;
   ranges: CalendarRange[];
+  marks: CalendarMark[];
   dragSelection: { start: string; end: string } | null;
   onMouseDown: (dateStr: string) => void;
   onMouseEnter: (dateStr: string) => void;
   onRangeClick: (range: CalendarRange, e: React.MouseEvent) => void;
+  onActionClick?: (mark: CalendarMark, e: React.MouseEvent) => void; // Optional if we want direct click handler for actions later, but interaction is via cell click for now
 }
 
 export const MonthGrid = memo(function MonthGrid({
@@ -24,6 +26,7 @@ export const MonthGrid = memo(function MonthGrid({
   monthName,
   holidays,
   ranges,
+  marks,
   dragSelection,
   onMouseDown,
   onMouseEnter,
@@ -40,6 +43,16 @@ export const MonthGrid = memo(function MonthGrid({
     return ranges.filter((r) => r.start_date <= monthEndStr && r.end_date >= monthStartStr);
   }, [ranges, monthStartStr, monthEndStr]);
 
+  const monthMarks = useMemo(() => {
+    return marks.filter((m) => m.date >= monthStartStr && m.date <= monthEndStr);
+  }, [marks, monthStartStr, monthEndStr]);
+
+  const marksMap = useMemo(() => {
+    const map = new Set<string>();
+    monthMarks.forEach((m) => map.add(m.date));
+    return map;
+  }, [monthMarks]);
+
   // Cells for Grid
   const cells = [
     ...Array.from({ length: startDay }, () => null),
@@ -48,6 +61,7 @@ export const MonthGrid = memo(function MonthGrid({
 
   return (
     <div className="flex items-center group gap-6 relative">
+      {/* ... header ... */}
       <div className="w-8 shrink-0 flex justify-end pr-3">
         <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500 group-hover:text-primary-500 transition-colors">
           {monthIndex + 1}
@@ -107,6 +121,7 @@ export const MonthGrid = memo(function MonthGrid({
             const isCoveredByRange = monthRanges.some((r) => dateStr >= r.start_date && dateStr <= r.end_date);
             const isCoveredByDrag = dragSelection && dateStr >= dragSelection.start && dateStr <= dragSelection.end;
             const isCovered = !!(isCoveredByRange || isCoveredByDrag);
+            const hasAction = marksMap.has(dateStr);
 
             return (
               <DayCell
@@ -119,6 +134,7 @@ export const MonthGrid = memo(function MonthGrid({
                 isWeekend={isWeekend}
                 holidayName={holidayName}
                 isCovered={isCovered}
+                hasAction={hasAction}
                 onMouseDown={onMouseDown}
                 onMouseEnter={onMouseEnter}
               />

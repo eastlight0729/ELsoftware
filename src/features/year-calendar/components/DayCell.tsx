@@ -10,6 +10,7 @@ interface DayCellProps {
   isWeekend: boolean;
   holidayName?: string;
   isCovered: boolean;
+  hasAction?: boolean;
   onMouseDown: (dateStr: string) => void;
   onMouseEnter: (dateStr: string) => void;
 }
@@ -23,6 +24,7 @@ export const DayCell = memo(function DayCell({
   isWeekend,
   holidayName,
   isCovered,
+  hasAction,
   onMouseDown,
   onMouseEnter,
 }: DayCellProps) {
@@ -43,7 +45,12 @@ export const DayCell = memo(function DayCell({
       {isToday && (
         <div className="absolute inset-0 border-2 border-indigo-600 dark:border-indigo-500 rounded-sm pointer-events-none" />
       )}
-
+      {hasAction && (
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1 bg-green-600 dark:bg-green-500"
+          style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+        />
+      )}{" "}
       {/* Custom Tooltip */}
       <div
         className={cn(

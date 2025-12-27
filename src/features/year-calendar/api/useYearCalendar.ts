@@ -156,3 +156,112 @@ export function useDeleteYearCalendarRange() {
     },
   });
 }
+
+export type CalendarMark = Pick<Tables<"year_calendar_marks">, "id" | "date" | "task">;
+
+export const markKeys = {
+  all: ["year-calendar-marks"] as const,
+  list: () => [...markKeys.all, "list"] as const,
+};
+
+export function useYearCalendarMarks() {
+  return useQuery({
+    queryKey: markKeys.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("year_calendar_marks")
+        .select("id, date, task")
+        .order("date", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+export function useUpsertYearCalendarMark() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, date, task }: { id?: number; date: string; task: string }) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error("Not authenticated");
+
+      const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
+
+      if (!profile || !profile.user_int_id) throw new Error("User profile not found");
+
+      const payload = {
+        user_id: profile.user_int_id,
+        date: date,
+        task: task.trim().slice(0, 500),
+      };
+
+      if (id) {
+        const { data, error } = await supabase
+          .from("year_calendar_marks")
+          .update(payload)
+          .eq("id", id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      } else {
+        const { data, error } = await supabase.from("year_calendar_marks").insert(payload).select().single();
+        if (error) throw error;
+        return data;
+      }
+    },
+    onMutate: async (newMark) => {
+      await queryClient.cancelQueries({ queryKey: markKeys.list() });
+      const previousMarks = queryClient.getQueryData<CalendarMark[]>(markKeys.list());
+
+      queryClient.setQueryData<CalendarMark[]>(markKeys.list(), (old) => {
+        const list = old ? [...old] : [];
+        if (newMark.id) {
+          const index = list.findIndex((m) => m.id === newMark.id);
+          if (index !== -1) {
+            list[index] = { ...list[index], date: newMark.date, task: newMark.task };
+          }
+        } else {
+          list.push({
+            id: -1, // Temp ID
+            date: newMark.date,
+            task: newMark.task,
+          });
+        }
+        return list;
+      });
+
+      return { previousMarks };
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: markKeys.list() });
+    },
+  });
+}
+
+export function useDeleteYearCalendarMark() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { error } = await supabase.from("year_calendar_marks").delete().eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: markKeys.list() });
+      const previousMarks = queryClient.getQueryData<CalendarMark[]>(markKeys.list());
+
+      queryClient.setQueryData<CalendarMark[]>(markKeys.list(), (old) => {
+        return old?.filter((m) => m.id !== id) || [];
+      });
+      return { previousMarks };
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: markKeys.list() });
+    },
+  });
+}

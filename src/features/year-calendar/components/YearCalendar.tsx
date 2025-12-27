@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ChevronDown, ChevronsDown } from "lucide-react";
 import { TaskModal } from "./TaskModal";
+import { ChoiceModal } from "./ChoiceModal";
+import { ActionModal } from "./ActionModal";
 import { CalendarHelpModal } from "./CalendarHelpModal";
 import { MonthGrid } from "./MonthGrid";
 import { YearCalendarHeader } from "./YearCalendarHeader";
@@ -17,16 +19,31 @@ export function YearCalendar() {
     isTodayVisible,
     holidays,
     ranges,
+    marks,
     actions: stateActions,
   } = useYearCalendarState();
 
   const {
     dragSelection,
     selectedRange,
-    isModalOpen,
+    selectedDate,
+
+    // Modals
+    isChoiceModalOpen,
+    isScheduleModalOpen,
+    isActionModalOpen,
+
     modalDates,
+    actionInitialTask,
+
     handlers: interactionHandlers,
-  } = useCalendarInteraction(stateActions.upsertRange, stateActions.deleteRange);
+  } = useCalendarInteraction(
+    stateActions.upsertRange,
+    stateActions.deleteRange,
+    marks,
+    stateActions.upsertMark,
+    stateActions.deleteMark
+  );
 
   return (
     <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
@@ -76,6 +93,7 @@ export function YearCalendar() {
                   year={month.year}
                   holidays={holidays}
                   ranges={ranges}
+                  marks={marks}
                   dragSelection={dragSelection}
                   onMouseDown={interactionHandlers.handleMouseDown}
                   onMouseEnter={interactionHandlers.handleMouseEnter}
@@ -109,19 +127,46 @@ export function YearCalendar() {
 
       <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">
         <div className="flex items-center gap-2">
+          <div
+            className="w-2 h-1.5 bg-green-700 dark:bg-green-600"
+            style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
+          />
+          <span>Action</span>
+        </div>
+        <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded-sm bg-green-500/50" />
-          <span>Task Range</span>
+          <span>Schedule Range</span>
         </div>
       </div>
 
-      {isModalOpen && selectedRange && (
+      {isChoiceModalOpen && (
+        <ChoiceModal
+          isOpen={isChoiceModalOpen}
+          onClose={interactionHandlers.handleCloseChoice}
+          onSelectSchedule={interactionHandlers.handleSelectSchedule}
+          onSelectAction={interactionHandlers.handleSelectAction}
+        />
+      )}
+
+      {isScheduleModalOpen && selectedRange && (
         <TaskModal
-          isOpen={isModalOpen}
+          isOpen={isScheduleModalOpen}
           dates={modalDates}
           initialTask={selectedRange.task || null}
           onSave={interactionHandlers.handleSaveTask}
           onRemove={interactionHandlers.handleRemoveTask}
-          onClose={interactionHandlers.handleCloseModal}
+          onClose={interactionHandlers.handleCloseScheduleModal}
+        />
+      )}
+
+      {isActionModalOpen && selectedDate && (
+        <ActionModal
+          isOpen={isActionModalOpen}
+          date={selectedDate}
+          initialTask={actionInitialTask || null}
+          onSave={interactionHandlers.handleSaveAction}
+          onRemove={interactionHandlers.handleRemoveAction}
+          onClose={interactionHandlers.handleCloseActionModal}
         />
       )}
 

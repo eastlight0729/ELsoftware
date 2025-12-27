@@ -1,28 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TaskModalProps {
   isOpen: boolean;
   dates: string[];
   initialTask: string | null;
-  onSave: (task: string) => void;
+  initialSize?: string;
+  onSave: (task: string, size: string) => void;
   onRemove: () => void;
   onClose: () => void;
 }
 
-export function TaskModal({ isOpen, dates, initialTask, onSave, onRemove, onClose }: TaskModalProps) {
+const SIZES = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "everyday", label: "Everyday" },
+];
+
+export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onRemove, onClose }: TaskModalProps) {
   const [task, setTask] = useState(initialTask || "");
+  const [size, setSize] = useState(initialSize || "everyday");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       setTask(initialTask || "");
+      setSize(initialSize || "everyday");
       // Focus after animation frame
       requestAnimationFrame(() => {
         textareaRef.current?.focus();
       });
     }
-  }, [isOpen, initialTask]);
+  }, [isOpen, initialTask, initialSize]);
 
   if (!isOpen) return null;
 
@@ -34,7 +45,7 @@ export function TaskModal({ isOpen, dates, initialTask, onSave, onRemove, onClos
         onClose();
       }
     } else {
-      onSave(task);
+      onSave(task, size);
     }
   };
 
@@ -72,7 +83,30 @@ export function TaskModal({ isOpen, dates, initialTask, onSave, onRemove, onClos
         </div>
 
         {/* content */}
-        <div className="p-6">
+        <div className="p-6 space-y-4">
+          {/* Size Selector */}
+          <div>
+            <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2 block">
+              Intensity / Size
+            </label>
+            <div className="flex gap-2">
+              {SIZES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setSize(s.value)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-md text-sm font-medium transition-colors border",
+                    size === s.value
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <textarea
             ref={textareaRef}
             value={task}
@@ -112,7 +146,7 @@ export function TaskModal({ isOpen, dates, initialTask, onSave, onRemove, onClos
               disabled={!task.trim()}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm shadow-indigo-200 dark:shadow-none transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save Task
+              Save Range
             </button>
           </div>
         </div>

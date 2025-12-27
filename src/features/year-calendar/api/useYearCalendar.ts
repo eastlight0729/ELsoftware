@@ -202,6 +202,12 @@ export function useUpsertYearCalendarMark() {
 
       if (!profile || !profile.user_int_id) throw new Error("User profile not found");
 
+      // Validate Date Format YYYY-MM-DD
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        throw new Error("Invalid date format");
+      }
+
       const payload = {
         user_id: profile.user_int_id,
         date: date,

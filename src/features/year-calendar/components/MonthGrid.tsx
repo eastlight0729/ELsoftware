@@ -15,7 +15,7 @@ interface MonthGridProps {
   ranges: CalendarRange[];
   marks: CalendarMark[];
   dragSelection: { start: string; end: string } | null;
-  onMouseDown: (dateStr: string) => void;
+  onMouseDown: (dateStr: string, e: React.MouseEvent) => void;
   onMouseEnter: (dateStr: string) => void;
   onRangeClick: (range: CalendarRange, e: React.MouseEvent) => void;
   onActionClick?: (mark: CalendarMark, e: React.MouseEvent) => void;

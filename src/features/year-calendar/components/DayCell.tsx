@@ -11,7 +11,7 @@ interface DayCellProps {
   holidayName?: string;
   isCovered: boolean;
   hasAction?: boolean;
-  onMouseDown: (dateStr: string) => void;
+  onMouseDown: (dateStr: string, e: React.MouseEvent) => void;
   onMouseEnter: (dateStr: string) => void;
 }
 
@@ -32,7 +32,7 @@ export const DayCell = memo(function DayCell({
 
   return (
     <div
-      onMouseDown={() => onMouseDown(dateStr)}
+      onMouseDown={(e) => onMouseDown(dateStr, e)}
       onMouseEnter={() => onMouseEnter(dateStr)}
       className={cn(
         "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer group/cell",

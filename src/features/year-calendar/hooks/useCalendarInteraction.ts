@@ -19,6 +19,9 @@ export function useCalendarInteraction(
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
 
+  // Dropdown Positioning
+  const [dropdownPosition, setDropdownPosition] = useState<{ x: number; y: number } | null>(null);
+
   // Selection Data
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedRange, setSelectedRange] = useState<{
@@ -30,10 +33,11 @@ export function useCalendarInteraction(
   } | null>(null);
 
   // Drag Handlers
-  const handleMouseDown = useCallback((dateStr: string) => {
+  const handleMouseDown = useCallback((dateStr: string, e: React.MouseEvent) => {
     setIsDragging(true);
     setDragStart(dateStr);
     setDragCurrent(dateStr);
+    setDropdownPosition({ x: e.clientX, y: e.clientY });
   }, []);
 
   const handleMouseEnter = useCallback(
@@ -121,6 +125,7 @@ export function useCalendarInteraction(
   const handleCloseChoice = () => {
     setIsChoiceModalOpen(false);
     setSelectedDate(null);
+    setDropdownPosition(null);
   };
 
   // --- Schedule/Task Handlers ---
@@ -199,6 +204,7 @@ export function useCalendarInteraction(
     isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
+    dropdownPosition,
 
     // Modal Data
     modalDates: selectedRange ? getDatesInRange(selectedRange.start, selectedRange.end) : [],

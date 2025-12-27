@@ -32,6 +32,7 @@ export function YearCalendar() {
     isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
+    dropdownPosition,
 
     modalDates,
     actionInitialTask,
@@ -145,6 +146,7 @@ export function YearCalendar() {
           onClose={interactionHandlers.handleCloseChoice}
           onSelectSchedule={interactionHandlers.handleSelectSchedule}
           onSelectAction={interactionHandlers.handleSelectAction}
+          position={dropdownPosition}
         />
       )}
 

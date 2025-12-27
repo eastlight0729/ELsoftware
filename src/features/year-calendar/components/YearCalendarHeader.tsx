@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronUp, ChevronsUp, RotateCcw, HelpCircle, MoreHorizontal } from "lucide-react";
+import { ChevronUp, ChevronDown, RotateCcw, HelpCircle, MoreHorizontal } from "lucide-react";
 
 interface YearCalendarHeaderProps {
   yearDisplay: string;
   isTodayVisible: boolean;
-  onPrevYear: () => void;
   onPrevMonth: () => void;
+  onNextMonth: () => void;
   onGoToToday: () => void;
   onShowHelp: () => void;
 }
@@ -13,8 +13,8 @@ interface YearCalendarHeaderProps {
 export function YearCalendarHeader({
   yearDisplay,
   isTodayVisible,
-  onPrevYear,
   onPrevMonth,
+  onNextMonth,
   onGoToToday,
   onShowHelp,
 }: YearCalendarHeaderProps) {
@@ -39,21 +39,21 @@ export function YearCalendarHeader({
 
   return (
     <div className="grid grid-cols-[32px_1fr_32px] gap-6 px-6 pb-2 items-center border-b border-neutral-300 dark:border-neutral-700">
-      {/* Top Left: Up Buttons */}
-      <div className="flex flex-col items-center gap-1">
-        <button
-          onClick={onPrevYear}
-          className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
-          title="Previous Year"
-        >
-          <ChevronsUp size={16} />
-        </button>
+      {/* Top Left: Navigation Buttons */}
+      <div className="flex items-center gap-1">
         <button
           onClick={onPrevMonth}
           className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
           title="Previous Month"
         >
           <ChevronUp size={16} />
+        </button>
+        <button
+          onClick={onNextMonth}
+          className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+          title="Next Month"
+        >
+          <ChevronDown size={16} />
         </button>
       </div>
 

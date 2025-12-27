@@ -1,4 +1,5 @@
-import { ChevronUp, ChevronsUp, RotateCcw, Info } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronUp, ChevronsUp, RotateCcw, Info, MoreHorizontal } from "lucide-react";
 
 interface YearCalendarHeaderProps {
   yearDisplay: string;
@@ -17,8 +18,22 @@ export function YearCalendarHeader({
   onGoToToday,
   onShowHelp,
 }: YearCalendarHeaderProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="grid grid-cols-[32px_1fr] gap-6 px-6 pb-2 border-b border-neutral-300 dark:border-neutral-700">
+    <div className="grid grid-cols-[32px_1fr_32px] gap-6 px-6 pb-2 items-center border-b border-neutral-300 dark:border-neutral-700">
       {/* Top Left: Up Buttons */}
       <div className="flex flex-col items-center gap-1">
         <button
@@ -38,7 +53,7 @@ export function YearCalendarHeader({
       </div>
 
       {/* Top Center: Year Text & Reset Button */}
-      <div className="flex items-center justify-center pb-1">
+      <div className="flex items-center justify-center">
         <div className="relative flex items-center">
           <button
             onClick={onShowHelp}
@@ -58,6 +73,28 @@ export function YearCalendarHeader({
             >
               <RotateCcw size={16} />
             </button>
+          )}
+        </div>
+      </div>
+
+      {/* Top Right: Menu Button */}
+      <div className="flex items-center justify-center" ref={menuRef}>
+        <div className="relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+            title="Menu"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+
+          {/* Menu Dropdown */}
+          {isMenuOpen && (
+            <div className="absolute top-full right-0 mt-1 w-32 bg-white dark:bg-neutral-800 rounded-md shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+              <div className="px-3 py-2 text-xs text-neutral-400 dark:text-neutral-500 text-center italic">
+                No options
+              </div>
+            </div>
           )}
         </div>
       </div>

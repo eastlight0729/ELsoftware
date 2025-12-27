@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ChevronDown, ChevronsDown } from "lucide-react";
 import { TaskModal } from "./TaskModal";
 import { ChoiceModal } from "./ChoiceModal";
 import { ActionModal } from "./ActionModal";
@@ -32,6 +31,7 @@ export function YearCalendar() {
     isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
+    dropdownPosition,
 
     modalDates,
     actionInitialTask,
@@ -50,8 +50,8 @@ export function YearCalendar() {
       <YearCalendarHeader
         yearDisplay={yearDisplay}
         isTodayVisible={isTodayVisible}
-        onPrevYear={stateActions.handlePrevYear}
         onPrevMonth={stateActions.handlePrevMonth}
+        onNextMonth={stateActions.handleNextMonth}
         onGoToToday={stateActions.handleGoToToday}
         onShowHelp={() => setIsHelpOpen(true)}
       />
@@ -103,26 +103,7 @@ export function YearCalendar() {
             </div>
           </div>
         </div>
-
-        {/* Bottom Footer Area (Down Buttons) */}
-        <div className="px-6 pt-2 pb-4 border-t border-neutral-300 dark:border-neutral-700">
-          <div className="flex flex-col items-center w-8 gap-1">
-            <button
-              onClick={stateActions.handleNextMonth}
-              className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
-              title="Next Month"
-            >
-              <ChevronDown size={16} />
-            </button>
-            <button
-              onClick={stateActions.handleNextYear}
-              className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-sm transition-colors text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
-              title="Next Year"
-            >
-              <ChevronsDown size={16} />
-            </button>
-          </div>
-        </div>
+        <div className="border-t border-neutral-300 dark:border-neutral-700" />
       </div>
 
       <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">
@@ -145,6 +126,7 @@ export function YearCalendar() {
           onClose={interactionHandlers.handleCloseChoice}
           onSelectSchedule={interactionHandlers.handleSelectSchedule}
           onSelectAction={interactionHandlers.handleSelectAction}
+          position={dropdownPosition}
         />
       )}
 

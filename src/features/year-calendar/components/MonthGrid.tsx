@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { CalendarRange } from "../api/useYearCalendar";
 import { getDaysInMonth, getRangeSegmentsForMonth, getStartDayOfMonth, formatDate, TOTAL_COLUMNS } from "../utils";
+import { DayCell } from "./DayCell";
 
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -101,44 +102,26 @@ export const MonthGrid = memo(function MonthGrid({
 
             const dateStr = formatDate(year, monthIndex, day);
             const holidayName = holidays[dateStr];
-            const isHoliday = !!holidayName;
             const dayOfWeek = DAY_NAMES[cellIndex % 7];
 
             const isCoveredByRange = monthRanges.some((r) => dateStr >= r.start_date && dateStr <= r.end_date);
             const isCoveredByDrag = dragSelection && dateStr >= dragSelection.start && dateStr <= dragSelection.end;
-            const isCovered = isCoveredByRange || isCoveredByDrag;
+            const isCovered = !!(isCoveredByRange || isCoveredByDrag);
 
             return (
-              <div
+              <DayCell
                 key={`day-${day}`}
-                onMouseDown={() => onMouseDown(dateStr)}
-                onMouseEnter={() => onMouseEnter(dateStr)}
-                className={cn(
-                  "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer group/cell",
-                  isCovered ? "bg-transparent" : isWeekend ? "bg-neutral-100 dark:bg-neutral-800/50" : "bg-transparent",
-                  isWeekend || isHoliday
-                    ? "text-red-500/80 dark:text-red-400/80"
-                    : "text-neutral-700 dark:text-neutral-300",
-                  "hover:bg-green-500/20 hover:z-50"
-                )}
-              >
-                <span className={cn("text-[10px] font-medium leading-none", isToday && "font-bold")}>{day}</span>
-                {isToday && (
-                  <div className="absolute inset-0 border-2 border-indigo-600 dark:border-indigo-500 rounded-sm pointer-events-none" />
-                )}
-
-                {/* Custom Tooltip */}
-                <div
-                  className={cn(
-                    "absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-[10px] rounded-md shadow-sm whitespace-nowrap pointer-events-none opacity-0 group-hover/cell:opacity-100 transition-opacity duration-75 z-50",
-                    "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-900"
-                  )}
-                >
-                  {`${monthName} ${day}, ${dayOfWeek}${isToday ? " (Today)" : ""}${
-                    isHoliday ? ` (${holidayName})` : ""
-                  }`}
-                </div>
-              </div>
+                day={day}
+                dateStr={dateStr}
+                monthName={monthName}
+                dayOfWeek={dayOfWeek}
+                isToday={isToday}
+                isWeekend={isWeekend}
+                holidayName={holidayName}
+                isCovered={isCovered}
+                onMouseDown={onMouseDown}
+                onMouseEnter={onMouseEnter}
+              />
             );
           })}
           {Array.from({ length: TOTAL_COLUMNS - cells.length }).map((_, i) => (

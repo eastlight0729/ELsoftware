@@ -2,11 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../lib/supabase";
 import { Tables } from "../../../lib/database.types";
 
-export type CalendarRange = Tables<"year_calendar_ranges">;
+export type CalendarRange = Pick<Tables<"year_calendar_ranges">, "id" | "start_date" | "end_date" | "task" | "color">;
 
 export const calendarKeys = {
   all: ["year-calendar"] as const,
   ranges: () => [...calendarKeys.all, "ranges"] as const,
+  holidays: (year: number) => [...calendarKeys.all, "holidays", year] as const,
 };
 
 export function useYearCalendarRanges() {
@@ -15,7 +16,7 @@ export function useYearCalendarRanges() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("year_calendar_ranges")
-        .select("*")
+        .select("id, start_date, end_date, task, color")
         .order("start_date", { ascending: true });
 
       if (error) throw error;
@@ -49,12 +50,16 @@ export function useUpsertYearCalendarRange() {
 
       if (!profile || !profile.user_int_id) throw new Error("User profile not found");
 
+      // Permitted colors only.
+      const ALLOWED_COLORS = ["indigo", "green", "red", "blue", "yellow", "purple", "gray"];
+      const cleanColor = ALLOWED_COLORS.includes(color || "") ? color : "indigo";
+
       const payload = {
         user_id: profile.user_int_id,
         start_date: startDate,
         end_date: endDate,
-        task: task ? task.slice(0, 500) : null, // Limit task length to 500 chars
-        color: color || "indigo",
+        task: task ? task.trim().slice(0, 500) : null, // Trim & Limit
+        color: cleanColor,
       };
 
       // Validate Date Format YYYY-MM-DD
@@ -100,8 +105,6 @@ export function useUpsertYearCalendarRange() {
           // Optimistically add new
           list.push({
             id: "temp-" + Date.now(),
-            created_at: new Date().toISOString(),
-            user_id: 0, // temporary
             start_date: newRange.startDate,
             end_date: newRange.endDate,
             task: newRange.task ?? null,

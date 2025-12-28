@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, CalendarRange } from "lucide-react";
 
 interface ActionModalProps {
   isOpen: boolean;
@@ -8,9 +8,10 @@ interface ActionModalProps {
   onSave: (task: string) => void;
   onRemove: () => void;
   onClose: () => void;
+  onSwitchTask: () => void;
 }
 
-export function ActionModal({ isOpen, date, initialTask, onSave, onRemove, onClose }: ActionModalProps) {
+export function ActionModal({ isOpen, date, initialTask, onSave, onRemove, onClose, onSwitchTask }: ActionModalProps) {
   const [taskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,6 +69,13 @@ export function ActionModal({ isOpen, date, initialTask, onSave, onRemove, onClo
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Action</h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">{formattedDate}</p>
           </div>
+          <button
+            onClick={onSwitchTask}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 rounded-lg transition-colors text-xs font-medium text-neutral-600 dark:text-neutral-300"
+          >
+            <CalendarRange size={14} className="text-blue-500" />
+            <span>Switch to Schedule</span>
+          </button>
         </div>
 
         {/* content */}

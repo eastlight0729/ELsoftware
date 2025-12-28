@@ -142,6 +142,7 @@ export function YearCalendar() {
           onSave={interactionHandlers.handleSaveTask}
           onRemove={interactionHandlers.handleRemoveTask}
           onClose={interactionHandlers.handleCloseScheduleModal}
+          onSwitchAction={interactionHandlers.handleSwitchToAction}
         />
       )}
 
@@ -153,6 +154,7 @@ export function YearCalendar() {
           onSave={interactionHandlers.handleSaveAction}
           onRemove={interactionHandlers.handleRemoveAction}
           onClose={interactionHandlers.handleCloseActionModal}
+          onSwitchTask={interactionHandlers.handleSwitchToTask}
         />
       )}
 

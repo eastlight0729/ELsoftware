@@ -225,6 +225,50 @@ export function useCalendarInteraction(
     setSelectedDate(null);
   };
 
+  // --- Switch Handlers ---
+  const handleSwitchToAction = (date: string) => {
+    setIsScheduleModalOpen(false);
+    // Don't clear selectedRange immediately if we want to preserve state?
+    // Actually, usually we clean up. But here maybe we just swap.
+    // If we swap, we set the new state.
+
+    // We need to set selectedDate for ActionModal
+    setSelectedDate(date);
+    setIsActionModalOpen(true);
+    // We can keep selectedRange as null or keep it?
+    // If we keep it, it might interfere if logic relies on "if selectedRange...".
+    // But selectedRange is mostly for TaskModal.
+    setSelectedRange(null);
+  };
+
+  const handleSwitchToTask = () => {
+    if (!selectedDate) return;
+
+    // Find overlapping range
+    const overlapping = ranges.find((r) => r.start_date <= selectedDate && r.end_date >= selectedDate);
+
+    setIsActionModalOpen(false);
+
+    if (overlapping) {
+      setSelectedRange({
+        start: overlapping.start_date,
+        end: overlapping.end_date,
+        id: overlapping.id,
+        task: overlapping.task || undefined,
+        size: overlapping.size,
+      });
+    } else {
+      // Fallback: Create new schedule for this day
+      setSelectedRange({
+        start: selectedDate,
+        end: selectedDate,
+      });
+    }
+
+    setIsScheduleModalOpen(true);
+    setSelectedDate(null);
+  };
+
   return {
     isDragging,
     dragSelection,
@@ -262,6 +306,10 @@ export function useCalendarInteraction(
       handleSaveAction,
       handleRemoveAction,
       handleCloseActionModal,
+
+      // Switching
+      handleSwitchToAction,
+      handleSwitchToTask,
     },
   };
 }

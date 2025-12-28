@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Zap, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TaskModalProps {
@@ -10,6 +10,7 @@ interface TaskModalProps {
   onSave: (task: string, size: string) => void;
   onRemove: () => void;
   onClose: () => void;
+  onSwitchAction: (date: string) => void;
 }
 
 const SIZES = [
@@ -19,11 +20,34 @@ const SIZES = [
   { value: "everyday", label: "All" },
 ];
 
-export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onRemove, onClose }: TaskModalProps) {
+export function TaskModal({
+  isOpen,
+  dates,
+  initialTask,
+  initialSize,
+  onSave,
+  onRemove,
+  onClose,
+  onSwitchAction,
+}: TaskModalProps) {
   const [taskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [size, setSize] = useState(initialSize || "everyday");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -83,6 +107,53 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
           <div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">{title}</h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">{subtitle}</p>
+          </div>
+
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => {
+                if (dates.length === 1) {
+                  onSwitchAction(dates[0]);
+                } else {
+                  setIsDropdownOpen(!isDropdownOpen);
+                }
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 rounded-lg transition-colors text-xs font-medium text-neutral-600 dark:text-neutral-300"
+            >
+              <Zap size={14} className="text-amber-500" />
+              <span>Switch to Action</span>
+              {dates.length > 1 && (
+                <ChevronDown
+                  size={12}
+                  className={cn("transition-transform duration-200", isDropdownOpen && "rotate-180")}
+                />
+              )}
+            </button>
+
+            {isDropdownOpen && dates.length > 1 && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="py-1 max-h-60 overflow-y-auto">
+                  {[...dates].sort().map((date) => (
+                    <button
+                      key={date}
+                      onClick={() => {
+                        onSwitchAction(date);
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-xs text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors flex items-center justify-between group"
+                    >
+                      <span className="font-medium">
+                        {new Date(date).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      <Zap size={12} className="opacity-0 group-hover:opacity-100 text-amber-500 transition-opacity" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

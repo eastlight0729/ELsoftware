@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { TaskModal } from "./TaskModal";
-import { ChoiceModal } from "./ChoiceModal";
 import { ActionModal } from "./ActionModal";
 import { CalendarHelpModal } from "./CalendarHelpModal";
 import { MonthGrid } from "./MonthGrid";
@@ -29,11 +28,9 @@ export function YearCalendar() {
     selectedDate,
 
     // Modals
-    isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
     isCautionModalOpen,
-    dropdownPosition,
 
     modalDates,
     actionInitialTask,
@@ -123,16 +120,6 @@ export function YearCalendar() {
         </div>
       </div>
 
-      {isChoiceModalOpen && (
-        <ChoiceModal
-          isOpen={isChoiceModalOpen}
-          onClose={interactionHandlers.handleCloseChoice}
-          onSelectSchedule={interactionHandlers.handleSelectSchedule}
-          onSelectAction={interactionHandlers.handleSelectAction}
-          position={dropdownPosition}
-        />
-      )}
-
       {isScheduleModalOpen && selectedRange && (
         <TaskModal
           isOpen={isScheduleModalOpen}
@@ -142,6 +129,7 @@ export function YearCalendar() {
           onSave={interactionHandlers.handleSaveTask}
           onRemove={interactionHandlers.handleRemoveTask}
           onClose={interactionHandlers.handleCloseScheduleModal}
+          onSwitchAction={interactionHandlers.handleSwitchToAction}
         />
       )}
 
@@ -153,6 +141,7 @@ export function YearCalendar() {
           onSave={interactionHandlers.handleSaveAction}
           onRemove={interactionHandlers.handleRemoveAction}
           onClose={interactionHandlers.handleCloseActionModal}
+          onSwitchTask={interactionHandlers.handleSwitchToTask}
         />
       )}
 

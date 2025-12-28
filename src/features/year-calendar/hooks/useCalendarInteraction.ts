@@ -16,13 +16,9 @@ export function useCalendarInteraction(
   const [dragCurrent, setDragCurrent] = useState<string | null>(null);
 
   // States for different modals
-  const [isChoiceModalOpen, setIsChoiceModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [isCautionModalOpen, setIsCautionModalOpen] = useState(false);
-
-  // Dropdown Positioning
-  const [dropdownPosition, setDropdownPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Selection Data
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -35,11 +31,10 @@ export function useCalendarInteraction(
   } | null>(null);
 
   // Drag Handlers
-  const handleMouseDown = useCallback((dateStr: string, e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((dateStr: string) => {
     setIsDragging(true);
     setDragStart(dateStr);
     setDragCurrent(dateStr);
-    setDropdownPosition({ x: e.clientX, y: e.clientY });
   }, []);
 
   const handleMouseEnter = useCallback(
@@ -64,23 +59,14 @@ export function useCalendarInteraction(
 
   const finishDrag = useCallback(() => {
     if (dragStart && dragCurrent) {
-      // Check if it's a click (single day selection) or a drag (multi day)
-      // If single day, open choice modal. If multi-day, go straight to schedule modal.
-      if (dragStart === dragCurrent) {
-        // It's a click
-        setSelectedDate(dragStart);
-        setIsChoiceModalOpen(true);
-      } else {
-        // It's a drag range
-        const start = dragStart < dragCurrent ? dragStart : dragCurrent;
-        const end = dragStart < dragCurrent ? dragCurrent : dragStart;
+      const start = dragStart < dragCurrent ? dragStart : dragCurrent;
+      const end = dragStart < dragCurrent ? dragCurrent : dragStart;
 
-        if (checkOverlap(start, end)) {
-          setIsCautionModalOpen(true);
-        } else {
-          setSelectedRange({ start, end });
-          setIsScheduleModalOpen(true);
-        }
+      if (checkOverlap(start, end)) {
+        setIsCautionModalOpen(true);
+      } else {
+        setSelectedRange({ start, end });
+        setIsScheduleModalOpen(true);
       }
     }
     setIsDragging(false);
@@ -119,33 +105,6 @@ export function useCalendarInteraction(
     });
     setIsScheduleModalOpen(true);
   }, []);
-
-  // --- Choice Handlers ---
-  const handleSelectSchedule = () => {
-    setIsChoiceModalOpen(false);
-    if (selectedDate) {
-      if (checkOverlap(selectedDate, selectedDate)) {
-        setIsCautionModalOpen(true);
-      } else {
-        // Open Schedule modal for this single date
-        setSelectedRange({ start: selectedDate, end: selectedDate });
-        setIsScheduleModalOpen(true);
-      }
-    }
-  };
-
-  const handleSelectAction = () => {
-    setIsChoiceModalOpen(false);
-    if (selectedDate) {
-      setIsActionModalOpen(true);
-    }
-  };
-
-  const handleCloseChoice = () => {
-    setIsChoiceModalOpen(false);
-    setSelectedDate(null);
-    setDropdownPosition(null);
-  };
 
   // --- Schedule/Task Handlers ---
   const handleSaveTask = (task: string, size: string) => {
@@ -276,11 +235,10 @@ export function useCalendarInteraction(
     selectedDate,
 
     // Modals Open State
-    isChoiceModalOpen,
+    // Modals Open State
     isScheduleModalOpen,
     isActionModalOpen,
     isCautionModalOpen,
-    dropdownPosition,
 
     // Modal Data
     modalDates: selectedRange ? getDatesInRange(selectedRange.start, selectedRange.end) : [],
@@ -290,11 +248,6 @@ export function useCalendarInteraction(
       handleMouseDown,
       handleMouseEnter,
       handleRangeClick,
-
-      // Choice
-      handleSelectSchedule,
-      handleSelectAction,
-      handleCloseChoice,
 
       // Schedule
       handleSaveTask,

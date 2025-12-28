@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { TaskModal } from "./TaskModal";
-import { ChoiceModal } from "./ChoiceModal";
 import { ActionModal } from "./ActionModal";
 import { CalendarHelpModal } from "./CalendarHelpModal";
 import { MonthGrid } from "./MonthGrid";
@@ -29,11 +28,9 @@ export function YearCalendar() {
     selectedDate,
 
     // Modals
-    isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
     isCautionModalOpen,
-    dropdownPosition,
 
     modalDates,
     actionInitialTask,
@@ -122,16 +119,6 @@ export function YearCalendar() {
           <span>Schedule Range</span>
         </div>
       </div>
-
-      {isChoiceModalOpen && (
-        <ChoiceModal
-          isOpen={isChoiceModalOpen}
-          onClose={interactionHandlers.handleCloseChoice}
-          onSelectSchedule={interactionHandlers.handleSelectSchedule}
-          onSelectAction={interactionHandlers.handleSelectAction}
-          position={dropdownPosition}
-        />
-      )}
 
       {isScheduleModalOpen && selectedRange && (
         <TaskModal

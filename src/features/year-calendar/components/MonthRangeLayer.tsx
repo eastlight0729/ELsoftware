@@ -27,7 +27,18 @@ export const MonthRangeLayer = memo(function MonthRangeLayer({
         const isStart = range.start_date >= monthStartStr;
         const isEnd = range.end_date <= monthEndStr;
 
-        const isSmall = range.size === "1" || range.size === "2";
+        const sizeClass = (() => {
+          switch (range.size) {
+            case "1":
+              return "h-1/4 self-end";
+            case "2":
+              return "h-1/2 self-end";
+            case "3":
+              return "h-3/4 self-end";
+            default:
+              return "h-full";
+          }
+        })();
 
         return (
           <div
@@ -35,7 +46,7 @@ export const MonthRangeLayer = memo(function MonthRangeLayer({
             className={cn(
               "rounded-sm relative",
               "bg-green-300 dark:bg-green-700",
-              isSmall ? "h-1.5 self-end mb-1" : "h-full",
+              sizeClass,
               !isStart &&
                 "rounded-l-none before:content-[''] before:absolute before:right-full before:top-0 before:bottom-0 before:w-6 before:bg-linear-to-r before:from-transparent before:to-green-300 dark:before:to-green-700",
               !isEnd &&

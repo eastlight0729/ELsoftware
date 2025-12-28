@@ -32,6 +32,19 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
         const isStart = range.start_date >= monthStartStr;
         const isEnd = range.end_date <= monthEndStr;
 
+        const sizeClass = (() => {
+          switch (range.size) {
+            case "1":
+              return "h-1/4 self-end";
+            case "2":
+              return "h-1/2 self-end";
+            case "3":
+              return "h-3/4 self-end";
+            default:
+              return "h-full";
+          }
+        })();
+
         return (
           <div
             key={range.id}
@@ -40,6 +53,7 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
               "group/range relative z-10 hover:z-50",
               "rounded-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/10 transition-colors pointer-events-auto",
               "flex items-center justify-center",
+              sizeClass,
               !isEnd && "rounded-r-none",
               !isStart && "rounded-l-none"
             )}

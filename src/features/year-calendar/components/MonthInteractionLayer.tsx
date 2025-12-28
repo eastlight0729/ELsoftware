@@ -45,6 +45,7 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
             style={{
               gridColumnStart: segments.startCol,
               gridColumnEnd: `span ${segments.span}`,
+              gridRow: 1,
             }}
             title={range.task || ""}
           >
@@ -77,6 +78,7 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
               style={{
                 gridColumnStart: segments.startCol,
                 gridColumnEnd: `span ${segments.span}`,
+                gridRow: 1,
               }}
             />
           );

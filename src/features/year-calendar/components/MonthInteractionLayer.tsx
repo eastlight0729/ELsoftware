@@ -50,11 +50,30 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
             }}
           >
             {/* Tooltip */}
-            {range.task && (
-              <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs rounded-sm py-1 px-2 whitespace-nowrap opacity-0 group-hover/range:opacity-100 transition-opacity pointer-events-none drop-shadow-md z-50">
-                {range.task}
-              </div>
-            )}
+            {/* Tooltip */}
+            <div
+              className={cn(
+                "absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-[10px] rounded-md shadow-sm whitespace-nowrap pointer-events-none opacity-0 group-hover/range:opacity-100 transition-opacity duration-75 z-50",
+                "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-neutral-900"
+              )}
+            >
+              {(() => {
+                const start = new Date(range.start_date).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                });
+                const end = new Date(range.end_date).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                });
+                return range.start_date === range.end_date ? start : `${start} - ${end}`;
+              })()}
+              {range.task && (
+                <div className="font-semibold border-t border-white/20 dark:border-neutral-700/50 mt-1 pt-1">
+                  {range.task.split("\n")[0]}
+                </div>
+              )}
+            </div>
           </div>
         );
       })}

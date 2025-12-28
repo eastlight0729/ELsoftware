@@ -20,16 +20,24 @@ const SIZES = [
 ];
 
 export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onRemove, onClose }: TaskModalProps) {
-  const [task, setTask] = useState(initialTask || "");
+  const [taskTitle, setTaskTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [size, setSize] = useState(initialSize || "everyday");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setTask(initialTask || "");
+      if (initialTask) {
+        const parts = initialTask.split("\n\n");
+        setTaskTitle(parts[0] || "");
+        setDescription(parts.slice(1).join("\n\n") || "");
+      } else {
+        setTaskTitle("");
+        setDescription("");
+      }
       setSize(initialSize || "everyday");
       requestAnimationFrame(() => {
-        textareaRef.current?.focus();
+        inputRef.current?.focus();
       });
     }
   }, [isOpen, initialTask, initialSize]);
@@ -37,14 +45,15 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
   if (!isOpen) return null;
 
   const handleSave = () => {
-    if (!task.trim()) {
+    if (!taskTitle.trim()) {
       if (initialTask) {
         onRemove();
       } else {
         onClose();
       }
     } else {
-      onSave(task, size);
+      const fullTask = description.trim() ? `${taskTitle}\n\n${description}` : taskTitle;
+      onSave(fullTask, size);
     }
   };
 
@@ -103,12 +112,27 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
             />
           </div>
 
+          <input
+            ref={inputRef}
+            type="text"
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.metaKey && !e.ctrlKey) {
+                e.preventDefault();
+                document.getElementById("task-description")?.focus();
+              }
+            }}
+            placeholder="Event Title"
+            className="w-full p-4 text-lg font-semibold bg-white dark:bg-neutral-900 rounded-xl border-none outline-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 transition-all"
+          />
+
           <textarea
-            ref={textareaRef}
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            placeholder="What are you planning?"
-            className="w-full h-32 p-4 bg-white dark:bg-neutral-900 rounded-xl border-none outline-none resize-none text-neutral-700 dark:text-neutral-200 placeholder:text-neutral-400 transition-all text-base"
+            id="task-description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add description..."
+            className="w-full h-32 p-4 bg-white dark:bg-neutral-900 rounded-xl border-none outline-none resize-none text-neutral-600 dark:text-neutral-300 placeholder:text-neutral-400 transition-all text-sm"
           />
 
           <div className="flex items-center justify-end text-xs text-neutral-400">
@@ -139,7 +163,7 @@ export function TaskModal({ isOpen, dates, initialTask, initialSize, onSave, onR
             </button>
             <button
               onClick={handleSave}
-              disabled={!task.trim()}
+              disabled={!taskTitle.trim()}
               className="px-5 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white rounded-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Schedule

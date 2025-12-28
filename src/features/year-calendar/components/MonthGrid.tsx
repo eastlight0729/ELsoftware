@@ -50,8 +50,8 @@ export const MonthGrid = memo(
     }, [marks, monthStartStr, monthEndStr]);
 
     const marksMap = useMemo(() => {
-      const map = new Set<string>();
-      monthMarks.forEach((m) => map.add(m.date));
+      const map = new Map<string, string>();
+      monthMarks.forEach((m) => map.set(m.date, m.task || ""));
       return map;
     }, [monthMarks]);
 
@@ -103,7 +103,8 @@ export const MonthGrid = memo(
               const isCoveredByDrag = dragSelection && dateStr >= dragSelection.start && dateStr <= dragSelection.end;
               const isCovered = !!(isCoveredByRange || isCoveredByDrag);
 
-              const hasAction = marksMap.has(dateStr);
+              const actionTask = marksMap.get(dateStr);
+              const hasAction = !!actionTask;
 
               return (
                 <DayCell
@@ -117,6 +118,7 @@ export const MonthGrid = memo(
                   holidayName={holidays[dateStr]}
                   isCovered={isCovered}
                   hasAction={hasAction}
+                  actionTask={actionTask}
                   onMouseDown={onMouseDown}
                   onMouseEnter={onMouseEnter}
                 />

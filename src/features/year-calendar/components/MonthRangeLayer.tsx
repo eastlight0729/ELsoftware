@@ -44,6 +44,7 @@ export const MonthRangeLayer = memo(function MonthRangeLayer({
             style={{
               gridColumnStart: segments.startCol,
               gridColumnEnd: `span ${segments.span}`,
+              gridRow: 1,
             }}
           />
         );

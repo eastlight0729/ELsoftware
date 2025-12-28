@@ -3,6 +3,7 @@ import { getDatesInRange } from "../utils";
 import { CalendarRange, CalendarMark } from "../api/useYearCalendar";
 
 export function useCalendarInteraction(
+  ranges: CalendarRange[],
   upsertRange: (vars: { id?: string; startDate: string; endDate: string; task?: string; size?: string }) => void,
   deleteRange: (id: string) => void,
   marks: CalendarMark[],
@@ -18,6 +19,7 @@ export function useCalendarInteraction(
   const [isChoiceModalOpen, setIsChoiceModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [isCautionModalOpen, setIsCautionModalOpen] = useState(false);
 
   // Dropdown Positioning
   const [dropdownPosition, setDropdownPosition] = useState<{ x: number; y: number } | null>(null);
@@ -49,6 +51,17 @@ export function useCalendarInteraction(
     [isDragging]
   );
 
+  const checkOverlap = useCallback(
+    (start: string, end: string, excludeId?: string) => {
+      return ranges.some((r) => {
+        if (excludeId && r.id === excludeId) return false;
+        // Overlap: A.start <= B.end && A.end >= B.start
+        return start <= r.end_date && end >= r.start_date;
+      });
+    },
+    [ranges]
+  );
+
   const finishDrag = useCallback(() => {
     if (dragStart && dragCurrent) {
       // Check if it's a click (single day selection) or a drag (multi day)
@@ -59,19 +72,21 @@ export function useCalendarInteraction(
         setIsChoiceModalOpen(true);
       } else {
         // It's a drag range
-        const start = new Date(dragStart);
-        const end = new Date(dragCurrent);
-        const s = start < end ? dragStart : dragCurrent;
-        const e = start < end ? dragCurrent : dragStart;
+        const start = dragStart < dragCurrent ? dragStart : dragCurrent;
+        const end = dragStart < dragCurrent ? dragCurrent : dragStart;
 
-        setSelectedRange({ start: s, end: e });
-        setIsScheduleModalOpen(true);
+        if (checkOverlap(start, end)) {
+          setIsCautionModalOpen(true);
+        } else {
+          setSelectedRange({ start, end });
+          setIsScheduleModalOpen(true);
+        }
       }
     }
     setIsDragging(false);
     setDragStart(null);
     setDragCurrent(null);
-  }, [dragStart, dragCurrent]);
+  }, [dragStart, dragCurrent, checkOverlap]);
 
   useEffect(() => {
     const handleGlobalMouseUp = () => {
@@ -86,9 +101,9 @@ export function useCalendarInteraction(
   // Determine current effective drag selection for highlighting temporary overlay
   const dragSelection = useMemo(() => {
     if (isDragging && dragStart && dragCurrent) {
-      const start = new Date(dragStart);
-      const end = new Date(dragCurrent);
-      return start < end ? { start: dragStart, end: dragCurrent } : { start: dragCurrent, end: dragStart };
+      const start = dragStart < dragCurrent ? dragStart : dragCurrent;
+      const end = dragStart < dragCurrent ? dragCurrent : dragStart;
+      return { start, end };
     }
     return null;
   }, [isDragging, dragStart, dragCurrent]);
@@ -109,9 +124,13 @@ export function useCalendarInteraction(
   const handleSelectSchedule = () => {
     setIsChoiceModalOpen(false);
     if (selectedDate) {
-      // Open Schedule modal for this single date
-      setSelectedRange({ start: selectedDate, end: selectedDate });
-      setIsScheduleModalOpen(true);
+      if (checkOverlap(selectedDate, selectedDate)) {
+        setIsCautionModalOpen(true);
+      } else {
+        // Open Schedule modal for this single date
+        setSelectedRange({ start: selectedDate, end: selectedDate });
+        setIsScheduleModalOpen(true);
+      }
     }
   };
 
@@ -131,6 +150,18 @@ export function useCalendarInteraction(
   // --- Schedule/Task Handlers ---
   const handleSaveTask = (task: string, size: string) => {
     if (selectedRange) {
+      // Double check overlap if it's a new range or bounds changed (though UI blocks interaction)
+      const isNew = !selectedRange.id;
+      if (isNew && checkOverlap(selectedRange.start, selectedRange.end)) {
+        setIsCautionModalOpen(true);
+        return;
+      }
+      // If editing, check overlap excluding self
+      if (!isNew && checkOverlap(selectedRange.start, selectedRange.end, selectedRange.id)) {
+        setIsCautionModalOpen(true);
+        return;
+      }
+
       upsertRange({
         id: selectedRange.id,
         startDate: selectedRange.start,
@@ -204,6 +235,7 @@ export function useCalendarInteraction(
     isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
+    isCautionModalOpen,
     dropdownPosition,
 
     // Modal Data
@@ -224,6 +256,7 @@ export function useCalendarInteraction(
       handleSaveTask,
       handleRemoveTask,
       handleCloseScheduleModal,
+      handleCloseCautionModal: () => setIsCautionModalOpen(false),
 
       // Action
       handleSaveAction,

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { TaskModal } from "./TaskModal";
 import { ChoiceModal } from "./ChoiceModal";
 import { ActionModal } from "./ActionModal";
@@ -31,6 +32,7 @@ export function YearCalendar() {
     isChoiceModalOpen,
     isScheduleModalOpen,
     isActionModalOpen,
+    isCautionModalOpen,
     dropdownPosition,
 
     modalDates,
@@ -38,6 +40,7 @@ export function YearCalendar() {
 
     handlers: interactionHandlers,
   } = useCalendarInteraction(
+    ranges,
     stateActions.upsertRange,
     stateActions.deleteRange,
     marks,
@@ -152,6 +155,17 @@ export function YearCalendar() {
           onClose={interactionHandlers.handleCloseActionModal}
         />
       )}
+
+      <ConfirmModal
+        isOpen={isCautionModalOpen}
+        onClose={interactionHandlers.handleCloseCautionModal}
+        onConfirm={interactionHandlers.handleCloseCautionModal}
+        title="Duplicated Schedule"
+        message="You cannot create a schedule that overlaps with an existing one."
+        confirmLabel="OK"
+        cancelLabel="Close"
+        variant="primary"
+      />
 
       <CalendarHelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>

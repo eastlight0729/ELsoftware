@@ -11,6 +11,7 @@ interface DayCellProps {
   holidayName?: string;
   isCovered: boolean;
   hasAction?: boolean;
+  actionTask?: string;
   onMouseDown: (dateStr: string, e: React.MouseEvent) => void;
   onMouseEnter: (dateStr: string) => void;
 }
@@ -25,6 +26,7 @@ export const DayCell = memo(function DayCell({
   holidayName,
   isCovered,
   hasAction,
+  actionTask,
   onMouseDown,
   onMouseEnter,
 }: DayCellProps) {
@@ -59,6 +61,11 @@ export const DayCell = memo(function DayCell({
         )}
       >
         {`${monthName} ${day}, ${dayOfWeek}${isToday ? " (Today)" : ""}${isHoliday ? ` (${holidayName})` : ""}`}
+        {actionTask && (
+          <div className="font-semibold border-t border-white/20 dark:border-neutral-700/50 mt-1 pt-1">
+            {actionTask.split("\n")[0]}
+          </div>
+        )}
       </div>
     </div>
   );

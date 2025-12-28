@@ -3,20 +3,18 @@ export const CALENDAR_HELP_TEXT = `
 
 Welcome to the Year Calendar! This tool helps you manage your tasks and schedule effectively throughout the year.
 
-## Navigation
-- **Scroll**: Use your mouse wheel or trackpad to scroll through the months.
-- **Buttons**:
-  - Use the **Up/Down arrows** on the left to jump between months or years.
-  - The **"Rotate" icon** next to the year allows you to quickly jump back to "Today".
+## Actions
 
-## Managing Tasks
-- **Create a Task**: Click and drag across days to select a date range. A modal will appear where you can enter task details.
-- **Edit/View Task**: Click on an existing task bar to view or edit its details.
-- **Delete Task**: You can remove a task from the task details modal.
+Click: Things that must happen on a specific day, but not a specific time (e.g., "Call Mom on her birthday").
 
-## Legend
-- **Green Bars**: Indicate active task ranges.
-- **Red Text**: Indicates weekends.
+## Schedules
 
-Enjoy planning your year!
+Click or drag: Things that must happen at a set time (e.g., appointments, classes, meetings).
+
+You can choose the size in your schedule
+- S: less then 3 hours
+- M: 5 hours
+- L: 8 hours
+- All: all day (more than 13 hours)
+
 `;

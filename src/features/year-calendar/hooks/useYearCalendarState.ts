@@ -24,7 +24,8 @@ export function useYearCalendarState() {
     } catch (e) {
       console.error("Failed to parse saved calendar date", e);
     }
-    return new Date(new Date().getFullYear(), 0, 1);
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
   });
 
   useEffect(() => {

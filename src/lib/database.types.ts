@@ -1,6 +1,11 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.1";
+  };
   public: {
     Tables: {
       inbox_items: {
@@ -28,28 +33,22 @@ export type Database = {
         Row: {
           column_id: string;
           content: string;
-          created_at: string;
           id: string;
           position: number;
-          updated_at: string;
           user_id: string;
         };
         Insert: {
           column_id: string;
           content: string;
-          created_at?: string;
           id?: string;
           position?: number;
-          updated_at?: string;
           user_id?: string;
         };
         Update: {
           column_id?: string;
           content?: string;
-          created_at?: string;
           id?: string;
           position?: number;
-          updated_at?: string;
           user_id?: string;
         };
         Relationships: [
@@ -75,7 +74,7 @@ export type Database = {
           id?: string;
           position?: number;
           title: string;
-          user_id: string;
+          user_id?: string;
         };
         Update: {
           created_at?: string;
@@ -86,91 +85,47 @@ export type Database = {
         };
         Relationships: [];
       };
-      memos: {
-        Row: {
-          content: string | null;
-          created_at: string;
-          id: string;
-          updated_at: string;
-          user_id: string;
-        };
-        Insert: {
-          content?: string | null;
-          created_at?: string;
-          id?: string;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Update: {
-          content?: string | null;
-          created_at?: string;
-          id?: string;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
       profiles: {
         Row: {
-          avatar_url: string | null;
           created_at: string;
           email: string | null;
           full_name: string | null;
           id: string;
-          updated_at: string;
-          user_int_id: number;
         };
         Insert: {
-          avatar_url?: string | null;
           created_at?: string;
           email?: string | null;
           full_name?: string | null;
           id: string;
-          updated_at?: string;
-          user_int_id?: number;
         };
         Update: {
-          avatar_url?: string | null;
           created_at?: string;
           email?: string | null;
           full_name?: string | null;
           id?: string;
-          updated_at?: string;
-          user_int_id?: number;
         };
         Relationships: [];
       };
       year_calendar_marks: {
         Row: {
-          created_at: string | null;
           date: string;
-          id: number;
+          id: string;
           task: string | null;
-          user_id: number;
+          user_id: string;
         };
         Insert: {
-          created_at?: string | null;
           date: string;
-          id?: number;
+          id?: string;
           task?: string | null;
-          user_id: number;
+          user_id: string;
         };
         Update: {
-          created_at?: string | null;
           date?: string;
-          id?: number;
+          id?: string;
           task?: string | null;
-          user_id?: number;
+          user_id?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: "year_calendar_marks_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["user_int_id"];
-          }
-        ];
+        Relationships: [];
       };
       year_calendar_ranges: {
         Row: {
@@ -178,37 +133,32 @@ export type Database = {
           created_at: string | null;
           end_date: string;
           id: string;
+          size: string | null;
           start_date: string;
           task: string | null;
-          user_id: number;
+          user_id: string;
         };
         Insert: {
           color?: string | null;
           created_at?: string | null;
           end_date: string;
           id?: string;
+          size?: string | null;
           start_date: string;
           task?: string | null;
-          user_id: number;
+          user_id: string;
         };
         Update: {
           color?: string | null;
           created_at?: string | null;
           end_date?: string;
           id?: string;
+          size?: string | null;
           start_date?: string;
           task?: string | null;
-          user_id?: number;
+          user_id?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: "year_calendar_ranges_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["user_int_id"];
-          }
-        ];
+        Relationships: [];
       };
     };
     Views: {
@@ -310,3 +260,9 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
   ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
   : never;
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const;

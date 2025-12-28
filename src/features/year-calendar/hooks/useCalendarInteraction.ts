@@ -7,8 +7,8 @@ export function useCalendarInteraction(
   upsertRange: (vars: { id?: string; startDate: string; endDate: string; task?: string; size?: string }) => void,
   deleteRange: (id: string) => void,
   marks: CalendarMark[],
-  upsertMark: (vars: { id?: number; date: string; task: string }) => void,
-  deleteMark: (id: number) => void
+  upsertMark: (vars: { id?: string; date: string; task: string }) => void,
+  deleteMark: (id: string) => void
 ) {
   // Selection / Dragging state
   const [isDragging, setIsDragging] = useState(false);

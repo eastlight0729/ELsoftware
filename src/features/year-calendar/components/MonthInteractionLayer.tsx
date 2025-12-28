@@ -37,8 +37,9 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
             key={range.id}
             onClick={(e) => onRangeClick(range, e)}
             className={cn(
+              "group/range relative z-10 hover:z-50",
               "rounded-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/10 transition-colors pointer-events-auto",
-              "flex items-center justify-center overflow-hidden",
+              "flex items-center justify-center",
               !isEnd && "rounded-r-none",
               !isStart && "rounded-l-none"
             )}
@@ -47,11 +48,13 @@ export const MonthInteractionLayer = memo(function MonthInteractionLayer({
               gridColumnEnd: `span ${segments.span}`,
               gridRow: 1,
             }}
-            title={range.task || ""}
           >
-            <span className="text-[10px] text-white truncate px-1 font-medium opacity-0 hover:opacity-100 transition-opacity drop-shadow-md">
-              {range.task}
-            </span>
+            {/* Tooltip */}
+            {range.task && (
+              <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs rounded-sm py-1 px-2 whitespace-nowrap opacity-0 group-hover/range:opacity-100 transition-opacity pointer-events-none drop-shadow-md z-50">
+                {range.task}
+              </div>
+            )}
           </div>
         );
       })}

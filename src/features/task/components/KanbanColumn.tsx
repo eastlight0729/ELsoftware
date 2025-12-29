@@ -14,6 +14,7 @@ interface KanbanColumnProps {
   createCard: (columnId: string, content: string) => void;
   onUpdateCard: (id: string, updates: Partial<KanbanCardType>) => void;
   onEditCardStart: (id: string) => void;
+  allowAddCard?: boolean;
 }
 
 export function KanbanColumn({
@@ -24,6 +25,7 @@ export function KanbanColumn({
   onUpdateCard,
   onEditCardStart,
   createCard,
+  allowAddCard = false,
 }: KanbanColumnProps) {
   const [editMode, setEditMode] = useState(false);
   const [isAddingCard, setIsAddingCard] = useState(false);
@@ -97,21 +99,25 @@ export function KanbanColumn({
 
       {/* Cards Container */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {isAddingCard ? (
-          <NewCardForm
-            onSubmit={(content) => {
-              createCard(column.id, content);
-              setIsAddingCard(false); // keep form open? usually close
-            }}
-            onCancel={() => setIsAddingCard(false)}
-          />
-        ) : (
-          <button
-            onClick={() => setIsAddingCard(true)}
-            className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium"
-          >
-            <Plus size={16} /> Add Card
-          </button>
+        {allowAddCard && (
+          <>
+            {isAddingCard ? (
+              <NewCardForm
+                onSubmit={(content) => {
+                  createCard(column.id, content);
+                  setIsAddingCard(false); // keep form open? usually close
+                }}
+                onCancel={() => setIsAddingCard(false)}
+              />
+            ) : (
+              <button
+                onClick={() => setIsAddingCard(true)}
+                className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium"
+              >
+                <Plus size={16} /> Add Card
+              </button>
+            )}
+          </>
         )}
 
         <SortableContext items={cardIds}>

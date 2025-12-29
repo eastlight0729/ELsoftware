@@ -188,7 +188,6 @@ export function KanbanBoard() {
               }}
               onUpdateCard={(id, updates) => updateCard({ id, updates })}
               onEditCardStart={setEditingCardId}
-              onDeleteCardRequest={setDeletingCardId}
             />
           ))}
         </SortableContext>
@@ -213,12 +212,9 @@ export function KanbanBoard() {
               createCard={() => {}}
               onUpdateCard={() => {}}
               onEditCardStart={() => {}}
-              onDeleteCardRequest={() => {}}
             />
           )}
-          {activeCard && (
-            <KanbanCard card={activeCard} onUpdate={() => {}} onEditStart={() => {}} onDeleteRequest={() => {}} />
-          )}
+          {activeCard && <KanbanCard card={activeCard} onEditStart={() => {}} />}
         </DragOverlay>,
         document.body
       )}

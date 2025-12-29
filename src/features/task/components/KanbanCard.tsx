@@ -1,17 +1,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Pencil, Trash2 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
 import { KanbanCard as KanbanCardType } from "../types";
 
 interface KanbanCardProps {
   card: KanbanCardType;
-  onUpdate: (id: string, updates: Partial<KanbanCardType>) => void;
   onEditStart: (id: string) => void;
-  onDeleteRequest: (id: string) => void;
 }
 
-export function KanbanCard({ card, onUpdate, onEditStart, onDeleteRequest }: KanbanCardProps) {
+export function KanbanCard({ card, onEditStart }: KanbanCardProps) {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: card.id,
     data: {
@@ -20,33 +16,9 @@ export function KanbanCard({ card, onUpdate, onEditStart, onDeleteRequest }: Kan
     },
   });
 
-  const [isInlineEditing, setIsInlineEditing] = useState(false);
-  const [title, setTitle] = useState(card.content);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    setTitle(card.content);
-  }, [card.content]);
-
-  useEffect(() => {
-    if (isInlineEditing) {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    }
-  }, [isInlineEditing]);
-
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
-  };
-
-  const handleInlineSave = () => {
-    setIsInlineEditing(false);
-    if (!title.trim() || title === card.content) {
-      setTitle(card.content);
-      return;
-    }
-    onUpdate(card.id, { content: title.trim() });
   };
 
   if (isDragging) {
@@ -65,80 +37,39 @@ export function KanbanCard({ card, onUpdate, onEditStart, onDeleteRequest }: Kan
       style={style}
       {...attributes}
       {...listeners}
-      className="group relative bg-white dark:bg-neutral-900 p-4 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all touch-none"
+      className="group relative bg-white dark:bg-neutral-900 p-4 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 hover:border-indigo-500/50 dark:hover:border-indigo-500/50 transition-all touch-none cursor-pointer"
+      // Note: dnd-kit listeners usually capture pointer events.
+      // If we want a click to register as "Open Modal" vs "Drag", we might need to rely on the fact that dnd-kit distinguishes clicks from drags.
+      // However, if we put onClick here, it might fire after a drag end if not carefully managed.
+      // A common pattern is to handle click on a child element or ensure drag didn't occur.
+      // But typically a clean 'click' without movement fires onClick.
+      onClick={(e) => {
+        // Using stopPropagation might interfere with dnd-kit if not careful, but for a click that opens a modal, it's usually fine.
+        // However, if we want dragging to work, we must not stopPointerDown or similar.
+        // onClick fires after pointer up.
+        onEditStart(card.id);
+      }}
     >
-      <div className="flex flex-col gap-2">
-        {/* Title Area */}
-        <div
-          className="relative min-h-[24px]"
-          onPointerDown={(e) => {
-            // Prevent drag when interacting with text area
-            if (isInlineEditing) e.stopPropagation();
-          }}
-        >
-          {isInlineEditing ? (
-            <textarea
-              ref={inputRef}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onBlur={handleInlineSave}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleInlineSave();
-                }
-                if (e.key === "Escape") {
-                  setTitle(card.content);
-                  setIsInlineEditing(false);
-                }
-              }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full bg-transparent text-sm text-neutral-900 dark:text-neutral-100 resize-none outline-none border-none p-0 focus:ring-0 leading-relaxed"
-              rows={Math.max(1, title.split("\n").length)}
-              style={{ height: "auto" }}
-            />
-          ) : (
-            <div
-              onClick={(e) => {
-                // e.stopPropagation(); // Allow drag from card body, but maybe title click edits?
-                // User requirement: "If user click title text area, user can edit the text."
-                // Usually this means separate from drag.
-                e.stopPropagation();
-                setIsInlineEditing(true);
-              }}
-              className="text-sm text-neutral-700 dark:text-neutral-200 whitespace-pre-wrap break-words leading-relaxed cursor-text hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-            >
-              {card.content}
+      <div className="flex flex-col gap-2 pointer-events-none">
+        {/* pointer-events-none on children ensures the parent div catches the click/drag easily, 
+            but might prevent text selection if desired. 
+            User wants "click the card anywhere -> modal opened". 
+            Text selection is likely less priority than robust click/drag. 
+        */}
+
+        {/* Size Badge if existing */}
+        {card.size && (
+          <div className="flex justify-start mb-1">
+            <div className="text-[10px] font-mono font-medium text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded border border-neutral-200 dark:border-neutral-700">
+              {card.size}
             </div>
-          )}
-        </div>
-
-        {/* Footer / Actions */}
-        <div className="flex justify-between items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* Size Badge if existing */}
-          <div className="text-[10px] font-mono font-medium text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
-            {card.size || "1"}
           </div>
+        )}
 
-          <div className="flex items-center gap-1">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditStart(card.id);
-              }}
-              className="p-1.5 text-neutral-400 hover:text-indigo-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-            >
-              <Pencil size={14} />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteRequest(card.id);
-              }}
-              className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-            >
-              <Trash2 size={14} />
-            </button>
+        {/* Title Area */}
+        <div className="relative min-h-[24px]">
+          <div className="text-sm text-neutral-700 dark:text-neutral-200 whitespace-pre-wrap break-words leading-relaxed">
+            {card.content}
           </div>
         </div>
       </div>

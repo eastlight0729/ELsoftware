@@ -14,7 +14,6 @@ interface KanbanColumnProps {
   createCard: (columnId: string, content: string) => void;
   onUpdateCard: (id: string, updates: Partial<KanbanCardType>) => void;
   onEditCardStart: (id: string) => void;
-  onDeleteCardRequest: (id: string) => void;
 }
 
 export function KanbanColumn({
@@ -24,7 +23,6 @@ export function KanbanColumn({
   onUpdateColumnTitle,
   onUpdateCard,
   onEditCardStart,
-  onDeleteCardRequest,
   createCard,
 }: KanbanColumnProps) {
   const [editMode, setEditMode] = useState(false);
@@ -101,13 +99,7 @@ export function KanbanColumn({
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0">
         <SortableContext items={cardIds}>
           {cards.map((card) => (
-            <KanbanCard
-              key={card.id}
-              card={card}
-              onUpdate={onUpdateCard}
-              onEditStart={onEditCardStart}
-              onDeleteRequest={onDeleteCardRequest}
-            />
+            <KanbanCard key={card.id} card={card} onEditStart={onEditCardStart} />
           ))}
         </SortableContext>
 

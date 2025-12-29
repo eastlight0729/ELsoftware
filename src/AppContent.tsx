@@ -24,7 +24,7 @@ export function AppContent({ activeCategory }: AppContentProps) {
       return <YearCalendar />;
     case "task":
       return (
-        <div className="w-full h-[80vh] overflow-hidden">
+        <div className="w-full h-full overflow-hidden">
           <KanbanBoard />
         </div>
       );

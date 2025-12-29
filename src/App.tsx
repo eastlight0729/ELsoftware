@@ -98,9 +98,15 @@ export default function App() {
           min-h-screen
         `}
       >
-        <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
-          <AppContent activeCategory={activeCategory} />
-        </div>
+        {activeCategory === "task" ? (
+          <div className="h-screen w-full p-1 overflow-hidden">
+            <AppContent activeCategory={activeCategory} />
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
+            <AppContent activeCategory={activeCategory} />
+          </div>
+        )}
       </main>
     </div>
   );

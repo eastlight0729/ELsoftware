@@ -2,11 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../lib/supabase";
 import { Tables } from "../../../lib/database.types";
 
-// Adjusting type to manually include size until database types are regenerated
 export type CalendarRange = Pick<
   Tables<"year_calendar_ranges">,
-  "id" | "start_date" | "end_date" | "task" | "color"
-> & { size?: string };
+  "id" | "start_date" | "end_date" | "task" | "color" | "size"
+>;
 
 export const calendarKeys = {
   all: ["year-calendar"] as const,
@@ -24,8 +23,7 @@ export function useYearCalendarRanges() {
         .order("start_date", { ascending: true });
 
       if (error) throw error;
-      // Force cast because `size` column exists in DB but not in generated `database.types.ts` yet.
-      return data as any as CalendarRange[];
+      return data;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -50,19 +48,17 @@ export function useUpsertYearCalendarRange() {
       color?: string;
       size?: string;
     }) => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
-
-      if (!profile || !profile.user_int_id) throw new Error("User profile not found");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
       // Permitted colors only.
       const ALLOWED_COLORS = ["indigo", "green", "red", "blue", "yellow", "purple", "gray"];
       const cleanColor = ALLOWED_COLORS.includes(color || "") ? color : "indigo";
 
       const payload = {
-        user_id: profile.user_int_id,
+        user_id: user.id,
         start_date: startDate,
         end_date: endDate,
         task: task ? task.trim().slice(0, 500) : null, // Trim & Limit
@@ -76,7 +72,7 @@ export function useUpsertYearCalendarRange() {
         throw new Error("Invalid date format");
       }
 
-      if (id) {
+      if (id && !id.startsWith("temp-")) {
         const { data, error } = await supabase
           .from("year_calendar_ranges")
           .update(payload)
@@ -86,6 +82,7 @@ export function useUpsertYearCalendarRange() {
         if (error) throw error;
         return data;
       } else {
+        // If id is temp, we treat as insert (or ignore id)
         const { data, error } = await supabase.from("year_calendar_ranges").insert(payload).select().single();
         if (error) throw error;
         return data;
@@ -97,7 +94,7 @@ export function useUpsertYearCalendarRange() {
 
       queryClient.setQueryData<CalendarRange[]>(calendarKeys.ranges(), (old) => {
         const list = old ? [...old] : [];
-        if (newRange.id) {
+        if (newRange.id && !newRange.id.startsWith("temp-")) {
           const index = list.findIndex((r) => r.id === newRange.id);
           if (index !== -1) {
             // Optimistically update existing
@@ -113,7 +110,7 @@ export function useUpsertYearCalendarRange() {
         } else {
           // Optimistically add new
           list.push({
-            id: "temp-" + Date.now(),
+            id: newRange.id || "temp-" + Date.now(),
             start_date: newRange.startDate,
             end_date: newRange.endDate,
             task: newRange.task ?? null,
@@ -194,13 +191,11 @@ export function useUpsertYearCalendarMark() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, date, task }: { id?: number; date: string; task: string }) => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error("Not authenticated");
-
-      const { data: profile } = await supabase.from("profiles").select("user_int_id").eq("id", user.user.id).single();
-
-      if (!profile || !profile.user_int_id) throw new Error("User profile not found");
+    mutationFn: async ({ id, date, task }: { id?: string; date: string; task: string }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
       // Validate Date Format YYYY-MM-DD
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -209,12 +204,12 @@ export function useUpsertYearCalendarMark() {
       }
 
       const payload = {
-        user_id: profile.user_int_id,
+        user_id: user.id,
         date: date,
         task: task.trim().slice(0, 500),
       };
 
-      if (id) {
+      if (id && !id.startsWith("temp-")) {
         const { data, error } = await supabase
           .from("year_calendar_marks")
           .update(payload)
@@ -235,14 +230,14 @@ export function useUpsertYearCalendarMark() {
 
       queryClient.setQueryData<CalendarMark[]>(markKeys.list(), (old) => {
         const list = old ? [...old] : [];
-        if (newMark.id) {
+        if (newMark.id && !newMark.id.startsWith("temp-")) {
           const index = list.findIndex((m) => m.id === newMark.id);
           if (index !== -1) {
             list[index] = { ...list[index], date: newMark.date, task: newMark.task };
           }
         } else {
           list.push({
-            id: -1, // Temp ID
+            id: newMark.id || "temp-" + Date.now(), // Temp string ID
             date: newMark.date,
             task: newMark.task,
           });
@@ -262,7 +257,7 @@ export function useDeleteYearCalendarMark() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const { error } = await supabase.from("year_calendar_marks").delete().eq("id", id);
       if (error) throw error;
       return id;

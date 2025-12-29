@@ -11,6 +11,8 @@ export interface KanbanCard {
   column_id: string;
   user_id: string;
   content: string;
+  description?: string;
+  size?: string;
   position: number;
   created_at: string;
   updated_at: string;

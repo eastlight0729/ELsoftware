@@ -25,6 +25,8 @@ import {
 import { KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from "../types";
 import { KanbanCard } from "./KanbanCard";
 import { KanbanColumn } from "./KanbanColumn";
+import { KanbanCardModal } from "./KanbanCardModal";
+import { ConfirmModal } from "./ConfirmModal";
 
 export function KanbanBoard() {
   const { data: columns = [] } = useColumns();
@@ -42,6 +44,8 @@ export function KanbanBoard() {
 
   const [activeColumn, setActiveColumn] = useState<KanbanColumnType | null>(null);
   const [activeCard, setActiveCard] = useState<KanbanCardType | null>(null);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+  const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -182,7 +186,9 @@ export function KanbanBoard() {
                 const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
                 createCard({ column_id: columnId, content, position: maxPos + 1000 });
               }}
-              deleteCard={deleteCard}
+              onUpdateCard={(id, updates) => updateCard({ id, updates })}
+              onEditCardStart={setEditingCardId}
+              onDeleteCardRequest={setDeletingCardId}
             />
           ))}
         </SortableContext>
@@ -205,13 +211,44 @@ export function KanbanBoard() {
               onDeleteColumn={() => {}}
               onUpdateColumnTitle={() => {}}
               createCard={() => {}}
-              deleteCard={() => {}}
+              onUpdateCard={() => {}}
+              onEditCardStart={() => {}}
+              onDeleteCardRequest={() => {}}
             />
           )}
-          {activeCard && <KanbanCard card={activeCard} onDelete={() => {}} />}
+          {activeCard && (
+            <KanbanCard card={activeCard} onUpdate={() => {}} onEditStart={() => {}} onDeleteRequest={() => {}} />
+          )}
         </DragOverlay>,
         document.body
       )}
+
+      {/* Modals */}
+      <KanbanCardModal
+        isOpen={!!editingCardId}
+        card={cards.find((c) => c.id === editingCardId) || null}
+        onSave={(id, updates) => updateCard({ id, updates })}
+        onRemove={(id) => {
+          setEditingCardId(null);
+          setDeletingCardId(id);
+        }}
+        onClose={() => setEditingCardId(null)}
+      />
+
+      <ConfirmModal
+        isOpen={!!deletingCardId}
+        title="Delete Card"
+        message="Are you sure you want to delete this card? This action cannot be undone."
+        onConfirm={() => {
+          if (deletingCardId) {
+            deleteCard(deletingCardId);
+            setDeletingCardId(null);
+          }
+        }}
+        onCancel={() => setDeletingCardId(null)}
+        isDestructive
+        confirmLabel="Delete"
+      />
     </DndContext>
   );
 }

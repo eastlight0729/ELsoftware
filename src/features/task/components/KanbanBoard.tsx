@@ -174,7 +174,7 @@ export function KanbanBoard() {
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
       <div className="flex h-full w-full gap-4 overflow-x-auto pb-4">
         <SortableContext items={columnIds}>
-          {columns.map((col) => (
+          {columns.map((col, index) => (
             <KanbanColumn
               key={col.id}
               column={col}
@@ -188,6 +188,7 @@ export function KanbanBoard() {
               }}
               onUpdateCard={(id, updates) => updateCard({ id, updates })}
               onEditCardStart={setEditingCardId}
+              allowAddCard={index === 0}
             />
           ))}
         </SortableContext>

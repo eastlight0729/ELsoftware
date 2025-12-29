@@ -1,6 +1,6 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, MoreHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from "../types";
 import { KanbanCard } from "./KanbanCard";
@@ -14,6 +14,7 @@ interface KanbanColumnProps {
   createCard: (columnId: string, content: string) => void;
   onUpdateCard: (id: string, updates: Partial<KanbanCardType>) => void;
   onEditCardStart: (id: string) => void;
+  allowAddCard?: boolean;
 }
 
 export function KanbanColumn({
@@ -24,9 +25,11 @@ export function KanbanColumn({
   onUpdateCard,
   onEditCardStart,
   createCard,
+  allowAddCard = false,
 }: KanbanColumnProps) {
   const [editMode, setEditMode] = useState(false);
   const [isAddingCard, setIsAddingCard] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: column.id,
@@ -87,37 +90,64 @@ export function KanbanColumn({
             </span>
           )}
         </div>
-        <button
-          onClick={() => onDeleteColumn(column.id)}
-          className="text-neutral-400 hover:text-red-400 p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-        >
-          <Trash2 size={16} />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+
+          {isMenuOpen && (
+            <>
+              {/* Backdrop to close menu */}
+              <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
+
+              {/* Dropdown Menu */}
+              <div className="absolute right-0 top-full mt-1 w-40 z-20 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden">
+                <button
+                  onClick={() => {
+                    onDeleteColumn(column.id);
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                >
+                  <Trash2 size={14} />
+                  Delete Column
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Cards Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <SortableContext items={cardIds}>
           {cards.map((card) => (
             <KanbanCard key={card.id} card={card} onEditStart={onEditCardStart} />
           ))}
         </SortableContext>
 
-        {isAddingCard ? (
-          <NewCardForm
-            onSubmit={(content) => {
-              createCard(column.id, content);
-              setIsAddingCard(false); // keep form open? usually close
-            }}
-            onCancel={() => setIsAddingCard(false)}
-          />
-        ) : (
-          <button
-            onClick={() => setIsAddingCard(true)}
-            className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium mt-auto"
-          >
-            <Plus size={16} /> Add Card
-          </button>
+        {allowAddCard && (
+          <>
+            {isAddingCard ? (
+              <NewCardForm
+                onSubmit={(content) => {
+                  createCard(column.id, content);
+                  setIsAddingCard(false); // keep form open? usually close
+                }}
+                onCancel={() => setIsAddingCard(false)}
+              />
+            ) : (
+              <button
+                onClick={() => setIsAddingCard(true)}
+                className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium mt-auto"
+              >
+                <Plus size={16} /> Add Card
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -57,15 +57,28 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="bg-neutral-100 dark:bg-neutral-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-neutral-200 dark:border-neutral-700 animate-in zoom-in-95 duration-200"
+        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-neutral-200 dark:border-neutral-700 animate-in zoom-in-95 duration-200"
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSave();
         }}
       >
-        {/* Header */}
-        <div className="px-6 py-5 border-b border-neutral-200 dark:border-neutral-700">
-          <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Edit Card</h3>
+        {/* Header containing Title Input */}
+        <div className="px-6 py-5">
+          <input
+            ref={titleInputRef}
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.metaKey && !e.ctrlKey) {
+                e.preventDefault();
+                document.getElementById("card-description")?.focus();
+              }
+            }}
+            className="w-full text-lg font-semibold text-neutral-900 dark:text-neutral-100 bg-transparent border-none outline-none placeholder:text-neutral-400"
+            placeholder="Card Title"
+          />
         </div>
 
         {/* Content */}
@@ -92,41 +105,18 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Title</label>
-            <input
-              ref={titleInputRef}
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.metaKey && !e.ctrlKey) {
-                  e.preventDefault();
-                  document.getElementById("card-description")?.focus();
-                }
-              }}
-              className="w-full p-3 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:border-green-500 dark:focus:border-green-500 outline-none transition-all text-neutral-900 dark:text-neutral-100 font-medium"
-              placeholder="Card Title"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Description</label>
             <textarea
               id="card-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add more details..."
-              className="w-full h-32 p-3 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 focus:border-green-500 dark:focus:border-green-500 outline-none resize-none text-neutral-600 dark:text-neutral-300 text-sm transition-all"
+              className="w-full h-96 py-4 bg-transparent border-y border-neutral-200 dark:border-neutral-700 outline-none resize-none text-neutral-600 dark:text-neutral-300 text-sm transition-all placeholder:text-neutral-400"
             />
-          </div>
-
-          <div className="flex items-center justify-end text-xs text-neutral-400">
-            <span className="text-neutral-500 dark:text-neutral-400">⌘ + Enter to save</span>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-200 dark:border-neutral-700/50 bg-neutral-50 dark:bg-neutral-800/50">
+        <div className="flex items-center justify-between px-6 py-4">
           <button
             onClick={handleRemove}
             className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-sm font-medium"

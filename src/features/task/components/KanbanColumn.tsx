@@ -97,12 +97,6 @@ export function KanbanColumn({
 
       {/* Cards Container */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0">
-        <SortableContext items={cardIds}>
-          {cards.map((card) => (
-            <KanbanCard key={card.id} card={card} onEditStart={onEditCardStart} />
-          ))}
-        </SortableContext>
-
         {isAddingCard ? (
           <NewCardForm
             onSubmit={(content) => {
@@ -114,11 +108,17 @@ export function KanbanColumn({
         ) : (
           <button
             onClick={() => setIsAddingCard(true)}
-            className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium mt-auto"
+            className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium"
           >
             <Plus size={16} /> Add Card
           </button>
         )}
+
+        <SortableContext items={cardIds}>
+          {cards.map((card) => (
+            <KanbanCard key={card.id} card={card} onEditStart={onEditCardStart} />
+          ))}
+        </SortableContext>
       </div>
     </div>
   );

@@ -96,7 +96,7 @@ export function KanbanColumn({
       </div>
 
       {/* Cards Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {isAddingCard ? (
           <NewCardForm
             onSubmit={(content) => {

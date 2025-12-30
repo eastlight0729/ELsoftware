@@ -1,6 +1,6 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, Trash2, MoreHorizontal } from "lucide-react";
+import { Plus, Archive, MoreHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from "../types";
 import { KanbanCard } from "./KanbanCard";
@@ -12,7 +12,6 @@ interface KanbanColumnProps {
   onDeleteColumn: (id: string) => void;
   onUpdateColumnTitle: (id: string, title: string) => void;
   createCard: (columnId: string, content: string) => void;
-  onUpdateCard: (id: string, updates: Partial<KanbanCardType>) => void;
   onEditCardStart: (id: string) => void;
   allowAddCard?: boolean;
 }
@@ -22,7 +21,6 @@ export function KanbanColumn({
   cards,
   onDeleteColumn,
   onUpdateColumnTitle,
-  onUpdateCard,
   onEditCardStart,
   createCard,
   allowAddCard = false,
@@ -110,10 +108,10 @@ export function KanbanColumn({
                     onDeleteColumn(column.id);
                     setIsMenuOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/50 flex items-center gap-2"
                 >
-                  <Trash2 size={14} />
-                  Delete Column
+                  <Archive size={14} />
+                  Archive Column
                 </button>
               </div>
             </>

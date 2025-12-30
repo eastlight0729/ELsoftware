@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Archive } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { KanbanCard } from "../types";
 
@@ -119,10 +119,10 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
         <div className="flex items-center justify-between px-6 py-4">
           <button
             onClick={handleRemove}
-            className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-3 py-2 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors text-sm font-medium"
           >
-            <Trash2 size={16} />
-            <span className="hidden sm:inline">Delete</span>
+            <Archive size={16} />
+            <span className="hidden sm:inline">Archive</span>
           </button>
 
           <div className="flex items-center gap-3">

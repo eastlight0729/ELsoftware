@@ -4,6 +4,7 @@ export interface KanbanColumn {
   title: string;
   position: number;
   created_at: string;
+  deleted_at?: string | null;
 }
 
 export interface KanbanCard {
@@ -16,7 +17,15 @@ export interface KanbanCard {
   position: number;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
 }
+
+export type ArchivedKanbanCard = KanbanCard & {
+  kanban_columns: {
+    title: string;
+    deleted_at: string | null;
+  } | null;
+};
 
 export interface NewKanbanColumn {
   title: string;

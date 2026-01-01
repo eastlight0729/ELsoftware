@@ -1,35 +1,113 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/electron-vite.animate.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import { AppCategory } from "./components/sidebar/types";
+import { Sidebar } from "./components/sidebar/Sidebar";
+import { sidebarConfig } from "./components/sidebar/config";
+import { SidebarTrigger } from "./components/sidebar/SidebarTrigger";
+import { SidebarBackdrop } from "./components/sidebar/SidebarBackdrop";
+import { AppContent } from "./AppContent";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { useAuth, Login } from "./features/auth";
+import { Loader2 } from "lucide-react";
+
+/**
+ * Root Application Component.
+ *
+ * Serving as the main layout container, it orchestrates:
+ * - The responsive Sidebar and its state.
+ * - The navigation logic via `activeCategory`.
+ * - The main content rendering via `AppContent`.
+ */
+export default function App() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
+  const { session, loading, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle Sidebar: Cmd + b
+      if ((e.metaKey || e.ctrlKey) && e.key === "b") {
+        e.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
+      }
+
+      // Menu Navigation: Cmd + Up/Down
+      if (e.metaKey || e.ctrlKey) {
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const currentIndex = sidebarConfig.findIndex((item) => item.id === activeCategory);
+
+          let nextIndex;
+          if (currentIndex === -1) {
+            // Currently in Settings or unknown
+            if (e.key === "ArrowUp") nextIndex = sidebarConfig.length - 1;
+            else nextIndex = 0;
+          } else {
+            if (e.key === "ArrowUp") {
+              // Wrap around to the last item if at the beginning
+              nextIndex = (currentIndex - 1 + sidebarConfig.length) % sidebarConfig.length;
+            } else {
+              // Wrap around to the first item if at the end
+              nextIndex = (currentIndex + 1) % sidebarConfig.length;
+            }
+          }
+
+          setActiveCategory(sidebarConfig[nextIndex].id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeCategory]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-neutral-900 text-white">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Login />;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://electron-vite.github.io" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">
+      <Sidebar
+        isOpen={isSidebarOpen}
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+        userEmail={session.user.email}
+        onLogout={signOut}
+      />
 
-export default App
+      <SidebarTrigger isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+
+      <SidebarBackdrop isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      {/* Main Content Area */}
+      {/* 
+          Padding is always pl-16 (mini-sidebar width).
+          When sidebar opens to w-64, it overlays the content instead of pushing it.
+      */}
+      <main
+        className={`
+          transition-[padding] duration-300 ease-in-out
+          pl-12
+          min-h-screen
+        `}
+      >
+        {activeCategory === "task" ? (
+          <div className="h-screen w-full p-1 overflow-hidden">
+            <AppContent activeCategory={activeCategory} />
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
+            <AppContent activeCategory={activeCategory} />
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

@@ -43,7 +43,7 @@ export function KanbanCard({ card, onEditStart }: KanbanCardProps) {
       // However, if we put onClick here, it might fire after a drag end if not carefully managed.
       // A common pattern is to handle click on a child element or ensure drag didn't occur.
       // But typically a clean 'click' without movement fires onClick.
-      onClick={(e) => {
+      onClick={() => {
         // Using stopPropagation might interfere with dnd-kit if not careful, but for a click that opens a modal, it's usually fine.
         // However, if we want dragging to work, we must not stopPointerDown or similar.
         // onClick fires after pointer up.
@@ -68,7 +68,7 @@ export function KanbanCard({ card, onEditStart }: KanbanCardProps) {
 
         {/* Title Area */}
         <div className="relative min-h-[24px]">
-          <div className="text-sm text-neutral-700 dark:text-neutral-200 whitespace-pre-wrap break-words leading-relaxed">
+          <div className="text-sm text-neutral-700 dark:text-neutral-200 whitespace-pre-wrap wrap-break-word leading-relaxed">
             {card.content}
           </div>
         </div>

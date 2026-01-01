@@ -214,7 +214,7 @@ export function useCalendarInteraction(
         end: overlapping.end_date,
         id: overlapping.id,
         task: overlapping.task || undefined,
-        size: overlapping.size,
+        size: overlapping.size || undefined,
       });
     } else {
       // Fallback: Create new schedule for this day

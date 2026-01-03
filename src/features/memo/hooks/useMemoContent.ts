@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { memoService } from "../api/memoService";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 const STORAGE_KEY = "memo-content";
 const DEFAULT_CONTENT = "# My Memo\n\nStart writing...";
@@ -15,45 +16,69 @@ const DEFAULT_CONTENT = "# My Memo\n\nStart writing...";
  * 5. Debounces saves to Supabase.
  */
 export function useMemoContent() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [content, setContentState] = useState<string>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) || DEFAULT_CONTENT;
-    } catch {
-      return DEFAULT_CONTENT;
-    }
-  });
-
+  const [content, setContentState] = useState<string>(DEFAULT_CONTENT);
+  const [hasLoadedLocal, setHasLoadedLocal] = useState(false);
   const [hasSynced, setHasSynced] = useState(false);
+
+  // Derived key based on user ID
+  const storageKey = user ? `${STORAGE_KEY}-${user.id}` : null;
+
+  // Reset state when user changes to prevent cross-user pollution if component stays mounted
+  useEffect(() => {
+    setHasSynced(false);
+    setHasLoadedLocal(false);
+    // content will be re-populated by the LocalStorage loader effect or Sync effect
+    setContentState(DEFAULT_CONTENT);
+  }, [user?.id]);
+
+  // Load from LocalStorage when user/storageKey becomes available
+  useEffect(() => {
+    if (storageKey) {
+      try {
+        const local = localStorage.getItem(storageKey);
+        if (local) {
+          setContentState(local);
+        }
+      } catch (e) {
+        console.error("Error loading memo from storage", e);
+      }
+      setHasLoadedLocal(true);
+    }
+  }, [storageKey]);
 
   // Fetch from Supabase
   const { data: remoteMemo, isSuccess } = useQuery({
-    queryKey: ["memo"],
+    queryKey: ["memo", user?.id],
     queryFn: memoService.getMemo,
-    staleTime: 5 * 60 * 1000, // 5 minutes stale time to avoid aggressive overwrites
+    staleTime: 5 * 60 * 1000,
     retry: 1,
+    enabled: !!user, // Only fetch if user is authenticated
   });
 
   // Mutation to save
   const mutation = useMutation({
     mutationFn: memoService.saveMemo,
     onSuccess: (data) => {
-      // Optional: Update query data silently
-      queryClient.setQueryData(["memo"], data);
+      if (user) {
+        queryClient.setQueryData(["memo", user.id], data);
+      }
     },
     onError: (error) => {
       console.error("Failed to save memo:", error);
     },
   });
 
-  // Sync Logic (Run once when remote data is available)
+  // Sync Logic
   useEffect(() => {
-    if (isSuccess && !hasSynced) {
+    // Only proceed if we've attempted to load local data and remote fetch is done
+    if (isSuccess && hasLoadedLocal && !hasSynced && storageKey) {
       if (remoteMemo?.content) {
-        // Server has data, sync down
+        // Server has data, sync down (Server Truth)
         console.log("Syncing memo from Supabase");
         setContentState(remoteMemo.content);
-        localStorage.setItem(STORAGE_KEY, remoteMemo.content);
+        localStorage.setItem(storageKey, remoteMemo.content);
       } else if (!remoteMemo && content !== DEFAULT_CONTENT) {
         // Server empty, Local has data -> Migrate
         console.log("Migrating local memo to Supabase...");
@@ -61,14 +86,16 @@ export function useMemoContent() {
       }
       setHasSynced(true);
     }
-  }, [remoteMemo, isSuccess, hasSynced, content, mutation]);
+  }, [remoteMemo, isSuccess, hasSynced, content, mutation, hasLoadedLocal, storageKey]);
 
   // Debounced Save
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const setContent = (newContent: string) => {
     setContentState(newContent);
-    localStorage.setItem(STORAGE_KEY, newContent);
+    if (storageKey) {
+      localStorage.setItem(storageKey, newContent);
+    }
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);

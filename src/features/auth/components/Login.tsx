@@ -18,17 +18,17 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-indigo-900 via-purple-900 to-slate-900 p-4 font-sans text-white">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-sky-500 to-red-400 dark:from-sky-950 dark:to-red-950 p-4 font-sans text-white">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-[50%] -left-[50%] h-[200%] w-[200%] animate-[spin_60s_linear_infinite] opacity-10 bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] mix-blend-overlay blur-3xl" />
       </div>
 
       <div className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
         <div className="mb-8 text-center">
-          <h1 className="bg-linear-to-r from-blue-300 to-purple-300 bg-clip-text text-4xl font-bold text-transparent drop-shadow-sm">
+          <h1 className="bg-linear-to-r from-sky-200 to-red-200 bg-clip-text text-4xl font-bold text-transparent drop-shadow-sm">
             Welcome Back
           </h1>
-          <p className="mt-2 text-slate-300">Sign in to access your workspace</p>
+          <p className="mt-2 text-white">Sign in to access your workspace</p>
         </div>
 
         <button
@@ -65,15 +65,7 @@ export const Login = () => {
           <span>{isLoading ? "Signing in..." : "Continue with Google"}</span>
         </button>
 
-        <div className="mt-8 flex justify-center space-x-4 border-t border-white/10 pt-6 text-xs text-slate-400">
-          <a href="#" className="hover:text-blue-300 transition-colors">
-            Privacy Policy
-          </a>
-          <span>•</span>
-          <a href="#" className="hover:text-blue-300 transition-colors">
-            Terms of Service
-          </a>
-        </div>
+
       </div>
     </div>
   );

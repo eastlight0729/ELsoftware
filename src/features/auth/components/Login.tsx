@@ -26,7 +26,7 @@ export const Login = () => {
       <div className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
         <div className="mb-8 text-center">
           <h1 className="bg-linear-to-r from-sky-200 to-red-200 bg-clip-text text-4xl font-bold text-transparent drop-shadow-sm">
-            Welcome Back
+            ELIXIR
           </h1>
           <p className="mt-2 text-white">Sign in to access your workspace</p>
         </div>

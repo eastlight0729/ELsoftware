@@ -17,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   </React.StrictMode>
 );
 
-// Use contextBridge
-window.electron.onMainProcessMessage((message) => {
-  console.log(message);
-});
+// Use contextBridge safely
+if (window.electron) {
+  window.electron.onMainProcessMessage((message) => {
+    console.log(message);
+  });
+}

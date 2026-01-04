@@ -9,7 +9,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { Plus, MoreHorizontal, Archive } from "lucide-react";
+import { Plus, Archive } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -27,7 +27,7 @@ import { KanbanCard } from "./KanbanCard";
 import { KanbanColumn } from "./KanbanColumn";
 import { KanbanCardModal } from "./KanbanCardModal";
 import { ConfirmModal } from "./ConfirmModal";
-import { ArchiveDrawer } from "./ArchiveDrawer";
+import { KanbanArchiveListModal } from "./KanbanArchiveListModal";
 
 export function KanbanBoard() {
   const { data: columns = [] } = useColumns();
@@ -48,7 +48,6 @@ export function KanbanBoard() {
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
-  const [isHeaderMenuOpen, setIsHeaderMenuOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -176,35 +175,22 @@ export function KanbanBoard() {
   return (
     <div className="flex flex-col h-full w-full">
       {/* Header */}
-      <div className="flex-none px-6 py-4 flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm z-10">
-        <h1 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">Kanban Board</h1>
-        <div className="relative">
+      {/* Header */}
+      <header className="flex-none mb-8">
+        <div className="w-full max-w-2xl mx-auto flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Kanban Board</h1>
+            <p className="text-white/80 font-medium">Manage your workflow.</p>
+          </div>
           <button
-            onClick={() => setIsHeaderMenuOpen(!isHeaderMenuOpen)}
-            className="p-2 text-neutral-500 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+            onClick={() => setIsArchiveOpen(true)}
+            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10 shadow-lg hover:scale-105"
+            title="Open Archive"
           >
-            <MoreHorizontal size={20} />
+            <Archive size={20} />
           </button>
-
-          {isHeaderMenuOpen && (
-            <>
-              <div className="fixed inset-0 z-20" onClick={() => setIsHeaderMenuOpen(false)} />
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden z-30">
-                <button
-                  onClick={() => {
-                    setIsArchiveOpen(true);
-                    setIsHeaderMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/50 flex items-center gap-2"
-                >
-                  <Archive size={16} />
-                  <span>Archived Items</span>
-                </button>
-              </div>
-            </>
-          )}
         </div>
-      </div>
+      </header>
 
       {/* Board Content */}
       <div className="flex-1 overflow-x-auto p-4">
@@ -231,7 +217,7 @@ export function KanbanBoard() {
 
             <button
               onClick={createNewColumn}
-              className="h-[60px] min-w-[300px] rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 flex items-center justify-center gap-2 text-neutral-500 hover:text-neutral-700 hover:border-neutral-400 dark:hover:text-neutral-300 transition-colors shrink-0"
+              className="h-[60px] min-w-[300px] rounded-xl border-2 border-dashed border-white/20 bg-white/5 flex items-center justify-center gap-2 text-white/50 hover:text-white hover:border-white/40 hover:bg-white/10 transition-all shrink-0 backdrop-blur-sm"
             >
               <Plus size={20} />
               <span className="font-medium">Add Column</span>
@@ -284,7 +270,7 @@ export function KanbanBoard() {
         </DndContext>
       </div>
 
-      <ArchiveDrawer isOpen={isArchiveOpen} onClose={() => setIsArchiveOpen(false)} />
+      <KanbanArchiveListModal isOpen={isArchiveOpen} onClose={() => setIsArchiveOpen(false)} />
     </div>
   );
 }

@@ -137,7 +137,7 @@ export default function App() {
         className={`fixed inset-0 min-h-screen w-full -z-10 transition-colors duration-500 ${
           backgroundPath 
             ? "bg-cover bg-fixed bg-center bg-no-repeat"
-            : activeCategory === "inbox"
+            : activeCategory === "inbox" || activeCategory === "task"
               ? "bg-linear-to-br from-sky-500 to-red-400"
               : "bg-neutral-100 dark:bg-neutral-800"
         }`}
@@ -169,7 +169,7 @@ export default function App() {
               className="w-full h-full"
             >
               {activeCategory === "task" ? (
-                <div className="h-screen w-full p-1 overflow-hidden">
+                <div className="h-screen w-full pt-4 px-4 pb-0 overflow-hidden">
                   <AppContent
                     activeCategory={activeCategory}
                     userEmail={session.user.email}

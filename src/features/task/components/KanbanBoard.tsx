@@ -230,7 +230,7 @@ export function KanbanBoard() {
       </header>
 
       {/* Board Content (Carousel) */}
-      <div className="flex-1 w-full relative overflow-hidden px-12 pb-4">
+      <div className="flex-1 w-full relative overflow-hidden pb-18">
         {/* Floating Kanban Navigator */}
         <div className="fixed bottom-[110px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-4 py-2 rounded-2xl bg-neutral-900/60 backdrop-blur-xl border border-white/10 shadow-2xl">
           <button

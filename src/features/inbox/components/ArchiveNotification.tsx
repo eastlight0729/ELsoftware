@@ -26,7 +26,7 @@ export const ArchiveNotification = ({ isOpen, onUndo, onClose }: ArchiveNotifica
           animate={{ y: 0, opacity: 1, x: "-50%" }}
           exit={{ y: 100, opacity: 0, x: "-50%" }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="fixed bottom-24 left-1/2 flex items-center gap-4 px-6 py-3 bg-neutral-900/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl z-50 min-w-[300px]"
+          className="fixed bottom-24 left-1/2 flex items-center gap-4 px-6 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl z-50 min-w-[300px]"
         >
           <span className="text-white text-sm font-medium">Item archived</span>
           <div className="flex-1" />

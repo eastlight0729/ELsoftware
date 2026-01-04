@@ -15,7 +15,7 @@ const ArchivedItem = ({ item }: { item: InboxItem }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   return (
-    <div className="flex items-center justify-between p-3 mb-2 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+    <div className="flex items-center justify-between p-3 mb-2 bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/20 transition-colors">
       <span className="text-white/80 text-sm truncate flex-1 pr-4">{item.content}</span>
       
       <div className="flex items-center gap-2 shrink-0">
@@ -76,7 +76,7 @@ export const ArchiveListModal = ({ isOpen, onClose }: ArchiveListModalProps) => 
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md bg-neutral-900/90 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[60vh]"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[60vh]"
           >
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div className="flex items-center gap-2 text-white/90">

@@ -44,14 +44,7 @@ export function KanbanCard({ card, onEditStart }: KanbanCardProps) {
     >
       <div className="flex flex-col gap-2 pointer-events-none">
         
-        {/* Size Badge if existing */}
-        {card.size && (
-          <div className="flex justify-start mb-1">
-            <div className="text-[10px] font-mono font-medium text-white/60">
-              {card.size}
-            </div>
-          </div>
-        )}
+
 
         {/* Title Area */}
         <div className="relative min-h-[24px]">

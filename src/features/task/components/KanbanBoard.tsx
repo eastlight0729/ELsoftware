@@ -9,7 +9,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { Plus, Archive, ChevronLeft, ChevronRight } from "lucide-react";
+import { Archive } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -208,7 +208,7 @@ export function KanbanBoard() {
     }
   };
 
-  const isAtEnd = currentIndex + columnsPerPage >= columns.length;
+
 
   // Swipe Gesture State
   const [touchStart, setTouchStart] = useState<number | null>(null);

@@ -12,6 +12,7 @@ import {
   useDeleteColumn,
   useListCarousel,
   useListDragDrop,
+  useRestoreCard,
   useRestoreColumn,
   useUpdateCard,
   useUpdateColumn,
@@ -31,6 +32,7 @@ export function ListBoard() {
   const { mutate: createColumn } = useCreateColumn();
   const { mutate: deleteColumn } = useDeleteColumn();
   const { mutate: restoreColumn } = useRestoreColumn();
+  const { mutate: restoreCard } = useRestoreCard();
   const { mutate: updateColumn } = useUpdateColumn();
 
   const { mutate: createCard } = useCreateCard();
@@ -42,6 +44,7 @@ export function ListBoard() {
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [archivedColumnId, setArchivedColumnId] = useState<string | null>(null);
+  const [archivedCardId, setArchivedCardId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
   // --- Hooks for Logic Extraction ---
@@ -151,6 +154,7 @@ export function ListBoard() {
                         onDeleteColumn={(id) => {
                           deleteColumn(id);
                           setArchivedColumnId(id);
+                          setArchivedCardId(null);
                         }}
                         onUpdateColumnTitle={(id, title) =>
                           updateColumn({ id, updates: { title } })
@@ -224,6 +228,8 @@ export function ListBoard() {
             onConfirm={() => {
               if (deletingCardId) {
                 deleteCard(deletingCardId);
+                setArchivedCardId(deletingCardId);
+                setArchivedColumnId(null);
                 setDeletingCardId(null);
               }
             }}
@@ -248,6 +254,18 @@ export function ListBoard() {
           }
         }}
         onClose={() => setArchivedColumnId(null)}
+      />
+
+      <UndoNotification
+        isOpen={!!archivedCardId}
+        message="Card archived"
+        onUndo={() => {
+          if (archivedCardId) {
+            restoreCard(archivedCardId);
+            setArchivedCardId(null);
+          }
+        }}
+        onClose={() => setArchivedCardId(null)}
       />
     </div>
   );

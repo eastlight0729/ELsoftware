@@ -89,7 +89,7 @@ export const KanbanArchiveListModal = ({ isOpen, onClose }: KanbanArchiveListMod
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[500px]"
+              className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col h-[500px]"
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -222,7 +222,7 @@ export const KanbanArchiveListModal = ({ isOpen, onClose }: KanbanArchiveListMod
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-neutral-900/90 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 backdrop-blur-md border border-white/10 z-[60]"
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] bg-neutral-900/90 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 backdrop-blur-md border border-white/10 z-60"
                   >
                     <AlertCircle size={18} className="text-green-400" />
                     <span className="text-sm font-medium">{toastMessage}</span>

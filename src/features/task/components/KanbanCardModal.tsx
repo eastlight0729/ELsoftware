@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Archive } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { KanbanCard } from "../types";
 
@@ -55,9 +56,23 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/10 backdrop-blur-[2px] animate-in fade-in duration-200">
-      <div
-        className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden border border-white/40 animate-in zoom-in-95 duration-200"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/10 backdrop-blur-[2px]"
+      />
+
+      {/* Modal */}
+      <motion.div
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden border border-white/40"
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSave();
@@ -141,7 +156,7 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

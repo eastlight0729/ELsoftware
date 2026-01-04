@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, FolderInput } from "lucide-react";
 import { useDeleteInboxItem, useUpdateInboxItem } from "../hooks/useInbox";
 import type { InboxItem as InboxItemType } from "../api";
 
@@ -52,13 +52,23 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
           {item.content}
         </span>
       )}
-      <button
-        onClick={() => deleteItem(item.id)}
-        className="p-2 text-white/70 hover:text-red-100 hover:bg-white/20 rounded-lg transition-colors shrink-0"
-        aria-label="Delete item"
-      >
-        <Trash2 size={18} />
-      </button>
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          onClick={() => {}}
+          className="p-2 text-white/70 hover:text-blue-100 hover:bg-white/20 rounded-lg transition-colors"
+          aria-label="Move item"
+          title="Move to..."
+        >
+          <FolderInput size={18} />
+        </button>
+        <button
+          onClick={() => deleteItem(item.id)}
+          className="p-2 text-white/70 hover:text-red-100 hover:bg-white/20 rounded-lg transition-colors"
+          aria-label="Delete item"
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
     </div>
   );
 });

@@ -16,7 +16,7 @@ import { Loader2 } from "lucide-react";
  * - The main content rendering via `AppContent`.
  */
 export default function App() {
-  const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
+  const [activeCategory, setActiveCategory] = useState<AppCategory>("inbox");
   const { session, loading, signOut } = useAuth();
   
   // Background Settings Logic

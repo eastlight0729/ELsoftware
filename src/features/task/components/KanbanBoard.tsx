@@ -306,29 +306,7 @@ export function KanbanBoard() {
       </header>
 
       {/* Board Content (Carousel) */}
-      <div className="flex-1 w-full relative overflow-hidden pb-18">
-        {/* Floating Kanban Navigator */}
-        <div className="fixed bottom-[110px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl">
-          <button
-            onClick={handlePrev}
-            disabled={currentIndex === 0}
-            className="p-2 rounded-xl hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all hover:scale-105 active:scale-95"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          
-          <span className="text-white font-medium font-mono text-sm min-w-[3rem] text-center tracking-wider drop-shadow-sm">
-             {columns.length > 0 ? currentIndex + 1 : 0} <span className="text-white/40 mx-1">/</span> {columns.length}
-          </span>
-
-          <button
-            onClick={() => handleNext(true)}
-            className="p-2 rounded-xl hover:bg-white/20 text-white/70 hover:text-white transition-all hover:scale-105 active:scale-95 group"
-          >
-            {isAtEnd ? <Plus size={20} className="text-white group-hover:text-amber-200" /> : <ChevronRight size={20} />}
-          </button>
-        </div>
-
+      <div className="flex-1 w-full relative overflow-hidden pb-0">
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
           <div 
             className="h-full w-full overflow-hidden touch-pan-y"

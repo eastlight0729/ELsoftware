@@ -48,7 +48,7 @@ export function KanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className="bg-white/10 w-full h-full max-h-full rounded-xl flex flex-col shrink-0 border border-white/20 shadow-lg transition-all"
+      className="bg-white/10 w-full h-full rounded-xl flex flex-col shrink-0 border border-white/20 shadow-lg transition-all"
     >
       {/* Column Header */}
       <div className="p-3 flex items-center justify-between border-b border-white/10">

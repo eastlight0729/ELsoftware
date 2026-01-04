@@ -1,4 +1,5 @@
 import { Menu, X } from "lucide-react";
+import { cn } from "../../lib/utils";
 import { NAVIGATION_BUTTON_BASE, NAVIGATION_BUTTON_COLORS, NAVIGATION_ICON_SIZE, NAVIGATION_ICON_STROKE_WIDTH } from "./constants";
 
 interface NavigationTriggerProps {
@@ -12,11 +13,18 @@ interface NavigationTriggerProps {
  * A fixed button to toggle the sidebar.
  * Placed at the top-left to ensure accessibility.
  */
+
+const TRIGGER_BUTTON_CLASSES = cn(
+  "fixed top-3 left-2 z-50",
+  NAVIGATION_BUTTON_BASE,
+  NAVIGATION_BUTTON_COLORS
+);
+
 export function NavigationTrigger({ isOpen, onToggle }: NavigationTriggerProps) {
   return (
     <button
       onClick={onToggle}
-      className={`fixed top-3 left-2 z-50 ${NAVIGATION_BUTTON_BASE} ${NAVIGATION_BUTTON_COLORS}`}
+      className={TRIGGER_BUTTON_CLASSES}
       aria-label="Toggle Sidebar"
     >
       {isOpen ? (

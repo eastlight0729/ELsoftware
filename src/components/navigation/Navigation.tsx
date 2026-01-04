@@ -1,6 +1,7 @@
 import { AppCategory } from "./types";
 import { NavigationItem } from "./NavigationItem";
 import { navigationConfig, settingsConfig } from "./config";
+import { cn } from "../../lib/utils";
 
 interface NavigationProps {
   /** The currently selected category in the main application. */
@@ -13,18 +14,19 @@ interface NavigationProps {
  * The main floating dock navigation component.
  * Displays navigation items defined in `config.tsx`.
  */
+
+const NAVIGATION_CONTAINER_CLASSES = cn(
+  "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
+  "flex flex-row items-center gap-2 p-2",
+  "bg-white/10 backdrop-blur-xl",
+  "border border-white/20",
+  "rounded-2xl shadow-xl",
+  "transition-all duration-300 ease-in-out"
+);
+
 export function Navigation({ activeCategory, onSelectCategory }: NavigationProps) {
   return (
-    <aside
-      className="
-        fixed bottom-6 left-1/2 -translate-x-1/2 z-50
-        flex flex-row items-center gap-2 p-2
-        bg-white/10 backdrop-blur-xl
-        border border-white/20
-        rounded-2xl shadow-xl
-        transition-all duration-300 ease-in-out
-      "
-    >
+    <aside className={NAVIGATION_CONTAINER_CLASSES}>
       {/* Main Navigation Items */}
       <nav className="flex flex-row gap-1">
         {navigationConfig.map((item) => (

@@ -1,58 +1,9 @@
-import { useState } from "react";
+
 import { Plus, Archive } from "lucide-react";
-import { useInboxItems, useCreateInboxItem, useArchiveInboxItem, useUnarchiveInboxItem } from "../hooks/useInbox";
+import { useInboxViewModel } from "../hooks/useInboxViewModel";
 import { InboxItem } from "./InboxItem";
 import { ArchiveListModal } from "./ArchiveListModal";
 import { ArchiveNotification } from "./ArchiveNotification";
-
-// Extract Logic to a Custom Hook (View Model)
-const useInboxViewModel = () => {
-  const { data: items, isLoading } = useInboxItems();
-  const { mutate: createItem } = useCreateInboxItem();
-  const { mutate: archiveItem } = useArchiveInboxItem();
-  const { mutate: unarchiveItem } = useUnarchiveInboxItem();
-  
-  const [inputValue, setInputValue] = useState("");
-  const [notificationState, setNotificationState] = useState<{ isOpen: boolean; itemId: string | null }>({ isOpen: false, itemId: null });
-  const [isArchiveListOpen, setIsArchiveListOpen] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim()) return;
-    createItem(inputValue.trim());
-    setInputValue("");
-  };
-
-  const handleArchive = (id: string) => {
-    archiveItem(id);
-    setNotificationState({ isOpen: true, itemId: id });
-  };
-
-  const handleUndoArchive = () => {
-    if (notificationState.itemId) {
-      unarchiveItem(notificationState.itemId);
-      setNotificationState({ isOpen: false, itemId: null });
-    }
-  };
-
-  const handleCloseNotification = () => {
-    setNotificationState((prev) => ({ ...prev, isOpen: false }));
-  };
-
-  return {
-    items,
-    isLoading,
-    inputValue,
-    setInputValue,
-    handleSubmit,
-    handleArchive,
-    handleUndoArchive,
-    handleCloseNotification,
-    notificationState,
-    isArchiveListOpen,
-    setIsArchiveListOpen,
-  };
-};
 
 export const InboxView = () => {
   const {

@@ -32,7 +32,7 @@ export const ArchiveNotification = ({ isOpen, onUndo, onClose }: ArchiveNotifica
           <div className="flex-1" />
           <button
             onClick={onUndo}
-            className="flex items-center gap-2 text-sky-400 hover:text-sky-300 font-medium text-sm transition-colors"
+            className="flex items-center gap-2 text-white hover:text-white/80 font-medium text-sm transition-colors"
           >
             <Undo2 size={16} />
             Undo

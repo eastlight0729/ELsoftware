@@ -76,11 +76,11 @@ export const ArchiveListModal = ({ isOpen, onClose }: ArchiveListModalProps) => 
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[60vh]"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[300px]"
           >
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div className="flex items-center gap-2 text-white/90">
-                <Archive size={20} className="text-orange-400" />
+                <Archive size={20} className="text-white" />
                 <h3 className="font-semibold">Archive</h3>
               </div>
               <button
@@ -91,7 +91,7 @@ export const ArchiveListModal = ({ isOpen, onClose }: ArchiveListModalProps) => 
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 space-y-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
               {isLoading ? (
                 <div className="space-y-2">
                   {[1, 2, 3].map((i) => (

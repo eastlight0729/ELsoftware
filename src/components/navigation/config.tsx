@@ -1,4 +1,4 @@
-import { Calendar, Inbox, Kanban, Settings, StickyNote } from "lucide-react";
+import { Calendar, Inbox, Kanban, Settings, StickyNote, CheckSquare, BarChart2 } from "lucide-react";
 import { AppCategory } from "./types";
 import { NAVIGATION_ICON_SIZE, NAVIGATION_ICON_STROKE_WIDTH } from "./constants";
 
@@ -24,21 +24,30 @@ export const navigationConfig: NavigationConfigItem[] = [
     icon: <Inbox size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
   {
-    id: "memo",
-    label: "Memo",
-    icon: <StickyNote size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
+    id: "actions",
+    label: "Actions",
+    icon: <CheckSquare size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
+  },
+  {
+    id: "calendar",
+    label: "Calendar",
+    // Note: Reusing the Calendar icon but id is now 'calendar' instead of 'year'
+    icon: <Calendar size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
   {
     id: "task",
     label: "Kanban",
     icon: <Kanban size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
-  // Schedule removed
-
   {
-    id: "year",
-    label: "Year Calendar",
-    icon: <Calendar size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
+    id: "review",
+    label: "Review",
+    icon: <BarChart2 size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
+  },
+  {
+    id: "memo",
+    label: "Reference", // Renamed from Memo
+    icon: <StickyNote size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
 ];
 

@@ -11,13 +11,13 @@ export const NAVIGATION_BUTTON_BASE = "p-2 rounded-lg transition-all duration-20
  * Derived from the standard NavigationTrigger design.
  */
 export const NAVIGATION_BUTTON_COLORS =
-  "text-neutral-600 dark:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50";
+  "text-white hover:bg-white/10";
 
 /**
  * Color scheme for the currently active menu item.
  */
 export const NAVIGATION_BUTTON_ACTIVE =
-  "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-sm";
+  "bg-white/20 text-white shadow-sm";
 
 /**
  * Standard stroke width for navigation icons.

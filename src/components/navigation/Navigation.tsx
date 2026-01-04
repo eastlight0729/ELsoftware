@@ -19,9 +19,9 @@ export function Navigation({ activeCategory, onSelectCategory }: NavigationProps
       className="
         fixed bottom-6 left-1/2 -translate-x-1/2 z-50
         flex flex-row items-center gap-2 p-2
-        bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md
-        border border-neutral-200 dark:border-neutral-800
-        rounded-2xl shadow-2xl
+        bg-white/10 backdrop-blur-xl
+        border border-white/20
+        rounded-2xl shadow-xl
         transition-all duration-300 ease-in-out
       "
     >
@@ -41,7 +41,7 @@ export function Navigation({ activeCategory, onSelectCategory }: NavigationProps
       </nav>
 
       {/* Separator */}
-      <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-700 mx-1" />
+      <div className="w-px h-8 bg-white/20 mx-1" />
 
       {/* Settings Category */}
       <NavigationItem

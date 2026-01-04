@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AppCategory } from "./components/navigation/types";
 import { Navigation } from "./components/navigation/Navigation";
 import { navigationConfig } from "./components/navigation/config";
@@ -33,6 +34,29 @@ export default function App() {
   
   // (No useEffect needed here for bgImage sync because the hook does it)
 
+  const [direction, setDirection] = useState(0);
+
+  const handleCategoryChange = (newCategory: AppCategory) => {
+    // Helper to get index including settings
+    const getCategoryIndex = (category: AppCategory) => {
+      if (category === "setting") return navigationConfig.length;
+      return navigationConfig.findIndex((item) => item.id === category);
+    };
+
+    const currentIndex = getCategoryIndex(activeCategory);
+    const newIndex = getCategoryIndex(newCategory);
+    
+    if (newIndex > currentIndex) {
+      setDirection(1);
+    } else if (newIndex < currentIndex) {
+      setDirection(-1);
+    } else {
+        setDirection(0);
+    }
+    
+    setActiveCategory(newCategory);
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Menu Navigation: Cmd + Left/Right (Changed from Up/Down for Dock)
@@ -50,9 +74,11 @@ export default function App() {
             if (e.key === "ArrowLeft") {
               // Wrap around to the last item if at the beginning
               nextIndex = (currentIndex - 1 + navigationConfig.length) % navigationConfig.length;
+              setDirection(-1);
             } else {
               // Wrap around to the first item if at the end
               nextIndex = (currentIndex + 1) % navigationConfig.length;
+              setDirection(1);
             }
           }
 
@@ -90,61 +116,92 @@ export default function App() {
       }
     : {};
 
-  return (
-    <div
-      style={backgroundStyle}
-      className={`min-h-screen w-full transition-all duration-500 ${
-        backgroundPath 
-          ? "" // If image is set, we don't need background colors
-          : activeCategory === "inbox"
-            ? "bg-gradient-to-br from-sky-500 to-red-400"
-            : "bg-neutral-100 dark:bg-neutral-800"
-      } text-neutral-800 dark:text-neutral-100`}
-    >
-      {/* Main Content Area */}
-      {/* 
-          Added pb-32 to accomodate the floating dock at the bottom.
-          Removed pl-12 since navigation is now a dock.
-      */}
-      <main
-        className={`
-          transition-[padding] duration-300 ease-in-out
-          ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
-          min-h-screen
-        `}
-      >
-        {activeCategory === "task" ? (
-          <div className="h-screen w-full p-1 overflow-hidden">
-            <AppContent
-              activeCategory={activeCategory}
-              userEmail={session.user.email}
-              onLogout={signOut}
-            />
-          </div>
-        ) : activeCategory === "inbox" ? (
-          <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
-            <AppContent
-              activeCategory={activeCategory}
-              userEmail={session.user.email}
-              onLogout={signOut}
-            />
-          </div>
-        ) : (
-          <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
-            <AppContent
-              activeCategory={activeCategory}
-              userEmail={session.user.email}
-              onLogout={signOut}
-            />
-          </div>
-        )}
-      </main>
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? "100%" : "-100%",
+      opacity: 0,
+    }),
+  };
 
-      <Navigation
-        activeCategory={activeCategory}
-        onSelectCategory={setActiveCategory}
+  return (
+    <>
+      <div 
+        className={`fixed inset-0 min-h-screen w-full -z-10 transition-colors duration-500 ${
+          backgroundPath 
+            ? "bg-cover bg-fixed bg-center bg-no-repeat"
+            : activeCategory === "inbox"
+              ? "bg-linear-to-br from-sky-500 to-red-400"
+              : "bg-neutral-100 dark:bg-neutral-800"
+        }`}
+        style={backgroundPath ? backgroundStyle : {}}
       />
-    </div>
+      
+      <div className="min-h-screen w-full text-neutral-800 dark:text-neutral-100 relative overflow-x-hidden">
+        {/* Main Content Area */}
+        {/* 
+            Added pb-32 to accomodate the floating dock at the bottom.
+            Removed pl-12 since navigation is now a dock.
+        */}
+        <main
+          className={`
+            transition-[padding] duration-300 ease-in-out
+            ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
+            min-h-screen
+          `}
+        >
+          <AnimatePresence mode="popLayout" custom={direction} initial={false}>
+            <motion.div
+              key={activeCategory}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+              className="w-full h-full"
+            >
+              {activeCategory === "task" ? (
+                <div className="h-screen w-full p-1 overflow-hidden">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              ) : activeCategory === "inbox" ? (
+                <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              ) : (
+                <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        <Navigation
+          activeCategory={activeCategory}
+          onSelectCategory={handleCategoryChange}
+        />
+      </div>
+    </>
   );
 }
-

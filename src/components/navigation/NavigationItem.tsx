@@ -35,7 +35,7 @@ function NavigationItemInternal<T extends string>({ id, icon, label, isActive, o
     >
       <span
         className={`relative z-10 transition-colors duration-200 shrink-0 ${
-          isActive ? "text-emerald-500" : "group-hover:text-neutral-800 dark:group-hover:text-neutral-200"
+          isActive ? "text-sky-400" : "group-hover:text-white"
         }`}
       >
         {icon}

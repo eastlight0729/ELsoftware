@@ -5,4 +5,4 @@
  * - `schedule`: For daily planning and timer.
  * - `setting`: For application preferences.
  */
-export type AppCategory = "inbox" | "memo" | "task" | "year" | "setting";
+export type AppCategory = "inbox" | "actions" | "calendar" | "task" | "review" | "memo" | "setting";

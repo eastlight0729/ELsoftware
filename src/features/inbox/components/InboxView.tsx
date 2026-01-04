@@ -62,8 +62,10 @@ export const InboxView = () => {
             ))}
           </div>
         ) : items?.length === 0 ? (
-          <div className="text-center py-20 text-white/60">
-            <p>Your inbox is empty.</p>
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+             <div className="p-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg">
+                <p className="text-white/80 font-medium text-lg">Your inbox is empty.</p>
+             </div>
           </div>
         ) : (
           items?.map((item) => <InboxItem key={item.id} item={item} />)

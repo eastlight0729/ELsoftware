@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { AppCategory } from "./components/sidebar/types";
-import { Sidebar } from "./components/sidebar/Sidebar";
-import { sidebarConfig } from "./components/sidebar/config";
+import { AppCategory } from "./components/navigation/types";
+import { Navigation } from "./components/navigation/Navigation";
+import { navigationConfig } from "./components/navigation/config";
 import { AppContent } from "./AppContent";
 
 import { useAuth, Login } from "./features/auth";
@@ -24,24 +24,24 @@ export default function App() {
       if (e.metaKey || e.ctrlKey) {
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
           e.preventDefault();
-          const currentIndex = sidebarConfig.findIndex((item) => item.id === activeCategory);
+          const currentIndex = navigationConfig.findIndex((item) => item.id === activeCategory);
 
           let nextIndex;
           if (currentIndex === -1) {
             // Currently in Settings or unknown
-            if (e.key === "ArrowLeft") nextIndex = sidebarConfig.length - 1;
+            if (e.key === "ArrowLeft") nextIndex = navigationConfig.length - 1;
             else nextIndex = 0;
           } else {
             if (e.key === "ArrowLeft") {
               // Wrap around to the last item if at the beginning
-              nextIndex = (currentIndex - 1 + sidebarConfig.length) % sidebarConfig.length;
+              nextIndex = (currentIndex - 1 + navigationConfig.length) % navigationConfig.length;
             } else {
               // Wrap around to the first item if at the end
-              nextIndex = (currentIndex + 1) % sidebarConfig.length;
+              nextIndex = (currentIndex + 1) % navigationConfig.length;
             }
           }
 
-          setActiveCategory(sidebarConfig[nextIndex].id);
+          setActiveCategory(navigationConfig[nextIndex].id);
         }
       }
     };
@@ -68,7 +68,7 @@ export default function App() {
       {/* Main Content Area */}
       {/* 
           Added pb-32 to accomodate the floating dock at the bottom.
-          Removed pl-12 since sidebar is now a dock.
+          Removed pl-12 since navigation is now a dock.
       */}
       <main
         className={`
@@ -88,7 +88,7 @@ export default function App() {
         )}
       </main>
 
-      <Sidebar
+      <Navigation
         activeCategory={activeCategory}
         onSelectCategory={setActiveCategory}
         userEmail={session.user.email}

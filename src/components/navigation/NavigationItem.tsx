@@ -1,7 +1,7 @@
 import React from "react";
-import { SIDEBAR_BUTTON_ACTIVE, SIDEBAR_BUTTON_BASE, SIDEBAR_BUTTON_COLORS } from "./constants";
+import { NAVIGATION_BUTTON_ACTIVE, NAVIGATION_BUTTON_BASE, NAVIGATION_BUTTON_COLORS } from "./constants";
 
-interface SidebarItemProps<T extends string> {
+interface NavigationItemProps<T extends string> {
   /** The unique identifier for this item. passed back in onClick. */
   id: T;
   /** The icon element to render. */
@@ -17,20 +17,20 @@ interface SidebarItemProps<T extends string> {
 }
 
 /**
- * A single navigation item in the sidebar.
- * Handles styling for active/inactive states and collapsed/expanded modes.
- * Memoized to prevent re-renders when other sidebar items change.
+ * A single navigation item.
+ * Handles styling for active/inactive states.
+ * Memoized to prevent re-renders when other items change.
  */
-function SidebarItemInternal<T extends string>({ id, icon, label, isActive, onClick, showLabel }: SidebarItemProps<T>) {
+function NavigationItemInternal<T extends string>({ id, icon, label, isActive, onClick, showLabel }: NavigationItemProps<T>) {
   return (
     <button
       onClick={() => onClick(id)}
       title={!showLabel ? label : undefined}
       className={`
-        group flex items-center gap-3 ${SIDEBAR_BUTTON_BASE}
+        group flex items-center gap-3 ${NAVIGATION_BUTTON_BASE}
         ${showLabel ? "w-full text-left" : "justify-center aspect-square"}
         relative overflow-hidden
-        ${isActive ? SIDEBAR_BUTTON_ACTIVE : SIDEBAR_BUTTON_COLORS}
+        ${isActive ? NAVIGATION_BUTTON_ACTIVE : NAVIGATION_BUTTON_COLORS}
       `}
     >
       <span
@@ -51,4 +51,4 @@ function SidebarItemInternal<T extends string>({ id, icon, label, isActive, onCl
 }
 
 // Cast to any to allow generic usage in React.memo which can be tricky with generics
-export const SidebarItem = React.memo(SidebarItemInternal) as typeof SidebarItemInternal;
+export const NavigationItem = React.memo(NavigationItemInternal) as typeof NavigationItemInternal;

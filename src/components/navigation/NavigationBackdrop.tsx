@@ -1,4 +1,4 @@
-interface SidebarBackdropProps {
+interface NavigationBackdropProps {
   /** Whether the sidebar is currently open. */
   isOpen: boolean;
   /** Callback to close the sidebar when backdrop is clicked. */
@@ -9,7 +9,7 @@ interface SidebarBackdropProps {
  * An overlay backdrop that appears when the sidebar is open on smaller screens.
  * Clicking it closes the sidebar.
  */
-export function SidebarBackdrop({ isOpen, onClose }: SidebarBackdropProps) {
+export function NavigationBackdrop({ isOpen, onClose }: NavigationBackdropProps) {
   if (!isOpen) return null;
 
   return (

@@ -1,9 +1,9 @@
 import { AppCategory } from "./types";
-import { SidebarItem } from "./SidebarItem";
-import { sidebarConfig, settingsConfig } from "./config";
-import { SidebarUserProfile } from "./SidebarUserProfile";
+import { NavigationItem } from "./NavigationItem";
+import { navigationConfig, settingsConfig } from "./config";
+import { NavigationUserProfile } from "./NavigationUserProfile";
 
-interface SidebarProps {
+interface NavigationProps {
   /** The currently selected category in the main application. */
   activeCategory: AppCategory;
   /** Callback to change the active category. */
@@ -18,7 +18,7 @@ interface SidebarProps {
  * The main floating dock navigation component.
  * Displays navigation items defined in `config.tsx`.
  */
-export function Sidebar({ activeCategory, onSelectCategory, userEmail, onLogout }: SidebarProps) {
+export function Navigation({ activeCategory, onSelectCategory, userEmail, onLogout }: NavigationProps) {
   return (
     <aside
       className="
@@ -32,8 +32,8 @@ export function Sidebar({ activeCategory, onSelectCategory, userEmail, onLogout 
     >
       {/* Main Navigation Items */}
       <nav className="flex flex-row gap-1">
-        {sidebarConfig.map((item) => (
-          <SidebarItem
+        {navigationConfig.map((item) => (
+          <NavigationItem
             key={item.id}
             id={item.id}
             icon={item.icon}
@@ -49,7 +49,7 @@ export function Sidebar({ activeCategory, onSelectCategory, userEmail, onLogout 
       <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-700 mx-1" />
 
       {/* Settings Category */}
-      <SidebarItem
+      <NavigationItem
         id={settingsConfig.id}
         icon={settingsConfig.icon}
         label={settingsConfig.label}
@@ -63,7 +63,7 @@ export function Sidebar({ activeCategory, onSelectCategory, userEmail, onLogout 
 
       {/* User Info - Dock Style */}
       <div className="pl-1">
-        <SidebarUserProfile email={userEmail} onLogout={onLogout} />
+        <NavigationUserProfile email={userEmail} onLogout={onLogout} />
       </div>
     </aside>
   );

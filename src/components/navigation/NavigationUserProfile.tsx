@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
-interface SidebarUserProfileProps {
+interface NavigationUserProfileProps {
   email?: string | null;
   onLogout: () => void;
 }
 
-export function SidebarUserProfile({ email, onLogout }: SidebarUserProfileProps) {
+export function NavigationUserProfile({ email, onLogout }: NavigationUserProfileProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleLogout = () => {

@@ -1,4 +1,4 @@
-import { AppCategory } from "./components/sidebar/types";
+import { AppCategory } from "./components/navigation/types";
 
 import { Memo } from "./features/memo";
 import { YearCalendar } from "./features/year-calendar";

@@ -15,7 +15,7 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
       <span className="text-white text-base font-medium drop-shadow-sm">{item.content}</span>
       <button
         onClick={() => deleteItem(item.id)}
-        className="opacity-0 group-hover:opacity-100 transition-opacity p-2 text-white/70 hover:text-red-100 hover:bg-white/20 rounded-lg"
+        className="p-2 text-white/70 hover:text-red-100 hover:bg-white/20 rounded-lg transition-colors"
         aria-label="Delete item"
       >
         <Trash2 size={18} />

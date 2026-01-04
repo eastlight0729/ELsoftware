@@ -1,13 +1,20 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
-import { useInboxItems, useCreateInboxItem } from "../hooks/useInbox";
+import { Plus, Archive } from "lucide-react";
+import { useInboxItems, useCreateInboxItem, useArchiveInboxItem, useUnarchiveInboxItem } from "../hooks/useInbox";
 import { InboxItem } from "./InboxItem";
+import { ArchiveListModal } from "./ArchiveListModal";
+import { ArchiveNotification } from "./ArchiveNotification";
 
 // Extract Logic to a Custom Hook (View Model)
 const useInboxViewModel = () => {
   const { data: items, isLoading } = useInboxItems();
   const { mutate: createItem } = useCreateInboxItem();
+  const { mutate: archiveItem } = useArchiveInboxItem();
+  const { mutate: unarchiveItem } = useUnarchiveInboxItem();
+  
   const [inputValue, setInputValue] = useState("");
+  const [notificationState, setNotificationState] = useState<{ isOpen: boolean; itemId: string | null }>({ isOpen: false, itemId: null });
+  const [isArchiveListOpen, setIsArchiveListOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,23 +23,66 @@ const useInboxViewModel = () => {
     setInputValue("");
   };
 
+  const handleArchive = (id: string) => {
+    archiveItem(id);
+    setNotificationState({ isOpen: true, itemId: id });
+  };
+
+  const handleUndoArchive = () => {
+    if (notificationState.itemId) {
+      unarchiveItem(notificationState.itemId);
+      setNotificationState({ isOpen: false, itemId: null });
+    }
+  };
+
+  const handleCloseNotification = () => {
+    setNotificationState((prev) => ({ ...prev, isOpen: false }));
+  };
+
   return {
     items,
     isLoading,
     inputValue,
     setInputValue,
     handleSubmit,
+    handleArchive,
+    handleUndoArchive,
+    handleCloseNotification,
+    notificationState,
+    isArchiveListOpen,
+    setIsArchiveListOpen,
   };
 };
 
 export const InboxView = () => {
-  const { items, isLoading, inputValue, setInputValue, handleSubmit } = useInboxViewModel();
+  const {
+    items,
+    isLoading,
+    inputValue,
+    setInputValue,
+    handleSubmit,
+    handleArchive,
+    handleUndoArchive,
+    handleCloseNotification,
+    notificationState,
+    isArchiveListOpen,
+    setIsArchiveListOpen,
+  } = useInboxViewModel();
 
   return (
-    <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Inbox</h1>
-        <p className="text-white/80 font-medium">Capture your thoughts and tasks.</p>
+    <div className="w-full max-w-2xl mx-auto h-full flex flex-col relative">
+      <header className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Inbox</h1>
+          <p className="text-white/80 font-medium">Capture your thoughts and tasks.</p>
+        </div>
+        <button
+          onClick={() => setIsArchiveListOpen(true)}
+          className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10 shadow-lg hover:scale-105"
+          title="Open Archive"
+        >
+          <Archive size={20} />
+        </button>
       </header>
 
       <form onSubmit={handleSubmit} className="relative mb-8">
@@ -68,9 +118,20 @@ export const InboxView = () => {
              </div>
           </div>
         ) : (
-          items?.map((item) => <InboxItem key={item.id} item={item} />)
+          items?.map((item) => <InboxItem key={item.id} item={item} onArchive={handleArchive} />)
         )}
       </div>
+
+      <ArchiveNotification
+        isOpen={notificationState.isOpen}
+        onUndo={handleUndoArchive}
+        onClose={handleCloseNotification}
+      />
+
+      <ArchiveListModal
+        isOpen={isArchiveListOpen}
+        onClose={() => setIsArchiveListOpen(false)}
+      />
     </div>
   );
 };

@@ -1,14 +1,14 @@
 import { memo, useState } from "react";
-import { Trash2, FolderInput } from "lucide-react";
-import { useDeleteInboxItem, useUpdateInboxItem } from "../hooks/useInbox";
+import { Archive, FolderInput } from "lucide-react";
+import { useUpdateInboxItem } from "../hooks/useInbox";
 import type { InboxItem as InboxItemType } from "../api";
 
 interface InboxItemProps {
   item: InboxItemType;
+  onArchive: (id: string) => void;
 }
 
-export const InboxItem = memo(({ item }: InboxItemProps) => {
-  const { mutate: deleteItem } = useDeleteInboxItem();
+export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
   const { mutate: updateItem } = useUpdateInboxItem();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -62,11 +62,11 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
           <FolderInput size={18} />
         </button>
         <button
-          onClick={() => deleteItem(item.id)}
-          className="p-2 text-white/70 hover:text-red-400 hover:bg-white/20 rounded-lg transition-colors"
-          aria-label="Delete item"
+          onClick={() => onArchive(item.id)}
+          className="p-2 text-white/70 hover:text-orange-400 hover:bg-white/20 rounded-lg transition-colors"
+          aria-label="Archive item"
         >
-          <Trash2 size={18} />
+          <Archive size={18} />
         </button>
       </div>
     </div>

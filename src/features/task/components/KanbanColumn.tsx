@@ -50,7 +50,7 @@ export function KanbanColumn({
       <div
         ref={setNodeRef}
         style={style}
-        className="bg-neutral-100/50 dark:bg-neutral-800/50 w-full h-[500px] rounded-xl border-2 border-indigo-500 opacity-40 shrink-0"
+        className="bg-white/10 w-full h-[500px] rounded-xl border border-white/20 opacity-40 shrink-0"
       />
     );
   }
@@ -59,22 +59,22 @@ export function KanbanColumn({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-neutral-100/50 dark:bg-neutral-800/50 w-full h-full max-h-full rounded-xl flex flex-col shrink-0"
+      className="bg-white/10 w-full h-full max-h-full rounded-xl flex flex-col shrink-0 border border-white/20 shadow-lg transition-all"
     >
       {/* Column Header */}
       <div
         {...attributes}
         {...listeners}
-        className="p-3 flex items-center justify-between cursor-grab active:cursor-grabbing border-b border-neutral-200 dark:border-neutral-700/50"
+        className="p-3 flex items-center justify-between cursor-grab active:cursor-grabbing border-b border-white/10"
       >
-        <div className="flex gap-2 items-center font-bold text-sm text-neutral-700 dark:text-neutral-200 w-full">
-          <div className="bg-neutral-200 dark:bg-neutral-700 px-2 py-0.5 rounded-full text-xs text-neutral-500 dark:text-neutral-400">
+        <div className="flex gap-2 items-center font-bold text-sm text-white w-full">
+          <div className="bg-white/20 px-2 py-0.5 rounded-full text-xs text-white/90 shadow-sm">
             {cards.length}
           </div>
           {editMode ? (
             <input
               autoFocus
-              className="bg-white dark:bg-neutral-900 border border-indigo-500 rounded px-1 py-0.5 outline-none w-full"
+              className="bg-white/10 border border-white/30 text-white rounded px-1 py-0.5 outline-none w-full placeholder-white/30"
               value={column.title}
               onChange={(e) => onUpdateColumnTitle(column.id, e.target.value)}
               onBlur={() => setEditMode(false)}
@@ -83,7 +83,7 @@ export function KanbanColumn({
               }}
             />
           ) : (
-            <span onClick={() => setEditMode(true)} className="truncate w-full cursor-text">
+            <span onClick={() => setEditMode(true)} className="truncate w-full cursor-text hover:bg-white/5 rounded px-1 -ml-1 transition-colors">
               {column.title}
             </span>
           )}
@@ -91,7 +91,7 @@ export function KanbanColumn({
         <div className="relative">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            className="text-white/60 hover:text-white p-1 rounded hover:bg-white/10 transition-colors"
           >
             <MoreHorizontal size={16} />
           </button>
@@ -102,13 +102,13 @@ export function KanbanColumn({
               <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
 
               {/* Dropdown Menu */}
-              <div className="absolute right-0 top-full mt-1 w-40 z-20 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 py-1 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-40 z-20 bg-white/10 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-1 overflow-hidden">
                 <button
                   onClick={() => {
                     onDeleteColumn(column.id);
                     setIsMenuOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/50 flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 flex items-center gap-2 transition-colors"
                 >
                   <Archive size={14} />
                   Archive Column
@@ -140,7 +140,7 @@ export function KanbanColumn({
             ) : (
               <button
                 onClick={() => setIsAddingCard(true)}
-                className="flex items-center gap-2 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 transition-colors w-full text-sm font-medium mt-auto"
+                className="flex items-center gap-2 p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors w-full text-sm font-medium mt-auto"
               >
                 <Plus size={16} /> Add Card
               </button>

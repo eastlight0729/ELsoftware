@@ -199,16 +199,68 @@ export function KanbanBoard() {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
   };
 
-  const handleNext = () => {
+  const handleNext = (allowCreate = true) => {
     if (currentIndex + columnsPerPage < columns.length) {
       setCurrentIndex((prev) => prev + 1);
-    } else {
+    } else if (allowCreate) {
       // Add logic
       createNewColumn();
     }
   };
 
   const isAtEnd = currentIndex + columnsPerPage >= columns.length;
+
+  // Swipe Gesture State
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null); // Reset
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext(false);
+    }
+    if (isRightSwipe) {
+      handlePrev();
+    }
+  };
+
+  // Mouse drag state
+  const [mouseDownX, setMouseDownX] = useState<number | null>(null);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    setMouseDownX(e.clientX);
+  };
+
+  const onMouseUp = (e: React.MouseEvent) => {
+    if (mouseDownX === null) return;
+    const distance = mouseDownX - e.clientX;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext(false);
+    }
+    if (isRightSwipe) {
+      handlePrev();
+    }
+    setMouseDownX(null);
+  };
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -254,7 +306,15 @@ export function KanbanBoard() {
         </div>
 
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
-          <div className="h-full w-full overflow-hidden">
+          <div 
+            className="h-full w-full overflow-hidden touch-pan-y"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onMouseDown={onMouseDown}
+            onMouseUp={onMouseUp}
+            onMouseLeave={() => setMouseDownX(null)}
+          >
              <div 
                className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
                style={{ 

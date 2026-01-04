@@ -25,9 +25,11 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
       return <InboxView />;
     case "actions":
       return (
-        <div className="flex flex-col items-center justify-center p-12 text-center text-neutral-500">
-          <h2 className="text-2xl font-bold mb-2">Actions</h2>
-          <p>Coming Soon</p>
+        <div className="flex h-full w-full items-center justify-center">
+            <div className="flex flex-col items-center justify-center p-12 text-center text-white bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/20">
+                <h2 className="text-2xl font-bold mb-2 drop-shadow-md">Actions</h2>
+                <p className="text-white/80 font-medium">Coming Soon</p>
+            </div>
         </div>
       );
     case "calendar":
@@ -40,9 +42,11 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
       );
     case "review":
       return (
-        <div className="flex flex-col items-center justify-center p-12 text-center text-neutral-500">
-          <h2 className="text-2xl font-bold mb-2">Review</h2>
-          <p>Coming Soon</p>
+        <div className="flex h-full w-full items-center justify-center">
+             <div className="flex flex-col items-center justify-center p-12 text-center text-white bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/20">
+                 <h2 className="text-2xl font-bold mb-2 drop-shadow-md">Review</h2>
+                 <p className="text-white/80 font-medium">Coming Soon</p>
+             </div>
         </div>
       );
     case "memo":

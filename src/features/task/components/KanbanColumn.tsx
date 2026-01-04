@@ -107,6 +107,18 @@ export function KanbanColumn({
 
               {/* Dropdown Menu */}
               <div className="absolute right-0 top-full mt-1 w-40 z-20 bg-white/10 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-1 overflow-hidden">
+                {allowAddCard && (
+                  <button
+                    onClick={() => {
+                      setIsAddingCard(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 flex items-center gap-2 transition-colors border-b border-white/5"
+                  >
+                    <Plus size={14} />
+                    Add Card
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     onDeleteColumn(column.id);
@@ -125,32 +137,23 @@ export function KanbanColumn({
 
       {/* Cards Container */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 flex flex-col gap-2 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {allowAddCard && isAddingCard && (
+          <div className="mb-2">
+            <NewCardForm
+              onSubmit={(content) => {
+                createCard(column.id, content);
+                setIsAddingCard(false);
+              }}
+              onCancel={() => setIsAddingCard(false)}
+            />
+          </div>
+        )}
+
         <SortableContext items={cardIds}>
           {cards.map((card) => (
             <KanbanCard key={card.id} card={card} onEditStart={onEditCardStart} />
           ))}
         </SortableContext>
-
-        {allowAddCard && (
-          <>
-            {isAddingCard ? (
-              <NewCardForm
-                onSubmit={(content) => {
-                  createCard(column.id, content);
-                  setIsAddingCard(false); // keep form open? usually close
-                }}
-                onCancel={() => setIsAddingCard(false)}
-              />
-            ) : (
-              <button
-                onClick={() => setIsAddingCard(true)}
-                className="flex items-center gap-2 p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors w-full text-sm font-medium mt-auto"
-              >
-                <Plus size={16} /> Add Card
-              </button>
-            )}
-          </>
-        )}
       </div>
     </div>
   );

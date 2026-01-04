@@ -38,7 +38,7 @@ export const DayCell = memo(function DayCell({
       onMouseEnter={() => onMouseEnter(dateStr)}
       className={cn(
         "aspect-square rounded-sm transition-all duration-100 relative flex items-center justify-center cursor-pointer group/cell",
-        isCovered ? "bg-transparent" : isWeekend ? "bg-neutral-100 dark:bg-neutral-800/50" : "bg-transparent",
+        isCovered ? "bg-transparent" : isWeekend ? "bg-white/10" : "bg-transparent",
         isWeekend || isHoliday ? "text-red-500/80 dark:text-red-400/80" : "text-neutral-700 dark:text-neutral-300",
         "hover:bg-green-500/20 hover:z-50"
       )}

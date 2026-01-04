@@ -46,7 +46,7 @@ export function YearCalendar() {
   );
 
   return (
-    <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none">
+    <div className="w-full h-full flex flex-col gap-6 animate-in fade-in duration-500 select-none bg-white/30 dark:bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-2xl overflow-hidden">
       <YearCalendarHeader
         yearDisplay={yearDisplay}
         isTodayVisible={isTodayVisible}
@@ -72,7 +72,7 @@ export function YearCalendar() {
                       <span
                         className={cn(
                           "text-[10px] font-bold",
-                          isWeekend ? "text-red-400 dark:text-red-400/80" : "text-neutral-400 dark:text-neutral-500"
+                          isWeekend ? "text-red-400 dark:text-red-400/80" : "text-neutral-600 dark:text-neutral-400"
                         )}
                       >
                         {WEEKDAY_LABELS[i % 7]}
@@ -103,7 +103,7 @@ export function YearCalendar() {
             </div>
           </div>
         </div>
-        <div className="border-t border-neutral-300 dark:border-neutral-700" />
+        <div className="border-t border-white/20 dark:border-white/10" />
       </div>
 
       <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">

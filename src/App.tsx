@@ -79,11 +79,19 @@ export default function App() {
       >
         {activeCategory === "task" ? (
           <div className="h-screen w-full p-1 overflow-hidden">
-            <AppContent activeCategory={activeCategory} />
+            <AppContent
+              activeCategory={activeCategory}
+              userEmail={session.user.email}
+              onLogout={signOut}
+            />
           </div>
         ) : (
           <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
-            <AppContent activeCategory={activeCategory} />
+            <AppContent
+              activeCategory={activeCategory}
+              userEmail={session.user.email}
+              onLogout={signOut}
+            />
           </div>
         )}
       </main>
@@ -91,8 +99,6 @@ export default function App() {
       <Navigation
         activeCategory={activeCategory}
         onSelectCategory={setActiveCategory}
-        userEmail={session.user.email}
-        onLogout={signOut}
       />
     </div>
   );

@@ -1,24 +1,19 @@
 import { AppCategory } from "./types";
 import { NavigationItem } from "./NavigationItem";
 import { navigationConfig, settingsConfig } from "./config";
-import { NavigationUserProfile } from "./NavigationUserProfile";
 
 interface NavigationProps {
   /** The currently selected category in the main application. */
   activeCategory: AppCategory;
   /** Callback to change the active category. */
   onSelectCategory: (category: AppCategory) => void;
-  /** The email of the currently logged in user. */
-  userEmail?: string | null;
-  /** Callback to log out the user. */
-  onLogout: () => void;
 }
 
 /**
  * The main floating dock navigation component.
  * Displays navigation items defined in `config.tsx`.
  */
-export function Navigation({ activeCategory, onSelectCategory, userEmail, onLogout }: NavigationProps) {
+export function Navigation({ activeCategory, onSelectCategory }: NavigationProps) {
   return (
     <aside
       className="
@@ -57,14 +52,6 @@ export function Navigation({ activeCategory, onSelectCategory, userEmail, onLogo
         onClick={onSelectCategory}
         showLabel={false}
       />
-
-      {/* Separator */}
-      <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-700 mx-1" />
-
-      {/* User Info - Dock Style */}
-      <div className="pl-1">
-        <NavigationUserProfile email={userEmail} onLogout={onLogout} />
-      </div>
     </aside>
   );
 }

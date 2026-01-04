@@ -91,7 +91,7 @@ export default function App() {
             />
           </div>
         ) : activeCategory === "inbox" ? (
-          <div className="h-screen w-full pt-24 pb-32 px-4 overflow-hidden">
+          <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
             <AppContent
               activeCategory={activeCategory}
               userEmail={session.user.email}

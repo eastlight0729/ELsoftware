@@ -1,4 +1,4 @@
-export const SIDEBAR_ICON_SIZE = 16;
+export const SIDEBAR_ICON_SIZE = 20;
 
 /**
  * Base layout styles for all sidebar buttons (trigger, menu items).

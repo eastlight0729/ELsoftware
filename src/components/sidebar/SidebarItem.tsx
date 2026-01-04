@@ -28,7 +28,7 @@ function SidebarItemInternal<T extends string>({ id, icon, label, isActive, onCl
       title={!showLabel ? label : undefined}
       className={`
         group flex items-center gap-3 ${SIDEBAR_BUTTON_BASE}
-        ${showLabel ? "w-full text-left" : "w-full justify-center"}
+        ${showLabel ? "w-full text-left" : "justify-center aspect-square"}
         relative overflow-hidden
         ${isActive ? SIDEBAR_BUTTON_ACTIVE : SIDEBAR_BUTTON_COLORS}
       `}

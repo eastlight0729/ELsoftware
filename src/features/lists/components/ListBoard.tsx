@@ -100,8 +100,8 @@ export function ListBoard() {
   return (
     <div className="flex flex-col h-full w-full">
       {/* Header */}
-      <header className="flex-none mb-8">
-        <div className="w-full max-w-2xl mx-auto flex items-center justify-between">
+      <header className="flex-none mb-8 px-6">
+        <div className="w-full flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Lists</h1>
             <p className="text-white/80 font-medium">Manage your workflow.</p>

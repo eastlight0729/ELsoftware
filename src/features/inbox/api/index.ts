@@ -4,10 +4,13 @@ import { Database } from "@/lib/database.types";
 export type InboxItem = Database["public"]["Tables"]["inbox_items"]["Row"];
 export type CreateInboxItemDTO = Pick<Database["public"]["Tables"]["inbox_items"]["Insert"], "content">;
 
+// Define exact columns to prevent over-fetching
+const INBOX_COLUMNS = "id, content, created_at, user_id, archived_at";
+
 export const getInboxItems = async () => {
   const { data, error } = await supabase
     .from("inbox_items")
-    .select("*")
+    .select(INBOX_COLUMNS)
     .is("archived_at", null)
     .order("created_at", { ascending: false });
 
@@ -18,7 +21,7 @@ export const getInboxItems = async () => {
 export const getArchivedInboxItems = async () => {
   const { data, error } = await supabase
     .from("inbox_items")
-    .select("*")
+    .select(INBOX_COLUMNS)
     .not("archived_at", "is", null)
     .order("archived_at", { ascending: false });
 
@@ -34,7 +37,11 @@ export const createInboxItem = async ({ content, userId }: { content: string; us
     throw new Error("Content exceeds maximum length of 500 characters");
   }
 
-  const { data, error } = await supabase.from("inbox_items").insert({ content, user_id: userId }).select().single();
+  const { data, error } = await supabase
+    .from("inbox_items")
+    .insert({ content, user_id: userId })
+    .select(INBOX_COLUMNS)
+    .single();
 
   if (error) throw error;
   return data;
@@ -53,7 +60,7 @@ export const updateInboxItem = async ({ id, content }: { id: string; content: st
     .from("inbox_items")
     .update({ content })
     .eq("id", id)
-    .select()
+    .select(INBOX_COLUMNS)
     .single();
 
   if (error) throw error;
@@ -65,7 +72,7 @@ export const archiveInboxItem = async (id: string) => {
     .from("inbox_items")
     .update({ archived_at: new Date().toISOString() })
     .eq("id", id)
-    .select()
+    .select(INBOX_COLUMNS)
     .single();
 
   if (error) throw error;
@@ -77,7 +84,7 @@ export const unarchiveInboxItem = async (id: string) => {
     .from("inbox_items")
     .update({ archived_at: null })
     .eq("id", id)
-    .select()
+    .select(INBOX_COLUMNS)
     .single();
 
   if (error) throw error;

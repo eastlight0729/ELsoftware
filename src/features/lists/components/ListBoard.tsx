@@ -18,7 +18,6 @@ import {
   useUpdateColumn,
 } from "../hooks";
 import { UndoNotification } from "@/components/ui/UndoNotification";
-import { ConfirmModal } from "./ConfirmModal";
 import { ListArchiveModal } from "./ListArchiveModal";
 import { ListCard } from "./ListCard";
 import { ListCardModal } from "./ListCardModal";
@@ -42,7 +41,6 @@ export function ListBoard() {
   const columnIds = useMemo(() => columns.map((col) => col.id), [columns]);
 
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
-  const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [archivedColumnId, setArchivedColumnId] = useState<string | null>(null);
   const [archivedCardId, setArchivedCardId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
@@ -215,27 +213,15 @@ export function ListBoard() {
             card={cards.find((c) => c.id === editingCardId) || null}
             onSave={(id, updates) => updateCard({ id, updates })}
             onRemove={(id) => {
+              deleteCard(id);
               setEditingCardId(null);
-              setDeletingCardId(id);
+              setArchivedCardId(id);
+              setArchivedColumnId(null);
             }}
             onClose={() => setEditingCardId(null)}
           />
 
-          <ConfirmModal
-            isOpen={!!deletingCardId}
-            title="Archive Card"
-            message="Are you sure you want to archive this card? It will be moved to the Archived Items."
-            onConfirm={() => {
-              if (deletingCardId) {
-                deleteCard(deletingCardId);
-                setArchivedCardId(deletingCardId);
-                setArchivedColumnId(null);
-                setDeletingCardId(null);
-              }
-            }}
-            onCancel={() => setDeletingCardId(null)}
-            confirmLabel="Archive"
-          />
+
         </DndContext>
       </div>
 

@@ -7,8 +7,20 @@ export type CreateInboxItemDTO = Pick<Database["public"]["Tables"]["inbox_items"
 export const getInboxItems = async () => {
   const { data, error } = await supabase
     .from("inbox_items")
-    .select("id, content, created_at, user_id")
+    .select("*")
+    .is("archived_at", null)
     .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+export const getArchivedInboxItems = async () => {
+  const { data, error } = await supabase
+    .from("inbox_items")
+    .select("*")
+    .not("archived_at", "is", null)
+    .order("archived_at", { ascending: false });
 
   if (error) throw error;
   return data;
@@ -40,6 +52,30 @@ export const updateInboxItem = async ({ id, content }: { id: string; content: st
   const { data, error } = await supabase
     .from("inbox_items")
     .update({ content })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const archiveInboxItem = async (id: string) => {
+  const { data, error } = await supabase
+    .from("inbox_items")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const unarchiveInboxItem = async (id: string) => {
+  const { data, error } = await supabase
+    .from("inbox_items")
+    .update({ archived_at: null })
     .eq("id", id)
     .select()
     .single();

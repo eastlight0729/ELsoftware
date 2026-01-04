@@ -2,13 +2,13 @@ import { useDroppable } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
 import { Plus, Archive, MoreHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
-import { KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from "../types";
-import { KanbanCard } from "./KanbanCard";
+import { ListCard as ListCardType, ListColumn as ListColumnType } from "../types";
+import { ListCard } from "./ListCard";
 import { NewCardForm } from "./NewCardForm";
 
-interface KanbanColumnProps {
-  column: KanbanColumnType;
-  cards: KanbanCardType[];
+interface ListColumnProps {
+  column: ListColumnType;
+  cards: ListCardType[];
   index: number;
   totalColumns: number;
   onDeleteColumn: (id: string) => void;
@@ -19,7 +19,7 @@ interface KanbanColumnProps {
   allowAddCard?: boolean;
 }
 
-export function KanbanColumn({
+export function ListColumn({
   column,
   cards,
   index,
@@ -30,7 +30,7 @@ export function KanbanColumn({
   onEditCardStart,
   createCard,
   allowAddCard = false,
-}: KanbanColumnProps) {
+}: ListColumnProps) {
   const [editMode, setEditMode] = useState(false);
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -149,7 +149,7 @@ export function KanbanColumn({
 
         <SortableContext items={cardIds}>
           {cards.map((card) => (
-            <KanbanCard key={card.id} card={card} onEditStart={onEditCardStart} />
+            <ListCard key={card.id} card={card} onEditStart={onEditCardStart} />
           ))}
         </SortableContext>
       </div>

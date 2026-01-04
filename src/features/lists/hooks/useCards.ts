@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCard, deleteCard, getCards, updateCard } from "../api";
-import { KanbanCard, NewKanbanCard } from "../types";
+import { ListCard, NewListCard } from "../types";
 
 export const cardKeys = {
   all: ["cards"] as const,
@@ -17,12 +17,12 @@ export function useCreateCard() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newCard: NewKanbanCard) => createCard(newCard),
+    mutationFn: (newCard: NewListCard) => createCard(newCard),
     onMutate: async (newCard) => {
       await queryClient.cancelQueries({ queryKey: cardKeys.all });
-      const previousCards = queryClient.getQueryData<KanbanCard[]>(cardKeys.all);
+      const previousCards = queryClient.getQueryData<ListCard[]>(cardKeys.all);
 
-      const optimisticCard: KanbanCard = {
+      const optimisticCard: ListCard = {
         id: "temp-id-" + Date.now(),
         user_id: "temp-user",
         ...newCard,
@@ -31,7 +31,7 @@ export function useCreateCard() {
       };
 
       if (previousCards) {
-        queryClient.setQueryData<KanbanCard[]>(cardKeys.all, [...previousCards, optimisticCard]);
+        queryClient.setQueryData<ListCard[]>(cardKeys.all, [...previousCards, optimisticCard]);
       }
 
       return { previousCards };
@@ -51,13 +51,13 @@ export function useUpdateCard() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<KanbanCard> }) => updateCard(id, updates),
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<ListCard> }) => updateCard(id, updates),
     onMutate: async ({ id, updates }) => {
       await queryClient.cancelQueries({ queryKey: cardKeys.all });
-      const previousCards = queryClient.getQueryData<KanbanCard[]>(cardKeys.all);
+      const previousCards = queryClient.getQueryData<ListCard[]>(cardKeys.all);
 
       if (previousCards) {
-        queryClient.setQueryData<KanbanCard[]>(
+        queryClient.setQueryData<ListCard[]>(
           cardKeys.all,
           previousCards.map((card) => (card.id === id ? { ...card, ...updates } : card))
         );
@@ -83,10 +83,10 @@ export function useDeleteCard() {
     mutationFn: (id: string) => deleteCard(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: cardKeys.all });
-      const previousCards = queryClient.getQueryData<KanbanCard[]>(cardKeys.all);
+      const previousCards = queryClient.getQueryData<ListCard[]>(cardKeys.all);
 
       if (previousCards) {
-        queryClient.setQueryData<KanbanCard[]>(
+        queryClient.setQueryData<ListCard[]>(
           cardKeys.all,
           previousCards.filter((card) => card.id !== id)
         );

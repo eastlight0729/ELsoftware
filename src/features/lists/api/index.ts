@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { KanbanCard, KanbanColumn, NewKanbanCard, NewKanbanColumn } from "../types";
+import { ListCard, ListColumn, NewListCard, NewListColumn } from "../types";
 
 // Columns
 // Columns
@@ -11,7 +11,7 @@ export async function getColumns() {
     .order("position", { ascending: true });
 
   if (error) throw error;
-  return data as KanbanColumn[];
+  return data as ListColumn[];
 }
 
 export async function getArchivedColumns() {
@@ -22,21 +22,21 @@ export async function getArchivedColumns() {
     .order("deleted_at", { ascending: false });
 
   if (error) throw error;
-  return data as KanbanColumn[];
+  return data as ListColumn[];
 }
 
-export async function createColumn(column: NewKanbanColumn) {
+export async function createColumn(column: NewListColumn) {
   const { data, error } = await (supabase as any).from("kanban_columns").insert(column).select().single();
 
   if (error) throw error;
-  return data as KanbanColumn;
+  return data as ListColumn;
 }
 
-export async function updateColumn(id: string, updates: Partial<KanbanColumn>) {
+export async function updateColumn(id: string, updates: Partial<ListColumn>) {
   const { data, error } = await (supabase as any).from("kanban_columns").update(updates).eq("id", id).select().single();
 
   if (error) throw error;
-  return data as KanbanColumn;
+  return data as ListColumn;
 }
 
 export async function archiveColumn(id: string) {
@@ -48,7 +48,7 @@ export async function archiveColumn(id: string) {
     .single();
 
   if (error) throw error;
-  return data as KanbanColumn;
+  return data as ListColumn;
 }
 
 export async function restoreColumn(id: string) {
@@ -60,7 +60,7 @@ export async function restoreColumn(id: string) {
     .single();
 
   if (error) throw error;
-  return data as KanbanColumn;
+  return data as ListColumn;
 }
 
 export async function hardDeleteColumn(id: string) {
@@ -80,7 +80,7 @@ export async function getCards() {
     .order("position", { ascending: true });
 
   if (error) throw error;
-  return data as KanbanCard[];
+  return data as ListCard[];
 }
 
 export async function getArchivedCards() {
@@ -95,22 +95,22 @@ export async function getArchivedCards() {
   // Flattener could be done here or in the component/hook.
   // For strict typing, we might strictly need to adjust the return type or mapped query data.
   // But given the constraints, I will let the hook handle the valid type or assume the join is handled.
-  // However, `data` will be KanbanCard & { kanban_columns: { title: string, deleted_at: string | null } }
+  // However, `data` will be ListCard & { kanban_columns: { title: string, deleted_at: string | null } }
   return data;
 }
 
-export async function createCard(card: NewKanbanCard) {
+export async function createCard(card: NewListCard) {
   const { data, error } = await (supabase as any).from("kanban_cards").insert(card).select().single();
 
   if (error) throw error;
-  return data as KanbanCard;
+  return data as ListCard;
 }
 
-export async function updateCard(id: string, updates: Partial<KanbanCard>) {
+export async function updateCard(id: string, updates: Partial<ListCard>) {
   const { data, error } = await (supabase as any).from("kanban_cards").update(updates).eq("id", id).select().single();
 
   if (error) throw error;
-  return data as KanbanCard;
+  return data as ListCard;
 }
 
 export async function archiveCard(id: string) {
@@ -122,7 +122,7 @@ export async function archiveCard(id: string) {
     .single();
 
   if (error) throw error;
-  return data as KanbanCard;
+  return data as ListCard;
 }
 
 export async function restoreCard(id: string) {
@@ -137,7 +137,7 @@ export async function restoreCard(id: string) {
     .single();
 
   if (error) throw error;
-  return data as KanbanCard;
+  return data as ListCard;
 }
 
 export async function hardDeleteCard(id: string) {

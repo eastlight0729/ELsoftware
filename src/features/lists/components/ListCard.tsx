@@ -1,13 +1,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { KanbanCard as KanbanCardType } from "../types";
+import { ListCard as ListCardType } from "../types";
 
-interface KanbanCardProps {
-  card: KanbanCardType;
+interface ListCardProps {
+  card: ListCardType;
   onEditStart: (id: string) => void;
 }
 
-export function KanbanCard({ card, onEditStart }: KanbanCardProps) {
+export function ListCard({ card, onEditStart }: ListCardProps) {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: card.id,
     data: {

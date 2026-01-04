@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { Archive } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { KanbanCard } from "../types";
+import { ListCard } from "../types";
 
-interface KanbanCardModalProps {
+interface ListCardModalProps {
   isOpen: boolean;
-  card: KanbanCard | null;
-  onSave: (id: string, updates: Partial<KanbanCard>) => void;
+  card: ListCard | null;
+  onSave: (id: string, updates: Partial<ListCard>) => void;
   onRemove: (id: string) => void;
   onClose: () => void;
 }
@@ -20,7 +20,7 @@ const SIZES = [
   { value: "8", label: "8" },
 ];
 
-export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: KanbanCardModalProps) {
+export function ListCardModal({ isOpen, card, onSave, onRemove, onClose }: ListCardModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [size, setSize] = useState("1");

@@ -22,14 +22,14 @@ import {
   useUpdateCard,
   useUpdateColumn,
 } from "../hooks";
-import { KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from "../types";
-import { KanbanCard } from "./KanbanCard";
-import { KanbanColumn } from "./KanbanColumn";
-import { KanbanCardModal } from "./KanbanCardModal";
+import { ListCard as ListCardType, ListColumn as ListColumnType } from "../types";
+import { ListCard } from "./ListCard";
+import { ListColumn } from "./ListColumn";
+import { ListCardModal } from "./ListCardModal";
 import { ConfirmModal } from "./ConfirmModal";
-import { KanbanArchiveListModal } from "./KanbanArchiveListModal";
+import { ListArchiveModal } from "./ListArchiveModal";
 
-export function KanbanBoard() {
+export function ListBoard() {
   const { data: columnsData = [] } = useColumns();
   const columns = columnsData; // specific instance for easier usage
   const { data: cards = [] } = useCards();
@@ -44,8 +44,8 @@ export function KanbanBoard() {
 
   const columnIds = useMemo(() => columns.map((col) => col.id), [columns]);
 
-  const [activeColumn, setActiveColumn] = useState<KanbanColumnType | null>(null);
-  const [activeCard, setActiveCard] = useState<KanbanCardType | null>(null);
+  const [activeColumn, setActiveColumn] = useState<ListColumnType | null>(null);
+  const [activeCard, setActiveCard] = useState<ListCardType | null>(null);
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
@@ -292,7 +292,7 @@ export function KanbanBoard() {
       <header className="flex-none mb-8">
         <div className="w-full max-w-2xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Kanban Board</h1>
+            <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Lists</h1>
             <p className="text-white/80 font-medium">Manage your workflow.</p>
           </div>
           <button
@@ -331,7 +331,7 @@ export function KanbanBoard() {
                     className="h-full px-2" 
                   >
                       <div className="h-full w-full">
-                        <KanbanColumn
+                        <ListColumn
                           column={col}
                           cards={cards.filter((c) => c.column_id === col.id).sort((a, b) => a.position - b.position)}
                           index={columns.indexOf(col)}
@@ -358,7 +358,7 @@ export function KanbanBoard() {
             <DragOverlay>
               {activeColumn && (
                  <div className="h-full" style={{ width: 300 }}> 
-                  <KanbanColumn
+                  <ListColumn
                     column={activeColumn}
                     cards={cards.filter((c) => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
                     index={columns.findIndex(c => c.id === activeColumn.id)}
@@ -371,12 +371,12 @@ export function KanbanBoard() {
                   />
                 </div>
               )}
-              {activeCard && <KanbanCard card={activeCard} onEditStart={() => {}} />}
+              {activeCard && <ListCard card={activeCard} onEditStart={() => {}} />}
             </DragOverlay>,
             document.body
           )}
 
-          <KanbanCardModal
+          <ListCardModal
             isOpen={!!editingCardId}
             card={cards.find((c) => c.id === editingCardId) || null}
             onSave={(id, updates) => updateCard({ id, updates })}
@@ -403,7 +403,7 @@ export function KanbanBoard() {
         </DndContext>
       </div>
 
-      <KanbanArchiveListModal isOpen={isArchiveOpen} onClose={() => setIsArchiveOpen(false)} />
+      <ListArchiveModal isOpen={isArchiveOpen} onClose={() => setIsArchiveOpen(false)} />
     </div>
   );
 }

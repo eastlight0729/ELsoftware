@@ -35,8 +35,8 @@ export const navigationConfig: NavigationConfigItem[] = [
     icon: <Calendar size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
   {
-    id: "task",
-    label: "Kanban",
+    id: "lists",
+    label: "Lists",
     icon: <Kanban size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
   {

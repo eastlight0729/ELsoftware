@@ -7,7 +7,7 @@ import {
   hardDeleteCard,
   hardDeleteColumn,
 } from "../api";
-import { ArchivedKanbanCard, KanbanColumn } from "../types";
+import { ArchivedListCard, ListColumn } from "../types";
 import { cardKeys } from "./useCards";
 import { columnKeys } from "./useColumns";
 
@@ -39,10 +39,10 @@ export function useRestoreCard() {
       await queryClient.cancelQueries({ queryKey: archiveKeys.cards });
       await queryClient.cancelQueries({ queryKey: cardKeys.all });
 
-      const prevArchived = queryClient.getQueryData<ArchivedKanbanCard[]>(archiveKeys.cards);
+      const prevArchived = queryClient.getQueryData<ArchivedListCard[]>(archiveKeys.cards);
 
       if (prevArchived) {
-        queryClient.setQueryData<ArchivedKanbanCard[]>(
+        queryClient.setQueryData<ArchivedListCard[]>(
           archiveKeys.cards,
           prevArchived.filter((c) => c.id !== id)
         );
@@ -82,10 +82,10 @@ export function useHardDeleteCard() {
     mutationFn: hardDeleteCard,
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: archiveKeys.cards });
-      const prevArchived = queryClient.getQueryData<ArchivedKanbanCard[]>(archiveKeys.cards);
+      const prevArchived = queryClient.getQueryData<ArchivedListCard[]>(archiveKeys.cards);
 
       if (prevArchived) {
-        queryClient.setQueryData<ArchivedKanbanCard[]>(
+        queryClient.setQueryData<ArchivedListCard[]>(
           archiveKeys.cards,
           prevArchived.filter((c) => c.id !== id)
         );
@@ -113,10 +113,10 @@ export function useRestoreColumn() {
       await queryClient.cancelQueries({ queryKey: archiveKeys.columns });
       await queryClient.cancelQueries({ queryKey: columnKeys.all });
 
-      const prevArchived = queryClient.getQueryData<KanbanColumn[]>(archiveKeys.columns);
+      const prevArchived = queryClient.getQueryData<ListColumn[]>(archiveKeys.columns);
 
       if (prevArchived) {
-        queryClient.setQueryData<KanbanColumn[]>(
+        queryClient.setQueryData<ListColumn[]>(
           archiveKeys.columns,
           prevArchived.filter((c) => c.id !== id)
         );
@@ -148,10 +148,10 @@ export function useHardDeleteColumn() {
     mutationFn: hardDeleteColumn,
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: archiveKeys.columns });
-      const prevArchived = queryClient.getQueryData<KanbanColumn[]>(archiveKeys.columns);
+      const prevArchived = queryClient.getQueryData<ListColumn[]>(archiveKeys.columns);
 
       if (prevArchived) {
-        queryClient.setQueryData<KanbanColumn[]>(
+        queryClient.setQueryData<ListColumn[]>(
           archiveKeys.columns,
           prevArchived.filter((c) => c.id !== id)
         );

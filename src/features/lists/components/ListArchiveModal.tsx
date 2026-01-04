@@ -11,9 +11,9 @@ import {
   useHardDeleteCard,
   useHardDeleteColumn,
 } from "../hooks";
-import { ArchivedKanbanCard, KanbanColumn } from "../types";
+import { ArchivedListCard, ListColumn } from "../types";
 
-interface KanbanArchiveListModalProps {
+interface ListArchiveModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
@@ -24,8 +24,8 @@ const ArchivedCardItem = ({
   onRestore,
   onHardDelete,
 }: {
-  card: ArchivedKanbanCard;
-  onRestore: (card: ArchivedKanbanCard) => void;
+  card: ArchivedListCard;
+  onRestore: (card: ArchivedListCard) => void;
   onHardDelete: (id: string) => void;
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -88,8 +88,8 @@ const ArchivedColumnItem = ({
   onRestore,
   onHardDelete,
 }: {
-  column: KanbanColumn;
-  onRestore: (column: KanbanColumn) => void;
+  column: ListColumn;
+  onRestore: (column: ListColumn) => void;
   onHardDelete: (id: string) => void;
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -142,7 +142,7 @@ const ArchivedColumnItem = ({
   );
 };
 
-export const KanbanArchiveListModal = ({ isOpen, onClose }: KanbanArchiveListModalProps) => {
+export const ListArchiveModal = ({ isOpen, onClose }: ListArchiveModalProps) => {
   const [activeTab, setActiveTab] = useState<"cards" | "columns">("cards");
 
   // Data Hooks
@@ -163,7 +163,7 @@ export const KanbanArchiveListModal = ({ isOpen, onClose }: KanbanArchiveListMod
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleRestoreCard = (card: ArchivedKanbanCard) => {
+  const handleRestoreCard = (card: ArchivedListCard) => {
     // Check Parent Column Logic
     if (!card.kanban_columns) {
       showToast("Error: Parent Column no longer exists.");
@@ -180,7 +180,7 @@ export const KanbanArchiveListModal = ({ isOpen, onClose }: KanbanArchiveListMod
     });
   };
 
-  const handleRestoreColumn = (column: KanbanColumn) => {
+  const handleRestoreColumn = (column: ListColumn) => {
     restoreColumn(column.id, {
       onSuccess: () => showToast(`Column "${column.title}" restored`),
     });
@@ -260,7 +260,7 @@ export const KanbanArchiveListModal = ({ isOpen, onClose }: KanbanArchiveListMod
                   archivedCards.length === 0 ? (
                     <EmptyState message="No archived cards" />
                   ) : (
-                    archivedCards.map((card: ArchivedKanbanCard) => (
+                    archivedCards.map((card: ArchivedListCard) => (
                       <ArchivedCardItem
                         key={card.id}
                         card={card}

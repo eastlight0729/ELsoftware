@@ -1,4 +1,4 @@
-export interface KanbanColumn {
+export interface ListColumn {
   id: string;
   user_id: string;
   title: string;
@@ -7,7 +7,7 @@ export interface KanbanColumn {
   deleted_at?: string | null;
 }
 
-export interface KanbanCard {
+export interface ListCard {
   id: string;
   column_id: string;
   user_id: string;
@@ -20,19 +20,19 @@ export interface KanbanCard {
   deleted_at?: string | null;
 }
 
-export type ArchivedKanbanCard = KanbanCard & {
+export type ArchivedListCard = ListCard & {
   kanban_columns: {
     title: string;
     deleted_at: string | null;
   } | null;
 };
 
-export interface NewKanbanColumn {
+export interface NewListColumn {
   title: string;
   position: number;
 }
 
-export interface NewKanbanCard {
+export interface NewListCard {
   column_id: string;
   content: string;
   position: number;

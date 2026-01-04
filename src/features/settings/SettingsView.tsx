@@ -25,16 +25,16 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
       </div>
 
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-md">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="h-16 w-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-md shrink-0">
               {userEmail?.charAt(0).toUpperCase() || "U"}
             </div>
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Account</h2>
+            <div className="space-y-1 min-w-0">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 truncate">Account</h2>
               <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-                <User size={14} />
-                <span>{userEmail}</span>
+                <User size={14} className="shrink-0" />
+                <span className="truncate" title={userEmail || ""}>{userEmail}</span>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
           <button
             onClick={() => setShowLogoutConfirm(true)}
             title="Sign Out"
-            className="flex items-center justify-center p-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition-colors cursor-pointer"
+            className="flex items-center justify-center p-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition-colors cursor-pointer shrink-0"
           >
             <LogOut size={20} />
           </button>

@@ -169,7 +169,7 @@ export default function App() {
               className="w-full h-full"
             >
               {activeCategory === "task" ? (
-                <div className="h-screen w-full pt-4 px-4 pb-0 overflow-hidden">
+                <div className="h-screen w-full pt-4 px-4 pb-[100px] overflow-hidden">
                   <AppContent
                     activeCategory={activeCategory}
                     userEmail={session.user.email}

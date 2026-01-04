@@ -92,7 +92,7 @@ export function KanbanColumn({
             </span>
           )}
         </div>
-        <div className="relative">
+        <div className="relative ml-3">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-white/60 hover:text-white p-1 rounded hover:bg-white/10 transition-colors"

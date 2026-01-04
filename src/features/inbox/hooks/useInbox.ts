@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getInboxItems, createInboxItem, deleteInboxItem, InboxItem } from "../api";
+import { getInboxItems, createInboxItem, deleteInboxItem, updateInboxItem, InboxItem } from "../api";
 import { useAuth } from "@/features/auth";
 
 export const inboxKeys = {
@@ -67,6 +67,34 @@ export const useDeleteInboxItem = () => {
       return { previousItems };
     },
     onError: (_err, _id, context) => {
+      if (context?.previousItems) {
+        queryClient.setQueryData(inboxKeys.all, context.previousItems);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: inboxKeys.all });
+    },
+  });
+};
+
+export const useUpdateInboxItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateInboxItem,
+    onMutate: async ({ id, content }) => {
+      await queryClient.cancelQueries({ queryKey: inboxKeys.all });
+      const previousItems = queryClient.getQueryData<InboxItem[]>(inboxKeys.all);
+
+      if (previousItems) {
+        queryClient.setQueryData<InboxItem[]>(
+          inboxKeys.all,
+          previousItems.map((item) => (item.id === id ? { ...item, content } : item))
+        );
+      }
+      return { previousItems };
+    },
+    onError: (_err, _variables, context) => {
       if (context?.previousItems) {
         queryClient.setQueryData(inboxKeys.all, context.previousItems);
       }

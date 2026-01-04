@@ -30,6 +30,9 @@ interface Window {
       clearMarks: () => Promise<void>;
       getHolidays: (year: number) => Promise<string[]>;
     };
+    system: {
+      openFileDialog: () => Promise<string | null>;
+    };
     onMainProcessMessage: (callback: (message: string) => void) => () => void;
   };
 }

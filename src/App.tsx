@@ -5,6 +5,7 @@ import { navigationConfig } from "./components/navigation/config";
 import { AppContent } from "./AppContent";
 
 import { useAuth, Login } from "./features/auth";
+import { useBackground } from "./features/settings";
 import { Loader2 } from "lucide-react";
 
 /**
@@ -15,8 +16,22 @@ import { Loader2 } from "lucide-react";
  * - The main content rendering via `AppContent`.
  */
 export default function App() {
-  const [activeCategory, setActiveCategory] = useState<AppCategory>("memo");
+  const [activeCategory, setActiveCategory] = useState<AppCategory>("inbox");
   const { session, loading, signOut } = useAuth();
+  
+  // Background Settings Logic
+  // Background Settings Logic
+  const { backgroundPath } = useBackground();
+  
+  // We don't need local state 'bgImage' anymore since we have direct access to backgroundPath 
+  // via the hook which already handles sync via events.
+  // Actually, wait, useBackground hook gives us the current state.
+  // The 'backgroundPath' from useBackground is already a state variable in that hook.
+  // So we can just use `backgroundPath` directly?
+  // Yes, because useBackground listens to the event and updates its own state.
+  // So we just need:
+  
+  // (No useEffect needed here for bgImage sync because the hook does it)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,9 +77,30 @@ export default function App() {
     return <Login />;
   }
 
+  // If a custom background image is set, use it.
+  // Otherwise, use the category-specific background classes.
+  // If a custom background image is set, use it.
+  // Otherwise, use the category-specific background classes.
+  const backgroundStyle = backgroundPath
+    ? {
+        backgroundImage: `url("${backgroundPath}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }
+    : {};
+
   return (
-    <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">
-      
+    <div
+      style={backgroundStyle}
+      className={`min-h-screen w-full transition-all duration-500 ${
+        backgroundPath 
+          ? "" // If image is set, we don't need background colors
+          : activeCategory === "inbox"
+            ? "bg-gradient-to-br from-sky-500 to-red-400"
+            : "bg-neutral-100 dark:bg-neutral-800"
+      } text-neutral-800 dark:text-neutral-100`}
+    >
       {/* Main Content Area */}
       {/* 
           Added pb-32 to accomodate the floating dock at the bottom.
@@ -73,12 +109,20 @@ export default function App() {
       <main
         className={`
           transition-[padding] duration-300 ease-in-out
-          pb-32
+          ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
           min-h-screen
         `}
       >
         {activeCategory === "task" ? (
           <div className="h-screen w-full p-1 overflow-hidden">
+            <AppContent
+              activeCategory={activeCategory}
+              userEmail={session.user.email}
+              onLogout={signOut}
+            />
+          </div>
+        ) : activeCategory === "inbox" ? (
+          <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
             <AppContent
               activeCategory={activeCategory}
               userEmail={session.user.email}

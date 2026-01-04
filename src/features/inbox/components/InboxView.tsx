@@ -31,8 +31,8 @@ export const InboxView = () => {
   return (
     <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white mb-2">Inbox</h1>
-        <p className="text-neutral-500 dark:text-neutral-400">Capture your thoughts and tasks.</p>
+        <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Inbox</h1>
+        <p className="text-white/80 font-medium">Capture your thoughts and tasks.</p>
       </header>
 
       <form onSubmit={handleSubmit} className="relative mb-8">
@@ -41,28 +41,28 @@ export const InboxView = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Add a new item..."
-          className="w-full p-4 pl-5 pr-12 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600 transition-all text-lg placeholder:text-neutral-400"
+          className="w-full p-4 pl-5 pr-12 bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-white/50 transition-all text-lg text-white placeholder:text-white/60"
           autoFocus
           maxLength={500}
         />
         <button
           type="submit"
           disabled={!inputValue.trim()}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-transform"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/30 text-white rounded-xl disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105 transition-all border border-white/20"
         >
           <Plus size={20} />
         </button>
       </form>
 
-      <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+      <div className="flex-1 overflow-y-auto space-y-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {isLoading ? (
           <div className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-14 bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-xl" />
+              <div key={i} className="h-14 bg-white/20 animate-pulse rounded-xl" />
             ))}
           </div>
         ) : items?.length === 0 ? (
-          <div className="text-center py-20 text-neutral-400">
+          <div className="text-center py-20 text-white/60">
             <p>Your inbox is empty.</p>
           </div>
         ) : (

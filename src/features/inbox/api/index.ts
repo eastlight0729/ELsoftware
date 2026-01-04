@@ -32,3 +32,18 @@ export const deleteInboxItem = async (id: string) => {
   const { error } = await supabase.from("inbox_items").delete().eq("id", id);
   if (error) throw error;
 };
+
+export const updateInboxItem = async ({ id, content }: { id: string; content: string }) => {
+  if (!content || content.trim().length === 0) {
+    throw new Error("Content is required");
+  }
+  const { data, error } = await supabase
+    .from("inbox_items")
+    .update({ content })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};

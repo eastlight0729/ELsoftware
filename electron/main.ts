@@ -5,6 +5,7 @@ import path from "node:path";
 // Import the service
 
 import { YearCalendarController } from "./features/YearCalendar/YearCalendarController.ts";
+import { SystemController } from "./features/System/SystemController.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -69,7 +70,10 @@ app.on("activate", () => {
 
 app.whenReady().then(() => {
   const yearCalendarController = new YearCalendarController();
+  const systemController = new SystemController();
+  
   yearCalendarController.initialize();
+  systemController.initialize();
 
   createWindow();
 });

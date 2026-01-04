@@ -50,7 +50,7 @@ export function KanbanColumn({
       <div
         ref={setNodeRef}
         style={style}
-        className="bg-neutral-100/50 dark:bg-neutral-800/50 w-[300px] h-[500px] rounded-xl border-2 border-indigo-500 opacity-40 shrink-0"
+        className="bg-neutral-100/50 dark:bg-neutral-800/50 w-full h-[500px] rounded-xl border-2 border-indigo-500 opacity-40 shrink-0"
       />
     );
   }
@@ -59,7 +59,7 @@ export function KanbanColumn({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-neutral-100/50 dark:bg-neutral-800/50 w-[300px] h-full max-h-full rounded-xl flex flex-col shrink-0"
+      className="bg-neutral-100/50 dark:bg-neutral-800/50 w-full h-full max-h-full rounded-xl flex flex-col shrink-0"
     >
       {/* Column Header */}
       <div

@@ -9,16 +9,16 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { Plus, Archive } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Plus, Archive, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   useCards,
   useColumns,
   useCreateCard,
   useCreateColumn,
-  useDeleteCard, // This is now Archive
-  useDeleteColumn, // This is now Archive
+  useDeleteCard,
+  useDeleteColumn,
   useUpdateCard,
   useUpdateColumn,
 } from "../hooks";
@@ -30,11 +30,12 @@ import { ConfirmModal } from "./ConfirmModal";
 import { KanbanArchiveListModal } from "./KanbanArchiveListModal";
 
 export function KanbanBoard() {
-  const { data: columns = [] } = useColumns();
+  const { data: columnsData = [] } = useColumns();
+  const columns = columnsData; // specific instance for easier usage
   const { data: cards = [] } = useCards();
 
   const { mutate: createColumn } = useCreateColumn();
-  const { mutate: deleteColumn } = useDeleteColumn(); // Performs Archive
+  const { mutate: deleteColumn } = useDeleteColumn();
   const { mutate: updateColumn } = useUpdateColumn();
 
   const { mutate: createCard } = useCreateCard();
@@ -49,10 +50,40 @@ export function KanbanBoard() {
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
+  // Carousel State
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [columnsPerPage, setColumnsPerPage] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setColumnsPerPage(1);
+      } else if (window.innerWidth < 1280) {
+        setColumnsPerPage(3);
+      } else {
+        setColumnsPerPage(4);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Ensure index is valid when columns change or resize
+  useEffect(() => {
+    if (columns.length > 0) {
+      const maxStartingIndex = Math.max(0, columns.length - columnsPerPage);
+      if (currentIndex > maxStartingIndex) {
+        setCurrentIndex(maxStartingIndex);
+      }
+    }
+  }, [columns.length, columnsPerPage, currentIndex]);
+
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 3, // 3px movement to start drag
+        distance: 3,
       },
     })
   );
@@ -77,8 +108,6 @@ export function KanbanBoard() {
     const overId = over.id;
 
     if (activeId === overId) return;
-
-    // We can add sophisticated drag over logic here if needed
   };
 
   const onDragEnd = (event: DragEndEvent) => {
@@ -94,11 +123,9 @@ export function KanbanBoard() {
     const isActiveAColumn = active.data.current?.type === "Column";
     if (isActiveAColumn) {
       if (activeId === overId) return;
-      // Reorder columns
       const oldIndex = columns.findIndex((col) => col.id === activeId);
       const newIndex = columns.findIndex((col) => col.id === overId);
 
-      // Calculate new position
       const newColumns = arrayMove(columns, oldIndex, newIndex);
 
       const prevCol = newColumns[newIndex - 1];
@@ -119,21 +146,17 @@ export function KanbanBoard() {
       return;
     }
 
-    // Card Drag End
     const isActiveACard = active.data.current?.type === "Card";
     if (isActiveACard) {
-      // Find active card and over card/column
       const activeCardData = cards.find((c) => c.id === activeId);
       if (!activeCardData) return;
 
-      // Dropped over a Card
       if (over.data.current?.type === "Card") {
         const overCardData = cards.find((c) => c.id === overId);
         if (!overCardData) return;
 
         if (activeCardData.column_id === overCardData.column_id && activeId === overId) return;
 
-        // Dropped onto another card - update column and approximate position
         updateCard({
           id: activeId as string,
           updates: {
@@ -144,12 +167,10 @@ export function KanbanBoard() {
         return;
       }
 
-      // Dropped over a Column (empty area)
       if (over.data.current?.type === "Column") {
         const columnId = overId as string;
-        if (activeCardData.column_id === columnId) return; // Same column, no reorder info
+        if (activeCardData.column_id === columnId) return;
 
-        // Move to column, append to bottom
         const colCards = cards.filter((c) => c.column_id === columnId);
         const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
 
@@ -170,11 +191,27 @@ export function KanbanBoard() {
       title: "New Column",
       position: maxPos + 1000,
     });
+    // Slide to the new column
+    setCurrentIndex(prev => prev + 1);
   };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    if (currentIndex + columnsPerPage < columns.length) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      // Add logic
+      createNewColumn();
+    }
+  };
+
+  const isAtEnd = currentIndex + columnsPerPage >= columns.length;
 
   return (
     <div className="flex flex-col h-full w-full">
-      {/* Header */}
       {/* Header */}
       <header className="flex-none mb-8">
         <div className="w-full max-w-2xl mx-auto flex items-center justify-between">
@@ -192,56 +229,83 @@ export function KanbanBoard() {
         </div>
       </header>
 
-      {/* Board Content */}
-      <div className="flex-1 overflow-x-auto p-4">
-        <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
-          <div className="flex h-full gap-4">
-            <SortableContext items={columnIds}>
-              {columns.map((col, index) => (
-                <KanbanColumn
-                  key={col.id}
-                  column={col}
-                  cards={cards.filter((c) => c.column_id === col.id).sort((a, b) => a.position - b.position)}
-                  onDeleteColumn={deleteColumn}
-                  onUpdateColumnTitle={(id, title) => updateColumn({ id, updates: { title } })}
-                  createCard={(columnId, content) => {
-                    const colCards = cards.filter((c) => c.column_id === columnId);
-                    const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
-                    createCard({ column_id: columnId, content, position: maxPos + 1000 });
-                  }}
-                  onEditCardStart={setEditingCardId}
-                  allowAddCard={index === 0}
-                />
-              ))}
-            </SortableContext>
+      {/* Board Content (Carousel) */}
+      <div className="flex-1 w-full relative overflow-hidden px-12 pb-4">
+        {/* Navigation Buttons in the 'Left/Right Center' */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-2 z-10">
+          <button
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+            className={`p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl transition-all hover:bg-white/20 hover:scale-110 disabled:opacity-0 disabled:pointer-events-none`}
+          >
+            <ChevronLeft size={24} />
+          </button>
+        </div>
 
-            <button
-              onClick={createNewColumn}
-              className="h-[60px] min-w-[300px] rounded-xl border-2 border-dashed border-white/20 bg-white/5 flex items-center justify-center gap-2 text-white/50 hover:text-white hover:border-white/40 hover:bg-white/10 transition-all shrink-0 backdrop-blur-sm"
-            >
-              <Plus size={20} />
-              <span className="font-medium">Add Column</span>
-            </button>
+        <div className="absolute top-1/2 -translate-y-1/2 right-2 z-10">
+          <button
+            onClick={handleNext}
+            className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl transition-all hover:bg-white/20 hover:scale-110 group flex items-center gap-2"
+          >
+            {isAtEnd ? <Plus size={24} className="group-hover:rotate-90 transition-transform" /> : <ChevronRight size={24} />}
+          </button>
+        </div>
+
+        <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
+          <div className="h-full w-full overflow-hidden">
+             <div 
+               className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
+               style={{ 
+                 transform: `translateX(calc(-${currentIndex} * (100% / ${columnsPerPage})))`
+               }}
+             >
+              <SortableContext items={columnIds}>
+                {columns.map((col) => (
+                  <div 
+                    key={col.id} 
+                    style={{ flex: `0 0 calc(100% / ${columnsPerPage})` }}
+                    className="h-full px-2" 
+                  >
+                      <div className="h-full w-full">
+                        <KanbanColumn
+                          column={col}
+                          cards={cards.filter((c) => c.column_id === col.id).sort((a, b) => a.position - b.position)}
+                          onDeleteColumn={deleteColumn}
+                          onUpdateColumnTitle={(id, title) => updateColumn({ id, updates: { title } })}
+                          createCard={(columnId, content) => {
+                            const colCards = cards.filter((c) => c.column_id === columnId);
+                            const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
+                            createCard({ column_id: columnId, content, position: maxPos + 1000 });
+                          }}
+                          onEditCardStart={setEditingCardId}
+                          allowAddCard={true} 
+                        />
+                      </div>
+                  </div>
+                ))}
+              </SortableContext>
+             </div>
           </div>
 
           {createPortal(
             <DragOverlay>
               {activeColumn && (
-                <KanbanColumn
-                  column={activeColumn}
-                  cards={cards.filter((c) => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
-                  onDeleteColumn={() => {}}
-                  onUpdateColumnTitle={() => {}}
-                  createCard={() => {}}
-                  onEditCardStart={() => {}}
-                />
+                 <div className="h-full" style={{ width: 300 }}> 
+                  <KanbanColumn
+                    column={activeColumn}
+                    cards={cards.filter((c) => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
+                    onDeleteColumn={() => {}}
+                    onUpdateColumnTitle={() => {}}
+                    createCard={() => {}}
+                    onEditCardStart={() => {}}
+                  />
+                </div>
               )}
               {activeCard && <KanbanCard card={activeCard} onEditStart={() => {}} />}
             </DragOverlay>,
             document.body
           )}
 
-          {/* Modals */}
           <KanbanCardModal
             isOpen={!!editingCardId}
             card={cards.find((c) => c.id === editingCardId) || null}
@@ -264,7 +328,6 @@ export function KanbanBoard() {
               }
             }}
             onCancel={() => setDeletingCardId(null)}
-            // isDestructive={false} // Soft delete, maybe not red button
             confirmLabel="Archive"
           />
         </DndContext>

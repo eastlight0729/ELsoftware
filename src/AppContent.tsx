@@ -23,9 +23,14 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
   switch (activeCategory) {
     case "inbox":
       return <InboxView />;
-    case "memo":
-      return <Memo />;
-    case "year":
+    case "actions":
+      return (
+        <div className="flex flex-col items-center justify-center p-12 text-center text-neutral-500">
+          <h2 className="text-2xl font-bold mb-2">Actions</h2>
+          <p>Coming Soon</p>
+        </div>
+      );
+    case "calendar":
       return <YearCalendar />;
     case "task":
       return (
@@ -33,6 +38,15 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
           <KanbanBoard />
         </div>
       );
+    case "review":
+      return (
+        <div className="flex flex-col items-center justify-center p-12 text-center text-neutral-500">
+          <h2 className="text-2xl font-bold mb-2">Review</h2>
+          <p>Coming Soon</p>
+        </div>
+      );
+    case "memo":
+      return <Memo />;
     case "setting":
       return <SettingsView userEmail={userEmail} onLogout={onLogout} />;
     default:

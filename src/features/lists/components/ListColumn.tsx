@@ -17,6 +17,7 @@ interface ListColumnProps {
   createCard: (columnId: string, content: string) => void;
   onCreateColumnAfter: (id: string) => void;
   onEditCardStart: (id: string) => void;
+  onArchiveCard: (id: string) => void;
   allowAddCard?: boolean;
 }
 
@@ -29,6 +30,7 @@ export function ListColumn({
   onUpdateColumnTitle,
   onCreateColumnAfter,
   onEditCardStart,
+  onArchiveCard,
   createCard,
   allowAddCard = false,
 }: ListColumnProps) {
@@ -122,7 +124,12 @@ export function ListColumn({
 
         <SortableContext items={cardIds}>
           {cards.map((card) => (
-            <ListCard key={card.id} card={card} onEditStart={onEditCardStart} />
+            <ListCard 
+              key={card.id} 
+              card={card} 
+              onEditStart={onEditCardStart} 
+              onArchive={onArchiveCard}
+            />
           ))}
         </SortableContext>
       </div>

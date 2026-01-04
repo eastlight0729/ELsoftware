@@ -1,13 +1,15 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Archive, FolderInput } from "lucide-react";
 import { ListCard as ListCardType } from "../types";
 
 interface ListCardProps {
   card: ListCardType;
   onEditStart: (id: string) => void;
+  onArchive: (id: string) => void;
 }
 
-export function ListCard({ card, onEditStart }: ListCardProps) {
+export function ListCard({ card, onEditStart, onArchive }: ListCardProps) {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: card.id,
     data: {
@@ -42,15 +44,35 @@ export function ListCard({ card, onEditStart }: ListCardProps) {
         onEditStart(card.id);
       }}
     >
-      <div className="flex flex-col gap-2 pointer-events-none">
-        
-
-
-        {/* Title Area */}
-        <div className="relative min-h-[24px]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex-1 min-w-0">
           <div className="text-sm text-white/90 font-medium whitespace-pre-wrap wrap-break-word leading-relaxed">
             {card.content}
           </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              // Implement move logic later or pass a handler
+            }}
+            className="p-1.5 text-white/70 hover:text-sky-400 hover:bg-white/20 rounded-lg transition-colors"
+            title="Move to..."
+          >
+            <FolderInput size={18} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onArchive(card.id);
+            }}
+            className="p-1.5 text-white/70 hover:text-orange-400 hover:bg-white/20 rounded-lg transition-colors"
+            title="Archive"
+          >
+            <Archive size={18} />
+          </button>
         </div>
       </div>
     </div>

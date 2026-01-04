@@ -173,6 +173,11 @@ export function ListBoard() {
                         }}
                         onCreateColumnAfter={handleCreateColumnAfter}
                         onEditCardStart={setEditingCardId}
+                        onArchiveCard={(id) => {
+                          deleteCard(id);
+                          setArchivedCardId(id);
+                          setArchivedColumnId(null);
+                        }}
                         allowAddCard={true}
                       />
                     </div>
@@ -198,11 +203,16 @@ export function ListBoard() {
                     createCard={() => {}}
                     onCreateColumnAfter={() => {}}
                     onEditCardStart={() => {}}
+                    onArchiveCard={() => {}}
                   />
                 </div>
               )}
               {activeCard && (
-                <ListCard card={activeCard} onEditStart={() => {}} />
+                <ListCard 
+                  card={activeCard} 
+                  onEditStart={() => {}} 
+                  onArchive={() => {}}
+                />
               )}
             </DragOverlay>,
             document.body

@@ -25,16 +25,16 @@ function NavigationItemInternal<T extends string>({ id, icon, label, isActive, o
   return (
     <button
       onClick={() => onClick(id)}
-      title={!showLabel ? label : undefined}
+      title={label}
       className={`
-        group flex items-center gap-3 ${NAVIGATION_BUTTON_BASE}
-        ${showLabel ? "w-full text-left" : "justify-center aspect-square"}
+        group flex items-center gap-2 ${NAVIGATION_BUTTON_BASE}
+        justify-center md:justify-start
         relative overflow-hidden
         ${isActive ? NAVIGATION_BUTTON_ACTIVE : NAVIGATION_BUTTON_COLORS}
       `}
     >
       <span
-        className={`relative z-10 transition-colors duration-200 ${
+        className={`relative z-10 transition-colors duration-200 shrink-0 ${
           isActive ? "text-emerald-500" : "group-hover:text-neutral-800 dark:group-hover:text-neutral-200"
         }`}
       >
@@ -42,7 +42,7 @@ function NavigationItemInternal<T extends string>({ id, icon, label, isActive, o
       </span>
 
       {showLabel && (
-        <span className="relative z-10 whitespace-nowrap overflow-hidden transition-all duration-200 animate-in fade-in slide-in-from-left-2">
+        <span className="relative z-10 whitespace-nowrap overflow-hidden hidden md:block text-sm font-medium animate-in fade-in slide-in-from-left-2">
           {label}
         </span>
       )}

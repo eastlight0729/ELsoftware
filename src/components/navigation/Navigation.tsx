@@ -35,7 +35,7 @@ export function Navigation({ activeCategory, onSelectCategory }: NavigationProps
             label={item.label}
             isActive={activeCategory === item.id}
             onClick={onSelectCategory}
-            showLabel={false}
+            showLabel={true}
           />
         ))}
       </nav>
@@ -50,7 +50,7 @@ export function Navigation({ activeCategory, onSelectCategory }: NavigationProps
         label={settingsConfig.label}
         isActive={activeCategory === settingsConfig.id}
         onClick={onSelectCategory}
-        showLabel={false}
+        showLabel={true}
       />
     </aside>
   );

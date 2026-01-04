@@ -137,7 +137,7 @@ export default function App() {
         className={`fixed inset-0 min-h-screen w-full -z-10 transition-colors duration-500 ${
           backgroundPath 
             ? "bg-cover bg-fixed bg-center bg-no-repeat"
-            : activeCategory === "inbox"
+            : activeCategory === "inbox" || activeCategory === "lists"
               ? "bg-linear-to-br from-sky-500 to-red-400"
               : "bg-neutral-100 dark:bg-neutral-800"
         }`}
@@ -153,7 +153,7 @@ export default function App() {
         <main
           className={`
             transition-[padding] duration-300 ease-in-out
-            ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
+            ${activeCategory === "lists" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
             min-h-screen
           `}
         >
@@ -168,8 +168,8 @@ export default function App() {
               transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
               className="w-full h-full"
             >
-              {activeCategory === "task" ? (
-                <div className="h-screen w-full p-1 overflow-hidden">
+              {activeCategory === "lists" ? (
+                <div className="h-screen w-full pt-4 px-4 pb-[100px] overflow-hidden">
                   <AppContent
                     activeCategory={activeCategory}
                     userEmail={session.user.email}

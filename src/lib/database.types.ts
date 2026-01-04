@@ -36,23 +36,32 @@ export type Database = {
         Row: {
           column_id: string;
           content: string;
+          created_at: string;
           id: string;
           position: number;
+          updated_at: string;
           user_id: string;
+          deleted_at: string | null;
         };
         Insert: {
           column_id: string;
           content: string;
+          created_at?: string;
           id?: string;
           position?: number;
+          updated_at?: string;
           user_id?: string;
+          deleted_at?: string | null;
         };
         Update: {
           column_id?: string;
           content?: string;
+          created_at?: string;
           id?: string;
           position?: number;
+          updated_at?: string;
           user_id?: string;
+          deleted_at?: string | null;
         };
         Relationships: [
           {
@@ -71,6 +80,7 @@ export type Database = {
           position: number;
           title: string;
           user_id: string;
+          deleted_at: string | null;
         };
         Insert: {
           created_at?: string;
@@ -78,6 +88,7 @@ export type Database = {
           position?: number;
           title: string;
           user_id?: string;
+          deleted_at?: string | null;
         };
         Update: {
           created_at?: string;
@@ -85,6 +96,7 @@ export type Database = {
           position?: number;
           title?: string;
           user_id?: string;
+          deleted_at?: string | null;
         };
         Relationships: [];
       };

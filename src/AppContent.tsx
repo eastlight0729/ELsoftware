@@ -2,7 +2,7 @@ import { AppCategory } from "./components/navigation/types";
 
 import { Memo } from "./features/memo";
 import { YearCalendar } from "./features/year-calendar";
-import { KanbanBoard } from "./features/task";
+import { ListBoard } from "./features/lists";
 import { InboxView } from "./features/inbox";
 import { SettingsView } from "./features/settings";
 
@@ -34,10 +34,10 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
       );
     case "calendar":
       return <YearCalendar />;
-    case "task":
+    case "lists":
       return (
         <div className="w-full h-full overflow-hidden">
-          <KanbanBoard />
+          <ListBoard />
         </div>
       );
     case "review":

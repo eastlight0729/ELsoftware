@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Archive } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { KanbanCard } from "../types";
+import { ListCard } from "../types";
 
-interface KanbanCardModalProps {
+interface ListCardModalProps {
   isOpen: boolean;
-  card: KanbanCard | null;
-  onSave: (id: string, updates: Partial<KanbanCard>) => void;
+  card: ListCard | null;
+  onSave: (id: string, updates: Partial<ListCard>) => void;
   onRemove: (id: string) => void;
   onClose: () => void;
 }
@@ -19,7 +20,7 @@ const SIZES = [
   { value: "8", label: "8" },
 ];
 
-export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: KanbanCardModalProps) {
+export function ListCardModal({ isOpen, card, onSave, onRemove, onClose }: ListCardModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [size, setSize] = useState("1");
@@ -55,16 +56,30 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-in fade-in duration-200">
-      <div
-        className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-neutral-200 dark:border-neutral-700 animate-in zoom-in-95 duration-200"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/10 backdrop-blur-[2px]"
+      />
+
+      {/* Modal */}
+      <motion.div
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden border border-white/40"
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
           if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSave();
         }}
       >
         {/* Header containing Title Input */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 border-b border-black/5">
           <input
             ref={titleInputRef}
             type="text"
@@ -76,7 +91,7 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
                 document.getElementById("card-description")?.focus();
               }
             }}
-            className="w-full text-lg font-semibold text-neutral-900 dark:text-neutral-100 bg-transparent border-none outline-none placeholder:text-neutral-400"
+            className="w-full text-lg font-semibold text-neutral-800 bg-transparent border-none outline-none placeholder:text-neutral-400"
             placeholder="Card Title"
           />
         </div>
@@ -92,10 +107,10 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
                   key={s.value}
                   onClick={() => setSize(s.value)}
                   className={cn(
-                    "w-8 h-8 rounded-full text-xs font-medium transition-colors border",
+                    "w-8 h-8 rounded-full text-xs font-medium transition-all duration-200 border",
                     size === s.value
-                      ? "bg-green-600 border-green-600 text-white"
-                      : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-green-500"
+                      ? "bg-sky-400 border-sky-400 text-white shadow-md scale-110"
+                      : "bg-white/50 border-neutral-200 text-neutral-600 hover:border-sky-300 hover:text-sky-500 hover:bg-white"
                   )}
                 >
                   {s.label}
@@ -110,16 +125,16 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add more details..."
-              className="w-full h-96 py-4 bg-transparent border-y border-neutral-200 dark:border-neutral-700 outline-none resize-none text-neutral-600 dark:text-neutral-300 text-sm transition-all placeholder:text-neutral-400"
+              className="w-full h-96 py-4 bg-transparent border-y border-neutral-100 outline-none resize-none text-neutral-700 text-sm transition-all placeholder:text-neutral-400"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-6 py-4 bg-neutral-50/50 border-t border-black/5">
           <button
             onClick={handleRemove}
-            className="flex items-center gap-2 px-3 py-2 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-3 py-2 text-neutral-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium"
           >
             <Archive size={16} />
             <span className="hidden sm:inline">Archive</span>
@@ -128,20 +143,20 @@ export function KanbanCardModal({ isOpen, card, onSave, onRemove, onClose }: Kan
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-colors text-sm font-medium"
+              className="px-4 py-2 text-neutral-600 hover:bg-black/5 rounded-lg transition-colors text-sm font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={!title.trim()}
-              className="px-5 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white rounded-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="px-5 py-2 bg-sky-400 hover:bg-sky-500 text-white rounded-lg transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-sky-400/20"
             >
               Save Changes
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

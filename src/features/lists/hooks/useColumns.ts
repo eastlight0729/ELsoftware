@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createColumn, deleteColumn, getColumns, updateColumn } from "../api";
-import { KanbanColumn, NewKanbanColumn } from "../types";
+import { ListColumn, NewListColumn } from "../types";
 
 export const columnKeys = {
   all: ["columns"] as const,
@@ -10,6 +10,7 @@ export function useColumns() {
   return useQuery({
     queryKey: columnKeys.all,
     queryFn: getColumns,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -17,12 +18,12 @@ export function useCreateColumn() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newColumn: NewKanbanColumn) => createColumn(newColumn),
+    mutationFn: (newColumn: NewListColumn) => createColumn(newColumn),
     onMutate: async (newColumn) => {
       await queryClient.cancelQueries({ queryKey: columnKeys.all });
-      const previousColumns = queryClient.getQueryData<KanbanColumn[]>(columnKeys.all);
+      const previousColumns = queryClient.getQueryData<ListColumn[]>(columnKeys.all);
 
-      const optimisticColumn: KanbanColumn = {
+      const optimisticColumn: ListColumn = {
         id: "temp-id-" + Date.now(),
         user_id: "temp-user",
         ...newColumn,
@@ -30,7 +31,7 @@ export function useCreateColumn() {
       };
 
       if (previousColumns) {
-        queryClient.setQueryData<KanbanColumn[]>(columnKeys.all, [...previousColumns, optimisticColumn]);
+        queryClient.setQueryData<ListColumn[]>(columnKeys.all, [...previousColumns, optimisticColumn]);
       }
 
       return { previousColumns };
@@ -50,13 +51,13 @@ export function useUpdateColumn() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<KanbanColumn> }) => updateColumn(id, updates),
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<ListColumn> }) => updateColumn(id, updates),
     onMutate: async ({ id, updates }) => {
       await queryClient.cancelQueries({ queryKey: columnKeys.all });
-      const previousColumns = queryClient.getQueryData<KanbanColumn[]>(columnKeys.all);
+      const previousColumns = queryClient.getQueryData<ListColumn[]>(columnKeys.all);
 
       if (previousColumns) {
-        queryClient.setQueryData<KanbanColumn[]>(
+        queryClient.setQueryData<ListColumn[]>(
           columnKeys.all,
           previousColumns.map((col) => (col.id === id ? { ...col, ...updates } : col))
         );
@@ -82,10 +83,10 @@ export function useDeleteColumn() {
     mutationFn: (id: string) => deleteColumn(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: columnKeys.all });
-      const previousColumns = queryClient.getQueryData<KanbanColumn[]>(columnKeys.all);
+      const previousColumns = queryClient.getQueryData<ListColumn[]>(columnKeys.all);
 
       if (previousColumns) {
-        queryClient.setQueryData<KanbanColumn[]>(
+        queryClient.setQueryData<ListColumn[]>(
           columnKeys.all,
           previousColumns.filter((col) => col.id !== id)
         );

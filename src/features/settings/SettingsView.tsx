@@ -17,7 +17,7 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Settings</h1>
         <p className="text-neutral-500 dark:text-neutral-400">

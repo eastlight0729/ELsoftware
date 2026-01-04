@@ -10,6 +10,7 @@ export function useColumns() {
   return useQuery({
     queryKey: columnKeys.all,
     queryFn: getColumns,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 

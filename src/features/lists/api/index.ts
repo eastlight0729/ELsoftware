@@ -4,9 +4,9 @@ import { ListCard, ListColumn, NewListCard, NewListColumn } from "../types";
 // Columns
 // Columns
 export async function getColumns() {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_columns")
-    .select("*")
+    .select("id, user_id, title, position, created_at, deleted_at")
     .is("deleted_at", null)
     .order("position", { ascending: true });
 
@@ -15,9 +15,9 @@ export async function getColumns() {
 }
 
 export async function getArchivedColumns() {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_columns")
-    .select("*")
+    .select("id, user_id, title, position, created_at, deleted_at")
     .not("deleted_at", "is", null)
     .order("deleted_at", { ascending: false });
 
@@ -26,21 +26,21 @@ export async function getArchivedColumns() {
 }
 
 export async function createColumn(column: NewListColumn) {
-  const { data, error } = await (supabase as any).from("kanban_columns").insert(column).select().single();
+  const { data, error } = await supabase.from("kanban_columns").insert(column).select().single();
 
   if (error) throw error;
   return data as ListColumn;
 }
 
 export async function updateColumn(id: string, updates: Partial<ListColumn>) {
-  const { data, error } = await (supabase as any).from("kanban_columns").update(updates).eq("id", id).select().single();
+  const { data, error } = await supabase.from("kanban_columns").update(updates).eq("id", id).select().single();
 
   if (error) throw error;
   return data as ListColumn;
 }
 
 export async function archiveColumn(id: string) {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_columns")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", id)
@@ -52,7 +52,7 @@ export async function archiveColumn(id: string) {
 }
 
 export async function restoreColumn(id: string) {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_columns")
     .update({ deleted_at: null })
     .eq("id", id)
@@ -64,7 +64,7 @@ export async function restoreColumn(id: string) {
 }
 
 export async function hardDeleteColumn(id: string) {
-  const { error } = await (supabase as any).from("kanban_columns").delete().eq("id", id);
+  const { error } = await supabase.from("kanban_columns").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -73,21 +73,21 @@ export const deleteColumn = archiveColumn;
 
 // Cards
 export async function getCards() {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_cards")
-    .select("*")
+    .select("id, user_id, column_id, content, position, created_at, updated_at, deleted_at")
     .is("deleted_at", null)
     .order("position", { ascending: true });
 
   if (error) throw error;
-  return data as ListCard[];
+  return data as unknown as ListCard[];
 }
 
 export async function getArchivedCards() {
   // We also need column info to display "Original Column Name" and for logic
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_cards")
-    .select("*, kanban_columns(title, deleted_at)")
+    .select("id, user_id, column_id, content, position, created_at, updated_at, deleted_at, kanban_columns(title, deleted_at)")
     .not("deleted_at", "is", null)
     .order("deleted_at", { ascending: false });
 
@@ -100,21 +100,21 @@ export async function getArchivedCards() {
 }
 
 export async function createCard(card: NewListCard) {
-  const { data, error } = await (supabase as any).from("kanban_cards").insert(card).select().single();
+  const { data, error } = await supabase.from("kanban_cards").insert(card).select().single();
 
   if (error) throw error;
   return data as ListCard;
 }
 
 export async function updateCard(id: string, updates: Partial<ListCard>) {
-  const { data, error } = await (supabase as any).from("kanban_cards").update(updates).eq("id", id).select().single();
+  const { data, error } = await supabase.from("kanban_cards").update(updates).eq("id", id).select().single();
 
   if (error) throw error;
   return data as ListCard;
 }
 
 export async function archiveCard(id: string) {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_cards")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", id)
@@ -129,7 +129,7 @@ export async function restoreCard(id: string) {
   // Logic check: "Does the parent Column exist AND is it Active?"
   // We should probably check this in the mutation or component.
   // The API just performs the action.
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from("kanban_cards")
     .update({ deleted_at: null })
     .eq("id", id)
@@ -141,7 +141,7 @@ export async function restoreCard(id: string) {
 }
 
 export async function hardDeleteCard(id: string) {
-  const { error } = await (supabase as any).from("kanban_cards").delete().eq("id", id);
+  const { error } = await supabase.from("kanban_cards").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -150,7 +150,7 @@ export const deleteCard = archiveCard;
 
 // Helper to check column status (active/archived/deleted)
 export async function getColumnStatus(id: string) {
-  const { data, error } = await (supabase as any).from("kanban_columns").select("deleted_at").eq("id", id).single();
+  const { data, error } = await supabase.from("kanban_columns").select("deleted_at").eq("id", id).single();
 
   if (error) return "deleted"; // Assuming error means not found -> deleted
   return data.deleted_at ? "archived" : "active";

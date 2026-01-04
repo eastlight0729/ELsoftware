@@ -10,6 +10,7 @@ export function useCards() {
   return useQuery({
     queryKey: cardKeys.all,
     queryFn: getCards,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 

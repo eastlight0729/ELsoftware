@@ -1,16 +1,7 @@
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { SortableContext, arrayMove } from "@dnd-kit/sortable";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 import { Archive } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   useCards,
@@ -19,19 +10,20 @@ import {
   useCreateColumn,
   useDeleteCard,
   useDeleteColumn,
+  useListCarousel,
+  useListDragDrop,
   useUpdateCard,
   useUpdateColumn,
 } from "../hooks";
-import { ListCard as ListCardType, ListColumn as ListColumnType } from "../types";
-import { ListCard } from "./ListCard";
-import { ListColumn } from "./ListColumn";
-import { ListCardModal } from "./ListCardModal";
 import { ConfirmModal } from "./ConfirmModal";
 import { ListArchiveModal } from "./ListArchiveModal";
+import { ListCard } from "./ListCard";
+import { ListCardModal } from "./ListCardModal";
+import { ListColumn } from "./ListColumn";
 
 export function ListBoard() {
   const { data: columnsData = [] } = useColumns();
-  const columns = columnsData; // specific instance for easier usage
+  const columns = columnsData;
   const { data: cards = [] } = useCards();
 
   const { mutate: createColumn } = useCreateColumn();
@@ -44,223 +36,34 @@ export function ListBoard() {
 
   const columnIds = useMemo(() => columns.map((col) => col.id), [columns]);
 
-  const [activeColumn, setActiveColumn] = useState<ListColumnType | null>(null);
-  const [activeCard, setActiveCard] = useState<ListCardType | null>(null);
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
-  // Carousel State
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [columnsPerPage, setColumnsPerPage] = useState(3);
+  // --- Hooks for Logic Extraction ---
+  
+  const {
+    currentIndex,
+    setCurrentIndex,
+    columnsPerPage,
+    swipeHandlers,
+  } = useListCarousel({ columns, createColumn });
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setColumnsPerPage(1);
-      } else if (window.innerWidth < 1280) {
-        setColumnsPerPage(3);
-      } else {
-        setColumnsPerPage(4);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const { 
+    sensors, 
+    activeColumn, 
+    activeCard, 
+    onDragStart, 
+    onDragOver, 
+    onDragEnd 
+  } = useListDragDrop({
+    columns,
+    cards,
+    updateColumn,
+    updateCard,
+  });
 
-  // Ensure index is valid when columns change or resize
-  useEffect(() => {
-    if (columns.length > 0) {
-      const maxStartingIndex = Math.max(0, columns.length - columnsPerPage);
-      if (currentIndex > maxStartingIndex) {
-        setCurrentIndex(maxStartingIndex);
-      }
-    }
-  }, [columns.length, columnsPerPage, currentIndex]);
-
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 3,
-      },
-    })
-  );
-
-  const onDragStart = (event: DragStartEvent) => {
-    if (event.active.data.current?.type === "Column") {
-      setActiveColumn(event.active.data.current.column);
-      return;
-    }
-
-    if (event.active.data.current?.type === "Card") {
-      setActiveCard(event.active.data.current.card);
-      return;
-    }
-  };
-
-  const onDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    if (activeId === overId) return;
-  };
-
-  const onDragEnd = (event: DragEndEvent) => {
-    setActiveColumn(null);
-    setActiveCard(null);
-
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    const isActiveAColumn = active.data.current?.type === "Column";
-    if (isActiveAColumn) {
-      if (activeId === overId) return;
-      const oldIndex = columns.findIndex((col) => col.id === activeId);
-      const newIndex = columns.findIndex((col) => col.id === overId);
-
-      const newColumns = arrayMove(columns, oldIndex, newIndex);
-
-      const prevCol = newColumns[newIndex - 1];
-      const nextCol = newColumns[newIndex + 1];
-
-      let newPos = 0;
-      if (!prevCol) {
-        newPos = (newColumns[0]?.position || 0) - 1000;
-        if (newColumns[0]) newPos = newColumns[0].position / 2;
-        else newPos = 1000;
-      } else if (!nextCol) {
-        newPos = prevCol.position + 1000;
-      } else {
-        newPos = (prevCol.position + nextCol.position) / 2;
-      }
-
-      updateColumn({ id: activeId as string, updates: { position: newPos } });
-      return;
-    }
-
-    const isActiveACard = active.data.current?.type === "Card";
-    if (isActiveACard) {
-      const activeCardData = cards.find((c) => c.id === activeId);
-      if (!activeCardData) return;
-
-      if (over.data.current?.type === "Card") {
-        const overCardData = cards.find((c) => c.id === overId);
-        if (!overCardData) return;
-
-        if (activeCardData.column_id === overCardData.column_id && activeId === overId) return;
-
-        updateCard({
-          id: activeId as string,
-          updates: {
-            column_id: overCardData.column_id,
-            position: overCardData.position + 0.1,
-          },
-        });
-        return;
-      }
-
-      if (over.data.current?.type === "Column") {
-        const columnId = overId as string;
-        if (activeCardData.column_id === columnId) return;
-
-        const colCards = cards.filter((c) => c.column_id === columnId);
-        const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
-
-        updateCard({
-          id: activeId as string,
-          updates: {
-            column_id: columnId,
-            position: maxPos + 1000,
-          },
-        });
-      }
-    }
-  };
-
-  const createNewColumn = () => {
-    const maxPos = columns.length > 0 ? Math.max(...columns.map((c) => c.position)) : 0;
-    createColumn({
-      title: "New Column",
-      position: maxPos + 1000,
-    });
-    // Slide to the new column
-    setCurrentIndex(prev => prev + 1);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => Math.max(0, prev - 1));
-  };
-
-  const handleNext = (allowCreate = true) => {
-    if (currentIndex + columnsPerPage < columns.length) {
-      setCurrentIndex((prev) => prev + 1);
-    } else if (allowCreate) {
-      // Add logic
-      createNewColumn();
-    }
-  };
-
-
-
-  // Swipe Gesture State
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-
-  // Minimum swipe distance
-  const minSwipeDistance = 50;
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null); // Reset
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe) {
-      handleNext(false);
-    }
-    if (isRightSwipe) {
-      handlePrev();
-    }
-  };
-
-  // Mouse drag state
-  const [mouseDownX, setMouseDownX] = useState<number | null>(null);
-
-  const onMouseDown = (e: React.MouseEvent) => {
-    setMouseDownX(e.clientX);
-  };
-
-  const onMouseUp = (e: React.MouseEvent) => {
-    if (mouseDownX === null) return;
-    const distance = mouseDownX - e.clientX;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe) {
-      handleNext(false);
-    }
-    if (isRightSwipe) {
-      handlePrev();
-    }
-    setMouseDownX(null);
-  };
+  // --- Handlers ---
 
   const handleCreateColumnAfter = (columnId: string) => {
     const index = columns.findIndex((c) => c.id === columnId);
@@ -276,14 +79,17 @@ export function ListBoard() {
       newPosition = currentColumn.position + 1000;
     }
 
-    createColumn({
-      title: "New Column",
-      position: newPosition,
-    }, {
-      onSuccess: () => {
-        setCurrentIndex((prev) => prev + 1);
+    createColumn(
+      {
+        title: "New Column",
+        position: newPosition,
+      },
+      {
+        onSuccess: () => {
+          setCurrentIndex((prev) => prev + 1);
+        },
       }
-    });
+    );
   };
 
   return (
@@ -307,61 +113,76 @@ export function ListBoard() {
 
       {/* Board Content (Carousel) */}
       <div className="flex-1 w-full relative overflow-hidden pb-0">
-        <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
-          <div 
+        <DndContext
+          sensors={sensors}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+        >
+          <div
             className="h-full w-full overflow-hidden touch-pan-y"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}
-            onMouseLeave={() => setMouseDownX(null)}
+            {...swipeHandlers}
           >
-             <div 
-               className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
-               style={{ 
-                 transform: `translateX(calc(-${currentIndex} * (100% / ${columnsPerPage})))`
-               }}
-             >
+            <div
+              className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
+              style={{
+                transform: `translateX(calc(-${currentIndex} * (100% / ${columnsPerPage})))`,
+              }}
+            >
               <SortableContext items={columnIds}>
                 {columns.map((col) => (
-                  <div 
-                    key={col.id} 
+                  <div
+                    key={col.id}
                     style={{ flex: `0 0 calc(100% / ${columnsPerPage})` }}
-                    className="h-full px-2" 
+                    className="h-full px-2"
                   >
-                      <div className="h-full w-full">
-                        <ListColumn
-                          column={col}
-                          cards={cards.filter((c) => c.column_id === col.id).sort((a, b) => a.position - b.position)}
-                          index={columns.indexOf(col)}
-                          totalColumns={columns.length}
-                          onDeleteColumn={deleteColumn}
-                          onUpdateColumnTitle={(id, title) => updateColumn({ id, updates: { title } })}
-                          createCard={(columnId, content) => {
-                            const colCards = cards.filter((c) => c.column_id === columnId);
-                            const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
-                            createCard({ column_id: columnId, content, position: maxPos + 1000 });
-                          }}
-                          onCreateColumnAfter={handleCreateColumnAfter}
-                          onEditCardStart={setEditingCardId}
-                          allowAddCard={true} 
-                        />
-                      </div>
+                    <div className="h-full w-full">
+                      <ListColumn
+                        column={col}
+                        cards={cards
+                          .filter((c) => c.column_id === col.id)
+                          .sort((a, b) => a.position - b.position)}
+                        index={columns.indexOf(col)}
+                        totalColumns={columns.length}
+                        onDeleteColumn={deleteColumn}
+                        onUpdateColumnTitle={(id, title) =>
+                          updateColumn({ id, updates: { title } })
+                        }
+                        createCard={(columnId, content) => {
+                          const colCards = cards.filter(
+                            (c) => c.column_id === columnId
+                          );
+                          const maxPos =
+                            colCards.length > 0
+                              ? Math.max(...colCards.map((c) => c.position))
+                              : 0;
+                          createCard({
+                            column_id: columnId,
+                            content,
+                            position: maxPos + 1000,
+                          });
+                        }}
+                        onCreateColumnAfter={handleCreateColumnAfter}
+                        onEditCardStart={setEditingCardId}
+                        allowAddCard={true}
+                      />
+                    </div>
                   </div>
                 ))}
               </SortableContext>
-             </div>
+            </div>
           </div>
 
           {createPortal(
             <DragOverlay>
               {activeColumn && (
-                 <div className="h-full" style={{ width: 300 }}> 
+                <div className="h-full" style={{ width: 300 }}>
                   <ListColumn
                     column={activeColumn}
-                    cards={cards.filter((c) => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
-                    index={columns.findIndex(c => c.id === activeColumn.id)}
+                    cards={cards
+                      .filter((c) => c.column_id === activeColumn.id)
+                      .sort((a, b) => a.position - b.position)}
+                    index={columns.findIndex((c) => c.id === activeColumn.id)}
                     totalColumns={columns.length}
                     onDeleteColumn={() => {}}
                     onUpdateColumnTitle={() => {}}
@@ -371,7 +192,9 @@ export function ListBoard() {
                   />
                 </div>
               )}
-              {activeCard && <ListCard card={activeCard} onEditStart={() => {}} />}
+              {activeCard && (
+                <ListCard card={activeCard} onEditStart={() => {}} />
+              )}
             </DragOverlay>,
             document.body
           )}
@@ -403,7 +226,10 @@ export function ListBoard() {
         </DndContext>
       </div>
 
-      <ListArchiveModal isOpen={isArchiveOpen} onClose={() => setIsArchiveOpen(false)} />
+      <ListArchiveModal
+        isOpen={isArchiveOpen}
+        onClose={() => setIsArchiveOpen(false)}
+      />
     </div>
   );
 }

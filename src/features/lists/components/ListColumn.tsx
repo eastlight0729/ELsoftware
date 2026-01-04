@@ -1,10 +1,11 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
-import { Plus, Archive, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ListCard as ListCardType, ListColumn as ListColumnType } from "../types";
 import { ListCard } from "./ListCard";
 import { NewCardForm } from "./NewCardForm";
+import { ListColumnMenu } from "./ListColumnMenu";
 
 interface ListColumnProps {
   column: ListColumnType;
@@ -89,46 +90,18 @@ export function ListColumn({
           </button>
 
           {isMenuOpen && (
-            <>
-              {/* Backdrop to close menu */}
-              <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
-
-              {/* Dropdown Menu */}
-              <div className="absolute right-0 top-full mt-1 w-40 z-20 bg-white/10 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-1 overflow-hidden">
-                {allowAddCard && (
-                  <button
-                    onClick={() => {
+            <ListColumnMenu
+              onAddCard={
+                allowAddCard
+                  ? () => {
                       setIsAddingCard(true);
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 flex items-center gap-2 transition-colors border-b border-white/5"
-                  >
-                    <Plus size={14} />
-                    Add Card
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    onCreateColumnAfter(column.id);
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 flex items-center gap-2 transition-colors border-b border-white/5"
-                >
-                  <Plus size={14} />
-                  Add Column
-                </button>
-                <button
-                  onClick={() => {
-                    onDeleteColumn(column.id);
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 flex items-center gap-2 transition-colors"
-                >
-                  <Archive size={14} />
-                  Archive Column
-                </button>
-              </div>
-            </>
+                    }
+                  : undefined
+              }
+              onAddColumn={() => onCreateColumnAfter(column.id)}
+              onArchive={() => onDeleteColumn(column.id)}
+              onClose={() => setIsMenuOpen(false)}
+            />
           )}
         </div>
       </div>

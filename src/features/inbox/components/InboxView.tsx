@@ -54,7 +54,7 @@ export const InboxView = () => {
         </button>
       </form>
 
-      <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+      <div className="flex-1 overflow-y-auto space-y-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
         {isLoading ? (
           <div className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (

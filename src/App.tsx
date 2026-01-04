@@ -78,12 +78,20 @@ export default function App() {
       <main
         className={`
           transition-[padding] duration-300 ease-in-out
-          pb-32
+          ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
           min-h-screen
         `}
       >
         {activeCategory === "task" ? (
           <div className="h-screen w-full p-1 overflow-hidden">
+            <AppContent
+              activeCategory={activeCategory}
+              userEmail={session.user.email}
+              onLogout={signOut}
+            />
+          </div>
+        ) : activeCategory === "inbox" ? (
+          <div className="h-screen w-full pt-24 pb-32 px-4 overflow-hidden">
             <AppContent
               activeCategory={activeCategory}
               userEmail={session.user.email}

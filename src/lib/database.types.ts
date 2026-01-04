@@ -181,6 +181,35 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_settings: {
+        Row: {
+          background_path: string | null;
+          created_at: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          background_path?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          background_path?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_settings_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

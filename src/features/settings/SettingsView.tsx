@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { LogOut, User } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { BackgroundSettings } from "./components/BackgroundSettings";
 
 interface SettingsViewProps {
   userEmail?: string | null;
@@ -46,6 +47,10 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
           >
             <LogOut size={20} />
           </button>
+        </div>
+
+        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+          <BackgroundSettings />
         </div>
 
         <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">

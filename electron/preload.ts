@@ -8,6 +8,9 @@ contextBridge.exposeInMainWorld("electron", {
     clearMarks: () => ipcRenderer.invoke("year-calendar:clear-marks"),
     getHolidays: (year: number) => ipcRenderer.invoke("year-calendar:get-holidays", year),
   },
+  system: {
+    openFileDialog: () => ipcRenderer.invoke("system:open-file-dialog"),
+  },
   // Expose a way to listen for the main process message without exposing 'on'
   onMainProcessMessage: (callback: (message: string) => void) => {
     const listener = (_event: any, message: string) => callback(message);

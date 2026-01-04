@@ -8,6 +8,9 @@ interface Window {
       clearMarks: () => Promise<void>;
       getHolidays: (year: number) => Promise<Record<string, string>>;
     };
+    system: {
+      openFileDialog: () => Promise<string | null>;
+    };
     onMainProcessMessage: (callback: (message: string) => void) => () => void;
   };
 }

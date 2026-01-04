@@ -47,7 +47,7 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
       ) : (
         <span 
           onClick={() => setIsEditing(true)}
-          className="flex-1 text-white text-base font-medium drop-shadow-sm cursor-text wrap-break-word pr-4"
+          className="flex-1 text-white text-base font-medium drop-shadow-sm cursor-text truncate pr-4"
         >
           {item.content}
         </span>

@@ -55,7 +55,7 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={() => {}}
-          className="p-2 text-white/70 hover:text-blue-100 hover:bg-white/20 rounded-lg transition-colors"
+          className="p-2 text-white/70 hover:text-sky-400 hover:bg-white/20 rounded-lg transition-colors"
           aria-label="Move item"
           title="Move to..."
         >
@@ -63,7 +63,7 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
         </button>
         <button
           onClick={() => deleteItem(item.id)}
-          className="p-2 text-white/70 hover:text-red-100 hover:bg-white/20 rounded-lg transition-colors"
+          className="p-2 text-white/70 hover:text-red-400 hover:bg-white/20 rounded-lg transition-colors"
           aria-label="Delete item"
         >
           <Trash2 size={18} />

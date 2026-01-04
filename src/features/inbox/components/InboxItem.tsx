@@ -33,7 +33,7 @@ export const InboxItem = memo(({ item }: InboxItemProps) => {
   };
 
   return (
-    <div className="group flex items-center justify-between p-3 mb-2 bg-white/20 backdrop-blur-xl rounded-xl border border-white/30 shadow-sm transition-all hover:shadow-md hover:border-white/50 hover:bg-white/30">
+    <div className="group flex items-center justify-between p-3 mb-2 bg-white/10 backdrop-blur-md rounded-xl shadow-md transition-all hover:shadow-md hover:bg-white/30">
       {isEditing ? (
         <input
           type="text"

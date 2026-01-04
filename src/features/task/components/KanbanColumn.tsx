@@ -68,14 +68,13 @@ export function KanbanColumn({
         className="p-3 flex items-center justify-between cursor-grab active:cursor-grabbing border-b border-white/10"
       >
         <div className="flex gap-2 items-center font-bold text-sm text-white w-full">
-          <div className="bg-white/20 px-2 py-0.5 rounded-full text-xs text-white/90 shadow-sm">
-            {cards.length}
-          </div>
+
           {editMode ? (
             <input
               autoFocus
               className="bg-white/10 border border-white/30 text-white rounded px-1 py-0.5 outline-none w-full placeholder-white/30"
               value={column.title}
+              placeholder="Input column name"
               onChange={(e) => onUpdateColumnTitle(column.id, e.target.value)}
               onBlur={() => setEditMode(false)}
               onKeyDown={(e) => {
@@ -83,8 +82,13 @@ export function KanbanColumn({
               }}
             />
           ) : (
-            <span onClick={() => setEditMode(true)} className="truncate w-full cursor-text hover:bg-white/5 rounded px-1 -ml-1 transition-colors">
-              {column.title}
+            <span
+              onClick={() => setEditMode(true)}
+              className={`truncate w-full cursor-text hover:bg-white/5 rounded px-1 -ml-1 transition-colors min-h-[24px] flex items-center ${
+                !column.title ? "text-white/40" : ""
+              }`}
+            >
+              {column.title || "Input column name"}
             </span>
           )}
         </div>

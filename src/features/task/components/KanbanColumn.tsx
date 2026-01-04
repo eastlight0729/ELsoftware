@@ -9,9 +9,12 @@ import { NewCardForm } from "./NewCardForm";
 interface KanbanColumnProps {
   column: KanbanColumnType;
   cards: KanbanCardType[];
+  index: number;
+  totalColumns: number;
   onDeleteColumn: (id: string) => void;
   onUpdateColumnTitle: (id: string, title: string) => void;
   createCard: (columnId: string, content: string) => void;
+  onCreateColumnAfter: (id: string) => void;
   onEditCardStart: (id: string) => void;
   allowAddCard?: boolean;
 }
@@ -19,8 +22,11 @@ interface KanbanColumnProps {
 export function KanbanColumn({
   column,
   cards,
+  index,
+  totalColumns,
   onDeleteColumn,
   onUpdateColumnTitle,
+  onCreateColumnAfter,
   onEditCardStart,
   createCard,
   allowAddCard = false,
@@ -45,11 +51,12 @@ export function KanbanColumn({
       className="bg-white/10 w-full h-full max-h-full rounded-xl flex flex-col shrink-0 border border-white/20 shadow-lg transition-all"
     >
       {/* Column Header */}
-      <div
-        className="p-3 flex items-center justify-between border-b border-white/10"
-      >
+      <div className="p-3 flex items-center justify-between border-b border-white/10">
         <div className="flex gap-2 items-center font-bold text-sm text-white w-full">
-
+          <span className="text-[10px] font-mono font-normal text-white/40 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 mr-1 shrink-0">
+            {index + 1} / {totalColumns}
+          </span>
+          
           {editMode ? (
             <input
               autoFocus
@@ -100,6 +107,16 @@ export function KanbanColumn({
                     Add Card
                   </button>
                 )}
+                <button
+                  onClick={() => {
+                    onCreateColumnAfter(column.id);
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 flex items-center gap-2 transition-colors border-b border-white/5"
+                >
+                  <Plus size={14} />
+                  Add Column
+                </button>
                 <button
                   onClick={() => {
                     onDeleteColumn(column.id);

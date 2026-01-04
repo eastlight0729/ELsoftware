@@ -262,6 +262,30 @@ export function KanbanBoard() {
     setMouseDownX(null);
   };
 
+  const handleCreateColumnAfter = (columnId: string) => {
+    const index = columns.findIndex((c) => c.id === columnId);
+    if (index === -1) return;
+
+    const currentColumn = columns[index];
+    const nextColumn = columns[index + 1];
+
+    let newPosition = 0;
+    if (nextColumn) {
+      newPosition = (currentColumn.position + nextColumn.position) / 2;
+    } else {
+      newPosition = currentColumn.position + 1000;
+    }
+
+    createColumn({
+      title: "New Column",
+      position: newPosition,
+    }, {
+      onSuccess: () => {
+        setCurrentIndex((prev) => prev + 1);
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       {/* Header */}
@@ -298,7 +322,7 @@ export function KanbanBoard() {
           </span>
 
           <button
-            onClick={handleNext}
+            onClick={() => handleNext(true)}
             className="p-2 rounded-xl hover:bg-white/20 text-white/70 hover:text-white transition-all hover:scale-105 active:scale-95 group"
           >
             {isAtEnd ? <Plus size={20} className="text-white group-hover:text-amber-200" /> : <ChevronRight size={20} />}
@@ -332,6 +356,8 @@ export function KanbanBoard() {
                         <KanbanColumn
                           column={col}
                           cards={cards.filter((c) => c.column_id === col.id).sort((a, b) => a.position - b.position)}
+                          index={columns.indexOf(col)}
+                          totalColumns={columns.length}
                           onDeleteColumn={deleteColumn}
                           onUpdateColumnTitle={(id, title) => updateColumn({ id, updates: { title } })}
                           createCard={(columnId, content) => {
@@ -339,6 +365,7 @@ export function KanbanBoard() {
                             const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
                             createCard({ column_id: columnId, content, position: maxPos + 1000 });
                           }}
+                          onCreateColumnAfter={handleCreateColumnAfter}
                           onEditCardStart={setEditingCardId}
                           allowAddCard={true} 
                         />
@@ -356,9 +383,12 @@ export function KanbanBoard() {
                   <KanbanColumn
                     column={activeColumn}
                     cards={cards.filter((c) => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
+                    index={columns.findIndex(c => c.id === activeColumn.id)}
+                    totalColumns={columns.length}
                     onDeleteColumn={() => {}}
                     onUpdateColumnTitle={() => {}}
                     createCard={() => {}}
+                    onCreateColumnAfter={() => {}}
                     onEditCardStart={() => {}}
                   />
                 </div>

@@ -231,23 +231,25 @@ export function KanbanBoard() {
 
       {/* Board Content (Carousel) */}
       <div className="flex-1 w-full relative overflow-hidden px-12 pb-4">
-        {/* Navigation Buttons in the 'Left/Right Center' */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-2 z-10">
+        {/* Floating Kanban Navigator */}
+        <div className="fixed bottom-[110px] left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-4 py-2 rounded-2xl bg-neutral-900/60 backdrop-blur-xl border border-white/10 shadow-2xl">
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className={`p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl transition-all hover:bg-white/20 hover:scale-110 disabled:opacity-0 disabled:pointer-events-none`}
+            className="p-2 rounded-xl hover:bg-white/10 text-white/50 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all hover:scale-105 active:scale-95"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} />
           </button>
-        </div>
+          
+          <span className="text-white/90 font-medium font-mono text-sm min-w-[3rem] text-center tracking-wider">
+             {columns.length > 0 ? currentIndex + 1 : 0} <span className="text-white/30 mx-1">/</span> {columns.length}
+          </span>
 
-        <div className="absolute top-1/2 -translate-y-1/2 right-2 z-10">
           <button
             onClick={handleNext}
-            className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl transition-all hover:bg-white/20 hover:scale-110 group flex items-center gap-2"
+            className="p-2 rounded-xl hover:bg-white/10 text-white/50 hover:text-white transition-all hover:scale-105 active:scale-95 group"
           >
-            {isAtEnd ? <Plus size={24} className="group-hover:rotate-90 transition-transform" /> : <ChevronRight size={24} />}
+            {isAtEnd ? <Plus size={20} className="text-indigo-400 group-hover:text-indigo-300" /> : <ChevronRight size={20} />}
           </button>
         </div>
 

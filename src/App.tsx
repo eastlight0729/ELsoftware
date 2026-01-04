@@ -91,60 +91,64 @@ export default function App() {
     : {};
 
   return (
-    <div
-      style={backgroundStyle}
-      className={`min-h-screen w-full transition-all duration-500 ${
-        backgroundPath 
-          ? "" // If image is set, we don't need background colors
-          : activeCategory === "inbox"
-            ? "bg-gradient-to-br from-sky-500 to-red-400"
-            : "bg-neutral-100 dark:bg-neutral-800"
-      } text-neutral-800 dark:text-neutral-100`}
-    >
-      {/* Main Content Area */}
-      {/* 
-          Added pb-32 to accomodate the floating dock at the bottom.
-          Removed pl-12 since navigation is now a dock.
-      */}
-      <main
-        className={`
-          transition-[padding] duration-300 ease-in-out
-          ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
-          min-h-screen
-        `}
-      >
-        {activeCategory === "task" ? (
-          <div className="h-screen w-full p-1 overflow-hidden">
-            <AppContent
-              activeCategory={activeCategory}
-              userEmail={session.user.email}
-              onLogout={signOut}
-            />
-          </div>
-        ) : activeCategory === "inbox" ? (
-          <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
-            <AppContent
-              activeCategory={activeCategory}
-              userEmail={session.user.email}
-              onLogout={signOut}
-            />
-          </div>
-        ) : (
-          <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
-            <AppContent
-              activeCategory={activeCategory}
-              userEmail={session.user.email}
-              onLogout={signOut}
-            />
-          </div>
-        )}
-      </main>
-
-      <Navigation
-        activeCategory={activeCategory}
-        onSelectCategory={setActiveCategory}
+    <>
+      <div 
+        className={`fixed inset-0 min-h-screen w-full -z-10 transition-colors duration-500 ${
+          backgroundPath 
+            ? "bg-cover bg-fixed bg-center bg-no-repeat"
+            : activeCategory === "inbox"
+              ? "bg-linear-to-br from-sky-500 to-red-400"
+              : "bg-neutral-100 dark:bg-neutral-800"
+        }`}
+        style={backgroundPath ? backgroundStyle : {}}
       />
-    </div>
+      
+      <div className="min-h-screen w-full text-neutral-800 dark:text-neutral-100 relative">
+        {/* Main Content Area */}
+        {/* 
+            Added pb-32 to accomodate the floating dock at the bottom.
+            Removed pl-12 since navigation is now a dock.
+        */}
+        <main
+          className={`
+            transition-[padding] duration-300 ease-in-out
+            ${activeCategory === "task" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
+            min-h-screen
+          `}
+        >
+          {activeCategory === "task" ? (
+            <div className="h-screen w-full p-1 overflow-hidden">
+              <AppContent
+                activeCategory={activeCategory}
+                userEmail={session.user.email}
+                onLogout={signOut}
+              />
+            </div>
+          ) : activeCategory === "inbox" ? (
+            <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
+              <AppContent
+                activeCategory={activeCategory}
+                userEmail={session.user.email}
+                onLogout={signOut}
+              />
+            </div>
+          ) : (
+            <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
+              <AppContent
+                activeCategory={activeCategory}
+                userEmail={session.user.email}
+                onLogout={signOut}
+              />
+            </div>
+          )}
+        </main>
+
+        <Navigation
+          activeCategory={activeCategory}
+          onSelectCategory={setActiveCategory}
+        />
+      </div>
+    </>
   );
 }
 

@@ -12,9 +12,11 @@ import {
   useDeleteColumn,
   useListCarousel,
   useListDragDrop,
+  useRestoreColumn,
   useUpdateCard,
   useUpdateColumn,
 } from "../hooks";
+import { UndoNotification } from "@/components/ui/UndoNotification";
 import { ConfirmModal } from "./ConfirmModal";
 import { ListArchiveModal } from "./ListArchiveModal";
 import { ListCard } from "./ListCard";
@@ -28,6 +30,7 @@ export function ListBoard() {
 
   const { mutate: createColumn } = useCreateColumn();
   const { mutate: deleteColumn } = useDeleteColumn();
+  const { mutate: restoreColumn } = useRestoreColumn();
   const { mutate: updateColumn } = useUpdateColumn();
 
   const { mutate: createCard } = useCreateCard();
@@ -38,6 +41,7 @@ export function ListBoard() {
 
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
+  const [archivedColumnId, setArchivedColumnId] = useState<string | null>(null);
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
   // --- Hooks for Logic Extraction ---
@@ -144,7 +148,10 @@ export function ListBoard() {
                           .sort((a, b) => a.position - b.position)}
                         index={columns.indexOf(col)}
                         totalColumns={columns.length}
-                        onDeleteColumn={deleteColumn}
+                        onDeleteColumn={(id) => {
+                          deleteColumn(id);
+                          setArchivedColumnId(id);
+                        }}
                         onUpdateColumnTitle={(id, title) =>
                           updateColumn({ id, updates: { title } })
                         }
@@ -229,6 +236,18 @@ export function ListBoard() {
       <ListArchiveModal
         isOpen={isArchiveOpen}
         onClose={() => setIsArchiveOpen(false)}
+      />
+
+      <UndoNotification
+        isOpen={!!archivedColumnId}
+        message="Column archived"
+        onUndo={() => {
+          if (archivedColumnId) {
+            restoreColumn(archivedColumnId);
+            setArchivedColumnId(null);
+          }
+        }}
+        onClose={() => setArchivedColumnId(null)}
       />
     </div>
   );

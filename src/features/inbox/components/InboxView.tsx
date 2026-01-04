@@ -3,7 +3,7 @@ import { Plus, Archive } from "lucide-react";
 import { useInboxViewModel } from "../hooks/useInboxViewModel";
 import { InboxItem } from "./InboxItem";
 import { ArchiveListModal } from "./ArchiveListModal";
-import { ArchiveNotification } from "./ArchiveNotification";
+import { UndoNotification } from "@/components/ui/UndoNotification";
 
 export const InboxView = () => {
   const {
@@ -73,10 +73,11 @@ export const InboxView = () => {
         )}
       </div>
 
-      <ArchiveNotification
+      <UndoNotification
         isOpen={notificationState.isOpen}
         onUndo={handleUndoArchive}
         onClose={handleCloseNotification}
+        message="Item archived"
       />
 
       <ArchiveListModal

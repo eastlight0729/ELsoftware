@@ -73,7 +73,13 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 transition-colors duration-200">
+    <div
+      className={`min-h-screen w-full transition-all duration-500 ${
+        activeCategory === "inbox"
+          ? "bg-gradient-to-br from-sky-500 to-red-400"
+          : "bg-neutral-100 dark:bg-neutral-800"
+      } text-neutral-800 dark:text-neutral-100`}
+    >
       <Sidebar
         isOpen={isSidebarOpen}
         activeCategory={activeCategory}

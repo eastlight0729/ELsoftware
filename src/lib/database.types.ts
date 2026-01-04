@@ -36,24 +36,30 @@ export type Database = {
         Row: {
           column_id: string;
           content: string;
+          created_at: string;
           id: string;
           position: number;
+          updated_at: string;
           user_id: string;
           deleted_at: string | null;
         };
         Insert: {
           column_id: string;
           content: string;
+          created_at?: string;
           id?: string;
           position?: number;
+          updated_at?: string;
           user_id?: string;
           deleted_at?: string | null;
         };
         Update: {
           column_id?: string;
           content?: string;
+          created_at?: string;
           id?: string;
           position?: number;
+          updated_at?: string;
           user_id?: string;
           deleted_at?: string | null;
         };

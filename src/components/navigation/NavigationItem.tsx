@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "../../lib/utils";
 import { NAVIGATION_BUTTON_ACTIVE, NAVIGATION_BUTTON_BASE, NAVIGATION_BUTTON_COLORS } from "./constants";
 
 interface NavigationItemProps<T extends string> {
@@ -21,22 +22,30 @@ interface NavigationItemProps<T extends string> {
  * Handles styling for active/inactive states.
  * Memoized to prevent re-renders when other items change.
  */
+
+const ITEM_BASE_CLASSES = cn(
+  "group flex items-center gap-2",
+  NAVIGATION_BUTTON_BASE,
+  "justify-center md:justify-start relative overflow-hidden"
+);
+
+const ICON_BASE_CLASSES = "relative z-10 transition-colors duration-200 shrink-0";
+
 function NavigationItemInternal<T extends string>({ id, icon, label, isActive, onClick, showLabel }: NavigationItemProps<T>) {
   return (
     <button
       onClick={() => onClick(id)}
       title={label}
-      className={`
-        group flex items-center gap-2 ${NAVIGATION_BUTTON_BASE}
-        justify-center md:justify-start
-        relative overflow-hidden
-        ${isActive ? NAVIGATION_BUTTON_ACTIVE : NAVIGATION_BUTTON_COLORS}
-      `}
+      className={cn(
+        ITEM_BASE_CLASSES,
+        isActive ? NAVIGATION_BUTTON_ACTIVE : NAVIGATION_BUTTON_COLORS
+      )}
     >
       <span
-        className={`relative z-10 transition-colors duration-200 shrink-0 ${
+        className={cn(
+          ICON_BASE_CLASSES,
           isActive ? "text-sky-400" : "group-hover:text-white"
-        }`}
+        )}
       >
         {icon}
       </span>
@@ -50,5 +59,5 @@ function NavigationItemInternal<T extends string>({ id, icon, label, isActive, o
   );
 }
 
-// Cast to any to allow generic usage in React.memo which can be tricky with generics
+// Preserve generic type signature through React.memo by casting to original component type
 export const NavigationItem = React.memo(NavigationItemInternal) as typeof NavigationItemInternal;

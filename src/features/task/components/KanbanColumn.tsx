@@ -1,5 +1,5 @@
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 import { Plus, Archive, MoreHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { KanbanCard as KanbanCardType, KanbanColumn as KanbanColumnType } from "../types";
@@ -29,43 +29,24 @@ export function KanbanColumn({
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+  const { setNodeRef } = useDroppable({
     id: column.id,
     data: {
       type: "Column",
       column,
     },
-    disabled: editMode,
   });
 
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-  };
-
   const cardIds = useMemo(() => cards.map((c) => c.id), [cards]);
-
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="bg-white/10 w-full h-[500px] rounded-xl border border-white/20 opacity-40 shrink-0"
-      />
-    );
-  }
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
       className="bg-white/10 w-full h-full max-h-full rounded-xl flex flex-col shrink-0 border border-white/20 shadow-lg transition-all"
     >
       {/* Column Header */}
       <div
-        {...attributes}
-        {...listeners}
-        className="p-3 flex items-center justify-between cursor-grab active:cursor-grabbing border-b border-white/10"
+        className="p-3 flex items-center justify-between border-b border-white/10"
       >
         <div className="flex gap-2 items-center font-bold text-sm text-white w-full">
 

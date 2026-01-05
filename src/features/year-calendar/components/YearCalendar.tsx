@@ -71,7 +71,7 @@ export function YearCalendar() {
   }, [year]);
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4 md:p-8">
+    <div className="w-full h-full flex items-center justify-center md:p-8">
       <div className={cn(
         "relative p-6 rounded-3xl transition-all duration-300",
         "bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl",

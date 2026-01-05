@@ -10,3 +10,9 @@ Create Grid-based year-calendar UI in @src/features/year-calendar/components . H
 8. Make a scroll bar in the grid, not screen.
 9. Added Year Display: A large, watermark-style year number (e.g., "2026") to appear in the background of the calendar card.
 10. Add the dragging feature: User drag year-calendar to the left/right → the year calendar switch into previous/next year calendar.
+
+## Refactor
+
+- Replacing Custom Logic with Native APIs
+
+  Replacing Custom Logic with Native APIs: Removed the DAYS_IN_MONTH array and isLeap/getDaysInMonth helpers. Now, new Date(year, monthIdx + 1, 0).getDate() handles the days-in-month calculation, including leap years, natively.

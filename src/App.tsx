@@ -152,8 +152,7 @@ export default function App() {
         */}
         <main
           className={`
-            transition-[padding] duration-300 ease-in-out
-            ${activeCategory === "lists" || activeCategory === "inbox" ? "pb-0" : "pb-32"}
+            transition-[padding] duration-300 ease-in-out}
             min-h-screen
           `}
         >
@@ -178,6 +177,14 @@ export default function App() {
                 </div>
               ) : activeCategory === "inbox" ? (
                 <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              ) : activeCategory === "calendar" ? (
+                <div className="h-screen w-full pt-4 px-30 pb-32 overflow-hidden">
                   <AppContent
                     activeCategory={activeCategory}
                     userEmail={session.user.email}

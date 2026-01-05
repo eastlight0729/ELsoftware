@@ -38,7 +38,7 @@ export function YearCalendarHeader({
   };
 
   return (
-    <div className="grid grid-cols-[32px_1fr_32px] gap-6 px-6 pb-2 items-center border-b border-white/20 dark:border-white/10">
+    <div className="grid grid-cols-[32px_1fr_32px] gap-6 p-6 items-center border-b border-white/20 dark:border-white/10">
       {/* Top Left: Navigation Buttons */}
       <div className="flex items-center gap-1">
         <button

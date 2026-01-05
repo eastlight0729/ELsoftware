@@ -59,8 +59,8 @@ export function YearCalendar() {
       {/* Calendar Grid Container */}
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Scrollable Area */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 pt-2">
-          <div>
+        <div className="flex-1 overflow-y-auto overflow-x-auto p-6 pt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="min-w-[1050px]">
             {/* Grid Header (Weekdays) */}
             <div className="flex mb-2 gap-6">
               <div className="w-8 shrink-0" /> {/* Spacer for Month Numbers column */}
@@ -103,10 +103,9 @@ export function YearCalendar() {
             </div>
           </div>
         </div>
-        <div className="border-t border-white/20 dark:border-white/10" />
       </div>
 
-      <div className="flex justify-end gap-4 px-2 text-xs text-neutral-400">
+      <div className="flex justify-end gap-4 p-6 text-xs border-t border-white/20 dark:border-white/10 text-neutral-400">
         <div className="flex items-center gap-2">
           <div
             className="w-2 h-1.5 bg-green-700 dark:bg-green-600"

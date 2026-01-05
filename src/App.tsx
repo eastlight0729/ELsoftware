@@ -184,7 +184,7 @@ export default function App() {
                   />
                 </div>
               ) : activeCategory === "calendar" ? (
-                <div className="h-screen w-full pt-4 px-4 pb-20 overflow-hidden">
+                <div className="h-screen w-full pt-4 px-4 pb-32 overflow-hidden">
                   <AppContent
                     activeCategory={activeCategory}
                     userEmail={session.user.email}

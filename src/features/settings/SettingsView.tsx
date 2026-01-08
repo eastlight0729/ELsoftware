@@ -2,6 +2,8 @@ import { useState } from "react";
 import { LogOut, User } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BackgroundSettings } from "./components/BackgroundSettings";
+import { FeatureLayout } from "@/components/ui/FeatureLayout";
+import { FeatureHeader } from "@/components/ui/FeatureHeader";
 
 interface SettingsViewProps {
   userEmail?: string | null;
@@ -17,13 +19,11 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Settings</h1>
-        <p className="text-neutral-500 dark:text-neutral-400">
-          Manage your account settings and preferences.
-        </p>
-      </div>
+    <FeatureLayout>
+      <FeatureHeader
+        title="Settings"
+        subtitle="Manage your account settings and preferences."
+      />
 
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 space-y-6">
         <div className="flex items-center justify-between gap-4">
@@ -77,6 +77,6 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
         confirmLabel="Sign Out"
         variant="danger"
       />
-    </div>
+    </FeatureLayout>
   );
 }

@@ -87,17 +87,6 @@ export default function App() {
     }),
   };
 
-  // Determine wrapper classes based on category to handle specific layout needs
-  const getContentWrapperClass = (category: AppCategory) => {
-    switch (category) {
-      case "lists":
-        return "h-screen w-full pt-4 px-4 pb-[100px] overflow-hidden";
-      case "inbox":
-        return "h-screen w-full pt-4 pb-32 px-4 overflow-hidden";
-      default:
-        return "max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12";
-    }
-  };
 
   return (
     <>
@@ -144,7 +133,7 @@ export default function App() {
               }}
               className="w-full h-full"
             >
-              <div className={getContentWrapperClass(activeCategory)}>
+              <div className="h-screen w-full overflow-hidden">
                 <AppContent
                   activeCategory={activeCategory}
                   userEmail={session.user.email}

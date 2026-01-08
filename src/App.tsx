@@ -87,7 +87,6 @@ export default function App() {
     }),
   };
 
-
   return (
     <>
       {/* Background Layer */}
@@ -99,26 +98,12 @@ export default function App() {
             ? "bg-linear-to-br from-sky-500 to-red-400"
             : "bg-neutral-100 dark:bg-neutral-800"
         }`}
-        style={
-          backgroundPath
-            ? { backgroundImage: `url("${backgroundPath}")` }
-            : undefined
-        }
+        style={backgroundPath ? { backgroundImage: `url("${backgroundPath}")` } : undefined}
       />
 
       <div className="min-h-screen w-full text-neutral-800 dark:text-neutral-100 relative overflow-x-hidden">
         {/* Main Content Area */}
-        <main
-          className={`
-            transition-[padding] duration-300 ease-in-out
-            ${
-              activeCategory === "lists" || activeCategory === "inbox"
-                ? "pb-0"
-                : "pb-32"
-            }
-            min-h-screen
-          `}
-        >
+        <main className={`transition-[padding] duration-300 ease-in-out min-h-screen`}>
           <AnimatePresence mode="popLayout" custom={direction} initial={false}>
             <motion.div
               key={activeCategory}
@@ -134,20 +119,13 @@ export default function App() {
               className="w-full h-full"
             >
               <div className="h-screen w-full overflow-hidden">
-                <AppContent
-                  activeCategory={activeCategory}
-                  userEmail={session.user.email}
-                  onLogout={signOut}
-                />
+                <AppContent activeCategory={activeCategory} userEmail={session.user.email} onLogout={signOut} />
               </div>
             </motion.div>
           </AnimatePresence>
         </main>
 
-        <Navigation
-          activeCategory={activeCategory}
-          onSelectCategory={(cat) => handleCategoryChange(cat)}
-        />
+        <Navigation activeCategory={activeCategory} onSelectCategory={(cat) => handleCategoryChange(cat)} />
       </div>
     </>
   );

@@ -11,7 +11,7 @@ interface InboxItemProps {
 
 export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
   const { mutate: updateItem } = useUpdateInboxItem();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(item.content);
 
@@ -37,18 +37,10 @@ export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
     <ItemCard
       actions={
         <>
-          <ItemCardActionButton
-            variant="info"
-            title="Move to..."
-            onClick={() => {}}
-          >
+          <ItemCardActionButton variant="info" title="Move to..." onClick={() => {}}>
             <FolderInput size={18} />
           </ItemCardActionButton>
-          <ItemCardActionButton
-            variant="danger"
-            title="Archive"
-            onClick={() => onArchive(item.id)}
-          >
+          <ItemCardActionButton variant="danger" title="Archive" onClick={() => onArchive(item.id)}>
             <Archive size={18} />
           </ItemCardActionButton>
         </>
@@ -65,10 +57,7 @@ export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
           className="w-full bg-transparent text-sm text-white/90 font-medium outline-none border-b border-white/50 pb-1 placeholder:text-white/50"
         />
       ) : (
-        <ItemCardContent
-          onClick={() => setIsEditing(true)}
-          className="cursor-text"
-        >
+        <ItemCardContent onClick={() => setIsEditing(true)} className="cursor-text">
           {item.content}
         </ItemCardContent>
       )}

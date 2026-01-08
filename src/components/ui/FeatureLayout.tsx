@@ -10,7 +10,7 @@ export const FeatureLayout = ({ children, className }: FeatureLayoutProps) => {
   return (
     <div
       className={cn(
-        "w-full max-w-2xl mx-auto h-full flex flex-col relative pt-4 pb-32 px-4",
+        "w-full mx-auto h-full flex flex-col relative pt-4 pb-32 px-4",
         className
       )}
     >

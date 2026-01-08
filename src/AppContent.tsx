@@ -1,7 +1,7 @@
 import { AppCategory } from "./components/navigation/types";
 
 // import { Memo } from "./features/memo";
-import { YearCalendar } from "./features/year-calendar";
+import { YearCalendar } from "./features/calendar";
 import { ListBoard } from "./features/lists";
 import { InboxView } from "./features/inbox";
 import { SettingsView } from "./features/settings";

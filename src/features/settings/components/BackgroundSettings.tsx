@@ -66,16 +66,15 @@ export function BackgroundSettings() {
         <div className="flex gap-2">
           <div className="relative flex-1">
             <input
-              type="text"
               value={backgroundPath}
               onChange={(e) => setBackgroundPath(e.target.value)}
               placeholder="Path or URL..."
-              className="w-full rounded-md border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-600 dark:text-neutral-300 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-500"
+              className="w-full rounded-md border border-white/20 dark:border-white/10 bg-white/50 dark:bg-black/20 backdrop-blur-sm px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
             />
             {backgroundPath && (
               <button
                 onClick={() => setBackgroundPath("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 transition-colors"
                 title="Clear image"
               >
                 <X size={14} />
@@ -84,7 +83,7 @@ export function BackgroundSettings() {
           </div>
           <button
             onClick={() => handleSelect(setBackgroundPath)}
-            className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-md text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors shrink-0"
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-neutral-900 dark:text-neutral-100 hover:bg-white/20 transition-all shrink-0"
           >
             <FolderOpen size={16} />
             Select

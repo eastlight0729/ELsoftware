@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { AppCategory } from "./components/navigation/types";
-import { Navigation } from "./components/navigation/Navigation";
-import { navigationConfig } from "./components/navigation/config";
-import { AppContent } from "./AppContent";
+import { useState } from "react";
+import { AnimatePresence, motion, Variants } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
 import { useAuth, Login } from "./features/auth";
 import { useBackground } from "./features/settings";
-import { Loader2 } from "lucide-react";
+import { AppContent } from "./AppContent";
+import { Navigation } from "./components/navigation/Navigation";
+import { navigationConfig } from "./components/navigation/config";
+import { AppCategory } from "./components/navigation/types";
+import { useKeyboardNavigation } from "./components/navigation/useKeyboardNavigation";
 
 /**
  * Root Application Component.
@@ -15,81 +16,48 @@ import { Loader2 } from "lucide-react";
  * Serving as the main layout container, it orchestrates:
  * - The navigation logic via `activeCategory`.
  * - The main content rendering via `AppContent`.
+ * - Global background management.
  */
 export default function App() {
   const [activeCategory, setActiveCategory] = useState<AppCategory>("inbox");
+  const [direction, setDirection] = useState<number>(0);
   const { session, loading, signOut } = useAuth();
-  
-  // Background Settings Logic
-  // Background Settings Logic
   const { backgroundPath } = useBackground();
-  
-  // We don't need local state 'bgImage' anymore since we have direct access to backgroundPath 
-  // via the hook which already handles sync via events.
-  // Actually, wait, useBackground hook gives us the current state.
-  // The 'backgroundPath' from useBackground is already a state variable in that hook.
-  // So we can just use `backgroundPath` directly?
-  // Yes, because useBackground listens to the event and updates its own state.
-  // So we just need:
-  
-  // (No useEffect needed here for bgImage sync because the hook does it)
 
-  const [direction, setDirection] = useState(0);
-
-  const handleCategoryChange = (newCategory: AppCategory) => {
+  /**
+   * Calculate the navigation direction and update the active category.
+   */
+  const handleCategoryChange = (newCategory: AppCategory, manualDirection?: number) => {
     // Helper to get index including settings
     const getCategoryIndex = (category: AppCategory) => {
+      // Treat "setting" as if it's at the end of the list
       if (category === "setting") return navigationConfig.length;
       return navigationConfig.findIndex((item) => item.id === category);
     };
 
-    const currentIndex = getCategoryIndex(activeCategory);
-    const newIndex = getCategoryIndex(newCategory);
-    
-    if (newIndex > currentIndex) {
-      setDirection(1);
-    } else if (newIndex < currentIndex) {
-      setDirection(-1);
+    if (manualDirection !== undefined) {
+      setDirection(manualDirection);
     } else {
+      const currentIndex = getCategoryIndex(activeCategory);
+      const newIndex = getCategoryIndex(newCategory);
+
+      if (newIndex > currentIndex) {
+        setDirection(1);
+      } else if (newIndex < currentIndex) {
+        setDirection(-1);
+      } else {
         setDirection(0);
+      }
     }
-    
+
     setActiveCategory(newCategory);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Menu Navigation: Cmd + Left/Right (Changed from Up/Down for Dock)
-      if (e.metaKey || e.ctrlKey) {
-        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-          e.preventDefault();
-          const currentIndex = navigationConfig.findIndex((item) => item.id === activeCategory);
-
-          let nextIndex;
-          if (currentIndex === -1) {
-            // Currently in Settings or unknown
-            if (e.key === "ArrowLeft") nextIndex = navigationConfig.length - 1;
-            else nextIndex = 0;
-          } else {
-            if (e.key === "ArrowLeft") {
-              // Wrap around to the last item if at the beginning
-              nextIndex = (currentIndex - 1 + navigationConfig.length) % navigationConfig.length;
-              setDirection(-1);
-            } else {
-              // Wrap around to the first item if at the end
-              nextIndex = (currentIndex + 1) % navigationConfig.length;
-              setDirection(1);
-            }
-          }
-
-          setActiveCategory(navigationConfig[nextIndex].id);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeCategory]);
+  // Enable keyboard navigation
+  useKeyboardNavigation({
+    activeCategory,
+    onNavigate: (cat, dir) => handleCategoryChange(cat, dir),
+  });
 
   if (loading) {
     return (
@@ -103,20 +71,8 @@ export default function App() {
     return <Login />;
   }
 
-  // If a custom background image is set, use it.
-  // Otherwise, use the category-specific background classes.
-  // If a custom background image is set, use it.
-  // Otherwise, use the category-specific background classes.
-  const backgroundStyle = backgroundPath
-    ? {
-        backgroundImage: `url("${backgroundPath}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }
-    : {};
-
-  const variants = {
+  // Animation variants
+  const variants: Variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? "100%" : "-100%",
       opacity: 0,
@@ -133,17 +89,18 @@ export default function App() {
 
   return (
     <>
-      <div 
+      {/* Background Layer */}
+      <div
         className={`fixed inset-0 min-h-screen w-full -z-10 transition-colors duration-500 ${
-          backgroundPath 
+          backgroundPath
             ? "bg-cover bg-fixed bg-center bg-no-repeat"
-            : activeCategory === "inbox" || activeCategory === "lists"
-              ? "bg-linear-to-br from-sky-500 to-red-400"
-              : "bg-neutral-100 dark:bg-neutral-800"
+            : activeCategory === "inbox" || activeCategory === "lists" || activeCategory === "setting"
+            ? "bg-linear-to-br from-sky-500 to-red-400"
+            : "bg-neutral-100 dark:bg-neutral-800"
         }`}
-        style={backgroundPath ? backgroundStyle : {}}
+        style={backgroundPath ? { backgroundImage: `url("${backgroundPath}")` } : undefined}
       />
-      
+
       <div className="min-h-screen w-full text-neutral-800 dark:text-neutral-100 relative overflow-x-hidden">
         {/* Main Content Area */}
         {/* 
@@ -152,7 +109,7 @@ export default function App() {
         */}
         <main
           className={`
-            transition-[padding] duration-300 ease-in-out}
+            transition-[padding] duration-300 ease-in-out
             min-h-screen
           `}
         >
@@ -164,7 +121,10 @@ export default function App() {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 },
+              }}
               className="w-full h-full"
             >
               {activeCategory === "lists" ? (
@@ -204,10 +164,8 @@ export default function App() {
           </AnimatePresence>
         </main>
 
-        <Navigation
-          activeCategory={activeCategory}
-          onSelectCategory={handleCategoryChange}
-        />
+
+        <Navigation activeCategory={activeCategory} onSelectCategory={(cat) => handleCategoryChange(cat)} />
       </div>
     </>
   );

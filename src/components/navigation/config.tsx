@@ -1,4 +1,4 @@
-import { Calendar, Inbox, Kanban, Settings, StickyNote, CheckSquare, BarChart2 } from "lucide-react";
+import { Calendar, Inbox, Kanban, Settings, CheckSquare, BarChart2 } from "lucide-react";
 import { AppCategory } from "./types";
 import { NAVIGATION_ICON_SIZE, NAVIGATION_ICON_STROKE_WIDTH } from "./constants";
 
@@ -44,11 +44,11 @@ export const navigationConfig: NavigationConfigItem[] = [
     label: "Review",
     icon: <BarChart2 size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
   },
-  {
-    id: "memo",
-    label: "Reference", // Renamed from Memo
-    icon: <StickyNote size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
-  },
+//   {
+//     id: "memo",
+//     label: "Reference", // Renamed from Memo
+//     icon: <StickyNote size={NAVIGATION_ICON_SIZE} strokeWidth={NAVIGATION_ICON_STROKE_WIDTH} />,
+//   },
 ];
 
 /**

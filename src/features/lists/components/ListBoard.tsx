@@ -1,6 +1,8 @@
+import { FeatureHeader } from "@/components/ui/FeatureHeader";
+import { ArchiveButton } from "@/components/ui/ArchiveButton";
+import { FeatureLayout } from "@/components/ui/FeatureLayout";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
-import { Archive } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -46,22 +48,10 @@ export function ListBoard() {
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
 
   // --- Hooks for Logic Extraction ---
-  
-  const {
-    currentIndex,
-    setCurrentIndex,
-    columnsPerPage,
-    swipeHandlers,
-  } = useListCarousel({ columns, createColumn });
 
-  const { 
-    sensors, 
-    activeColumn, 
-    activeCard, 
-    onDragStart, 
-    onDragOver, 
-    onDragEnd 
-  } = useListDragDrop({
+  const { currentIndex, setCurrentIndex, columnsPerPage, swipeHandlers } = useListCarousel({ columns, createColumn });
+
+  const { sensors, activeColumn, activeCard, onDragStart, onDragOver, onDragEnd } = useListDragDrop({
     columns,
     cards,
     updateColumn,
@@ -98,36 +88,18 @@ export function ListBoard() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <FeatureLayout>
       {/* Header */}
-      <header className="flex-none mb-8 px-6">
-        <div className="w-full flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Lists</h1>
-            <p className="text-white/80 font-medium">Manage your workflow.</p>
-          </div>
-          <button
-            onClick={() => setIsArchiveOpen(true)}
-            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10 shadow-lg hover:scale-105"
-            title="Open Archive"
-          >
-            <Archive size={20} />
-          </button>
-        </div>
-      </header>
+      <FeatureHeader
+        title="Lists"
+        subtitle="Manage your workflow."
+        action={<ArchiveButton onClick={() => setIsArchiveOpen(true)} />}
+      />
 
       {/* Board Content (Carousel) */}
       <div className="flex-1 w-full relative overflow-hidden pb-0">
-        <DndContext
-          sensors={sensors}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
-        >
-          <div
-            className="h-full w-full overflow-hidden touch-pan-y"
-            {...swipeHandlers}
-          >
+        <DndContext sensors={sensors} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd}>
+          <div className="h-full w-full overflow-hidden touch-pan-y" {...swipeHandlers}>
             <div
               className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
               style={{
@@ -136,17 +108,11 @@ export function ListBoard() {
             >
               <SortableContext items={columnIds}>
                 {columns.map((col) => (
-                  <div
-                    key={col.id}
-                    style={{ flex: `0 0 calc(100% / ${columnsPerPage})` }}
-                    className="h-full px-2"
-                  >
+                  <div key={col.id} style={{ flex: `0 0 calc(100% / ${columnsPerPage})` }} className="h-full px-2">
                     <div className="h-full w-full">
                       <ListColumn
                         column={col}
-                        cards={cards
-                          .filter((c) => c.column_id === col.id)
-                          .sort((a, b) => a.position - b.position)}
+                        cards={cards.filter((c) => c.column_id === col.id).sort((a, b) => a.position - b.position)}
                         index={columns.indexOf(col)}
                         totalColumns={columns.length}
                         onDeleteColumn={(id) => {
@@ -154,17 +120,10 @@ export function ListBoard() {
                           setArchivedColumnId(id);
                           setArchivedCardId(null);
                         }}
-                        onUpdateColumnTitle={(id, title) =>
-                          updateColumn({ id, updates: { title } })
-                        }
+                        onUpdateColumnTitle={(id, title) => updateColumn({ id, updates: { title } })}
                         createCard={(columnId, content) => {
-                          const colCards = cards.filter(
-                            (c) => c.column_id === columnId
-                          );
-                          const maxPos =
-                            colCards.length > 0
-                              ? Math.max(...colCards.map((c) => c.position))
-                              : 0;
+                          const colCards = cards.filter((c) => c.column_id === columnId);
+                          const maxPos = colCards.length > 0 ? Math.max(...colCards.map((c) => c.position)) : 0;
                           createCard({
                             column_id: columnId,
                             content,
@@ -193,9 +152,7 @@ export function ListBoard() {
                 <div className="h-full" style={{ width: 300 }}>
                   <ListColumn
                     column={activeColumn}
-                    cards={cards
-                      .filter((c) => c.column_id === activeColumn.id)
-                      .sort((a, b) => a.position - b.position)}
+                    cards={cards.filter((c) => c.column_id === activeColumn.id).sort((a, b) => a.position - b.position)}
                     index={columns.findIndex((c) => c.id === activeColumn.id)}
                     totalColumns={columns.length}
                     onDeleteColumn={() => {}}
@@ -207,13 +164,7 @@ export function ListBoard() {
                   />
                 </div>
               )}
-              {activeCard && (
-                <ListCard 
-                  card={activeCard} 
-                  onEditStart={() => {}} 
-                  onArchive={() => {}}
-                />
-              )}
+              {activeCard && <ListCard card={activeCard} onEditStart={() => {}} onArchive={() => {}} />}
             </DragOverlay>,
             document.body
           )}
@@ -230,15 +181,10 @@ export function ListBoard() {
             }}
             onClose={() => setEditingCardId(null)}
           />
-
-
         </DndContext>
       </div>
 
-      <ListArchiveModal
-        isOpen={isArchiveOpen}
-        onClose={() => setIsArchiveOpen(false)}
-      />
+      <ListArchiveModal isOpen={isArchiveOpen} onClose={() => setIsArchiveOpen(false)} />
 
       <UndoNotification
         isOpen={!!archivedColumnId}
@@ -263,6 +209,6 @@ export function ListBoard() {
         }}
         onClose={() => setArchivedCardId(null)}
       />
-    </div>
+    </FeatureLayout>
   );
 }

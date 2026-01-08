@@ -2,6 +2,7 @@ import { memo, useState } from "react";
 import { Archive, FolderInput } from "lucide-react";
 import { useUpdateInboxItem } from "../hooks/useInbox";
 import type { InboxItem as InboxItemType } from "../api";
+import { ItemCard, ItemCardContent, ItemCardActionButton } from "@/components/ui/ItemCard";
 
 interface InboxItemProps {
   item: InboxItemType;
@@ -10,7 +11,7 @@ interface InboxItemProps {
 
 export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
   const { mutate: updateItem } = useUpdateInboxItem();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(item.content);
 
@@ -33,7 +34,18 @@ export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
   };
 
   return (
-    <div className="group flex items-center justify-between p-3 mb-2 bg-white/10 backdrop-blur-md rounded-xl shadow-md transition-all hover:shadow-md hover:bg-white/30">
+    <ItemCard
+      actions={
+        <>
+          <ItemCardActionButton variant="info" title="Move to..." onClick={() => {}}>
+            <FolderInput size={18} />
+          </ItemCardActionButton>
+          <ItemCardActionButton variant="danger" title="Archive" onClick={() => onArchive(item.id)}>
+            <Archive size={18} />
+          </ItemCardActionButton>
+        </>
+      }
+    >
       {isEditing ? (
         <input
           type="text"
@@ -42,34 +54,14 @@ export const InboxItem = memo(({ item, onArchive }: InboxItemProps) => {
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
           autoFocus
-          className="flex-1 bg-transparent text-white text-base font-medium outline-none border-b border-white/50 pb-1 mr-4 placeholder:text-white/50"
+          className="w-full bg-transparent text-sm text-white/90 font-medium outline-none border-b border-white/50 pb-1 placeholder:text-white/50"
         />
       ) : (
-        <span 
-          onClick={() => setIsEditing(true)}
-          className="flex-1 text-white text-base font-medium drop-shadow-sm cursor-text truncate pr-4"
-        >
+        <ItemCardContent onClick={() => setIsEditing(true)} className="cursor-text">
           {item.content}
-        </span>
+        </ItemCardContent>
       )}
-      <div className="flex items-center gap-1 shrink-0">
-        <button
-          onClick={() => {}}
-          className="p-2 text-white/70 hover:text-sky-400 hover:bg-white/20 rounded-lg transition-colors"
-          aria-label="Move item"
-          title="Move to..."
-        >
-          <FolderInput size={18} />
-        </button>
-        <button
-          onClick={() => onArchive(item.id)}
-          className="p-2 text-white/70 hover:text-orange-400 hover:bg-white/20 rounded-lg transition-colors"
-          aria-label="Archive item"
-        >
-          <Archive size={18} />
-        </button>
-      </div>
-    </div>
+    </ItemCard>
   );
 });
 

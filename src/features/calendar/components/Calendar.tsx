@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import {
-  format,
   startOfMonth,
   endOfMonth,
   startOfWeek,
@@ -17,6 +16,9 @@ import { motion, AnimatePresence, PanInfo, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
+const SWIPE_THRESHOLD = 50;
+const VELOCITY_THRESHOLD = 200;
+const SPRING_TRANSITION = { type: "spring", stiffness: 300, damping: 30 } as const;
 
 const variants: Variants = {
   enter: (direction: number) => ({
@@ -38,8 +40,53 @@ const variants: Variants = {
   }),
 };
 
-const SWIPE_THRESHOLD = 50;
-const VELOCITY_THRESHOLD = 200;
+interface MonthCardProps {
+  date: Date;
+  name: string;
+  days: Date[];
+}
+
+import { GlassPanel, GlassPanelContent, GlassPanelHeader } from "@/components/ui/GlassPanel";
+
+function MonthCard({ date, name, days }: MonthCardProps) {
+  return (
+    <GlassPanel>
+      <GlassPanelHeader className="justify-center py-2 min-h-[40px]">
+        <span className="text-sm font-bold tracking-wide text-white/80">{name}</span>
+      </GlassPanelHeader>
+
+      <GlassPanelContent>
+        <div className="grid grid-cols-7 gap-y-1 gap-x-0.5 text-center">
+          {WEEKDAYS.map((day, i) => (
+            <div key={`${name}-d-${i}`} className="text-[10px] font-medium uppercase text-white/40">
+              {day}
+            </div>
+          ))}
+
+          {days.map((day, i) => {
+            const isCurrentMonth = isSameMonth(day, date);
+            const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+
+            return (
+              <div
+                key={`${name}-day-${i}`}
+                className={cn(
+                  "flex aspect-square items-center justify-center rounded-sm text-[10px] sm:text-xs",
+                  !isCurrentMonth && "opacity-0",
+                  isCurrentMonth && "text-white/70",
+                  isCurrentMonth && isWeekend && "text-red-400/80",
+                  isToday(day) && "bg-sky-500 font-bold text-white shadow-sm rounded-md"
+                )}
+              >
+                {isCurrentMonth ? day.getDate() : ""}
+              </div>
+            );
+          })}
+        </div>
+      </GlassPanelContent>
+    </GlassPanel>
+  );
+}
 
 export function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -57,7 +104,7 @@ export function Calendar() {
     setCurrentDate((prev) => subYears(prev, 1));
   };
 
-  const handleDragEnd = (_: never, { offset, velocity }: PanInfo) => {
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, { offset, velocity }: PanInfo) => {
     const swipe = offset.x;
     const velocityX = velocity.x;
 
@@ -71,7 +118,6 @@ export function Calendar() {
     }
   };
 
-  // Generate 12 months for the current year
   const months = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => {
       const monthDate = setMonth(new Date(year, 0, 1), i);
@@ -81,14 +127,14 @@ export function Calendar() {
       });
       return {
         date: monthDate,
-        name: format(monthDate, "MMMM"),
+        name: monthDate.toLocaleString("default", { month: "long" }),
         days,
       };
     });
   }, [year]);
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+    <div className="relative flex items-center justify-center w-full h-full overflow-hidden md:p-8">
       <AnimatePresence mode="popLayout" initial={false} custom={direction}>
         <motion.div
           key={year}
@@ -97,7 +143,7 @@ export function Calendar() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={SPRING_TRANSITION}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.2}
@@ -105,61 +151,23 @@ export function Calendar() {
           onDragEnd={handleDragEnd}
           className="w-full h-full overflow-y-auto touch-pan-y [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          <div className="max-w-7xl mx-auto h-full flex flex-col">
-            {/* Bento Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 pt-4">
-              {months.map((month, index) => (
-                <div
-                  key={month.name}
-                  className={cn(
-                    "p-4 rounded-2xl",
-                    "bg-white/5 backdrop-blur-md border border-white/10 shadow-lg",
-                    "flex flex-col gap-3"
-                  )}
-                >
-                  <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                    <span className="text-sm font-bold text-white/80 tracking-wide">
-                      {month.name}
-                    </span>
-                    {index === 0 && (
-                      <span className="text-xl font-black text-white/20 tracking-tighter leading-none">
-                        {year}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-y-1 gap-x-0.5 text-center">
-                    {/* Weekday Headers */}
-                    {WEEKDAYS.map((day, i) => (
-                      <div
-                        key={`${month.name}-d-${i}`}
-                        className="text-[10px] font-medium text-white/40 uppercase"
-                      >
-                        {day}
-                      </div>
-                    ))}
-
-                    {/* Calendar Days */}
-                    {month.days.map((day, i) => {
-                      const isCurrentMonth = isSameMonth(day, month.date);
-                      return (
-                        <div
-                          key={`${month.name}-day-${i}`}
-                          className={cn(
-                            "aspect-square flex items-center justify-center rounded-sm text-[10px] sm:text-xs",
-                            !isCurrentMonth && "opacity-0", // Hide days from other months for cleaner look? Or low opacity?
-                            isCurrentMonth && "text-white/70",
-                            isCurrentMonth && (day.getDay() === 0 || day.getDay() === 6) && "text-red-400/80",
-                            isToday(day) && "bg-sky-500 text-white font-bold shadow-sm rounded-md"
-                          )}
-                        >
-                          {isCurrentMonth ? format(day, "d") : ""}
-                        </div>
-                      );
-                    })}
-                  </div>
+          <div className="flex flex-col h-full max-w-7xl mx-auto p-4">
+            <div className="flex flex-col w-full h-full transition-all border shadow-lg bg-white/10 rounded-xl shrink-0 border-white/20">
+              <div className="flex items-center justify-between p-3 border-b border-white/10">
+                <div className="flex items-center w-full gap-2 text-sm font-bold text-white">
+                  <span className="flex items-center min-h-6 px-1 -ml-1 transition-colors rounded cursor-text truncate hover:bg-white/5">
+                    {year}
+                  </span>
                 </div>
-              ))}
+              </div>
+
+              <div className="flex-1 p-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {months.map((month) => (
+                    <MonthCard key={month.name} date={month.date} name={month.name} days={month.days} />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

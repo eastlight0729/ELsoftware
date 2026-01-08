@@ -108,7 +108,7 @@ export function ListBoard() {
             >
               <SortableContext items={columnIds}>
                 {columns.map((col) => (
-                  <div key={col.id} style={{ flex: `0 0 calc(100% / ${columnsPerPage})` }} className="h-full px-2">
+                  <div key={col.id} style={{ flex: `0 0 calc(100% / ${columnsPerPage})` }} className="h-full">
                     <div className="h-full w-full">
                       <ListColumn
                         column={col}

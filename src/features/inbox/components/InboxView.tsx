@@ -5,6 +5,7 @@ import { ArchiveListModal } from "./ArchiveListModal";
 import { UndoNotification } from "@/components/ui/UndoNotification";
 import { FeatureHeader } from "@/components/ui/FeatureHeader";
 import { ArchiveButton } from "@/components/ui/ArchiveButton";
+import { FeatureLayout } from "@/components/ui/FeatureLayout";
 
 export const InboxView = () => {
   const {
@@ -22,7 +23,7 @@ export const InboxView = () => {
   } = useInboxViewModel();
 
   return (
-    <div className="w-full max-w-2xl mx-auto h-full flex flex-col relative pt-4 pb-32 px-4">
+    <FeatureLayout>
       <FeatureHeader
         title="Inbox"
         subtitle="Capture your thoughts and tasks."
@@ -77,6 +78,6 @@ export const InboxView = () => {
         isOpen={isArchiveListOpen}
         onClose={() => setIsArchiveListOpen(false)}
       />
-    </div>
+    </FeatureLayout>
   );
 };

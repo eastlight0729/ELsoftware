@@ -2,6 +2,8 @@ import { useState } from "react";
 import { LogOut, User } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { BackgroundSettings } from "./components/BackgroundSettings";
+import { FeatureLayout } from "@/components/ui/FeatureLayout";
+import { FeatureHeader } from "@/components/ui/FeatureHeader";
 
 interface SettingsViewProps {
   userEmail?: string | null;
@@ -17,15 +19,13 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Settings</h1>
-        <p className="text-neutral-500 dark:text-neutral-400">
-          Manage your account settings and preferences.
-        </p>
-      </div>
+    <FeatureLayout>
+      <FeatureHeader
+        title="Settings"
+        subtitle="Manage your account settings and preferences."
+      />
 
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6 space-y-6">
+      <div className="bg-white/60 dark:bg-black/40 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-white/10 shadow-xl p-6 space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
             <div className="h-16 w-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-md shrink-0">
@@ -41,19 +41,18 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
           </div>
           
           <button
-            onClick={() => setShowLogoutConfirm(true)}
             title="Sign Out"
-            className="flex items-center justify-center p-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-lg transition-colors cursor-pointer shrink-0"
+            className="flex items-center justify-center p-2 text-red-600 dark:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-900/40 rounded-lg transition-colors cursor-pointer shrink-0"
           >
             <LogOut size={20} />
           </button>
         </div>
 
-        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+        <div className="pt-6 border-t border-white/20 dark:border-white/10">
           <BackgroundSettings />
         </div>
 
-        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+        <div className="pt-6 border-t border-white/20 dark:border-white/10">
           <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 mb-4">Application Details</h3>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
@@ -77,6 +76,6 @@ export function SettingsView({ userEmail, onLogout }: SettingsViewProps) {
         confirmLabel="Sign Out"
         variant="danger"
       />
-    </div>
+    </FeatureLayout>
   );
 }

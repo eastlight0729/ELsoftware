@@ -1,9 +1,11 @@
-
-import { Plus, Archive } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useInboxViewModel } from "../hooks/useInboxViewModel";
 import { InboxItem } from "./InboxItem";
 import { ArchiveListModal } from "./ArchiveListModal";
 import { UndoNotification } from "@/components/ui/UndoNotification";
+import { FeatureHeader } from "@/components/ui/FeatureHeader";
+import { ArchiveButton } from "@/components/ui/ArchiveButton";
+import { FeatureLayout } from "@/components/ui/FeatureLayout";
 
 export const InboxView = () => {
   const {
@@ -21,20 +23,12 @@ export const InboxView = () => {
   } = useInboxViewModel();
 
   return (
-    <div className="w-full max-w-2xl mx-auto h-full flex flex-col relative">
-      <header className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Inbox</h1>
-          <p className="text-white/80 font-medium">Capture your thoughts and tasks.</p>
-        </div>
-        <button
-          onClick={() => setIsArchiveListOpen(true)}
-          className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10 shadow-lg hover:scale-105"
-          title="Open Archive"
-        >
-          <Archive size={20} />
-        </button>
-      </header>
+    <FeatureLayout>
+      <FeatureHeader
+        title="Inbox"
+        subtitle="Capture your thoughts and tasks."
+        action={<ArchiveButton onClick={() => setIsArchiveListOpen(true)} />}
+      />
 
       <form onSubmit={handleSubmit} className="relative mb-8">
         <input
@@ -84,6 +78,6 @@ export const InboxView = () => {
         isOpen={isArchiveListOpen}
         onClose={() => setIsArchiveListOpen(false)}
       />
-    </div>
+    </FeatureLayout>
   );
 };

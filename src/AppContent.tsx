@@ -1,6 +1,6 @@
 import { AppCategory } from "./components/navigation/types";
 
-import { Memo } from "./features/memo";
+// import { Memo } from "./features/memo";
 import { YearCalendar } from "./features/year-calendar";
 import { ListBoard } from "./features/lists";
 import { InboxView } from "./features/inbox";
@@ -16,6 +16,18 @@ interface AppContentProps {
 }
 
 /**
+ * Internal helper component for features not yet implemented.
+ */
+const ComingSoon = ({ title }: { title: string }) => (
+  <div className="flex h-full w-full items-center justify-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-12 text-center text-white shadow-xl backdrop-blur-md">
+      <h2 className="mb-2 text-2xl font-bold drop-shadow-md">{title}</h2>
+      <p className="font-medium text-white/80">Coming Soon</p>
+    </div>
+  </div>
+);
+
+/**
  * Renders the main content based on the active category.
  * Centralizes the routing logic.
  */
@@ -24,33 +36,17 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
     case "inbox":
       return <InboxView />;
     case "actions":
-      return (
-        <div className="flex h-full w-full items-center justify-center">
-            <div className="flex flex-col items-center justify-center p-12 text-center text-white bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/20">
-                <h2 className="text-2xl font-bold mb-2 drop-shadow-md">Actions</h2>
-                <p className="text-white/80 font-medium">Coming Soon</p>
-            </div>
-        </div>
-      );
+      return <ComingSoon title="Actions" />;
     case "calendar":
       return <YearCalendar />;
     case "lists":
       return (
-        <div className="w-full h-full overflow-hidden">
           <ListBoard />
-        </div>
       );
     case "review":
-      return (
-        <div className="flex h-full w-full items-center justify-center">
-             <div className="flex flex-col items-center justify-center p-12 text-center text-white bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/20">
-                 <h2 className="text-2xl font-bold mb-2 drop-shadow-md">Review</h2>
-                 <p className="text-white/80 font-medium">Coming Soon</p>
-             </div>
-        </div>
-      );
-    case "memo":
-      return <Memo />;
+      return <ComingSoon title="Review" />;
+//     case "memo":
+//       return <Memo />;
     case "setting":
       return <SettingsView userEmail={userEmail} onLogout={onLogout} />;
     default:

@@ -1,137 +1,11 @@
-import { useState, useMemo } from "react";
-import {
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  addYears,
-  subYears,
-  isSameMonth,
-  isToday,
-  setMonth,
-} from "date-fns";
-import { motion, AnimatePresence, PanInfo, Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { cn } from "@/lib/utils";
-
-const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
-const SWIPE_THRESHOLD = 50;
-const VELOCITY_THRESHOLD = 200;
-const SPRING_TRANSITION = { type: "spring", stiffness: 300, damping: 30 } as const;
-
-const variants: Variants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? "100%" : "-100%",
-    opacity: 0,
-    scale: 0.95,
-  }),
-  center: {
-    zIndex: 1,
-    x: 0,
-    opacity: 1,
-    scale: 1,
-  },
-  exit: (direction: number) => ({
-    zIndex: 0,
-    x: direction < 0 ? "100%" : "-100%",
-    opacity: 0,
-    scale: 0.95,
-  }),
-};
-
-interface MonthCardProps {
-  date: Date;
-  name: string;
-  days: Date[];
-}
-
-import { GlassPanel, GlassPanelContent, GlassPanelHeader } from "@/components/ui/GlassPanel";
-
-function MonthCard({ date, name, days }: MonthCardProps) {
-  return (
-    <GlassPanel>
-      <GlassPanelHeader className="justify-center py-2 min-h-[40px]">
-        <span className="text-sm font-bold tracking-wide text-white/80">{name}</span>
-      </GlassPanelHeader>
-
-      <GlassPanelContent>
-        <div className="grid grid-cols-7 gap-y-1 gap-x-0.5 text-center">
-          {WEEKDAYS.map((day, i) => (
-            <div key={`${name}-d-${i}`} className="text-[10px] font-medium uppercase text-white/40">
-              {day}
-            </div>
-          ))}
-
-          {days.map((day, i) => {
-            const isCurrentMonth = isSameMonth(day, date);
-            const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-
-            return (
-              <div
-                key={`${name}-day-${i}`}
-                className={cn(
-                  "flex aspect-square items-center justify-center rounded-sm text-[10px] sm:text-xs",
-                  !isCurrentMonth && "opacity-0",
-                  isCurrentMonth && "text-white/70",
-                  isCurrentMonth && isWeekend && "text-red-400/80",
-                  isToday(day) && "bg-sky-500 font-bold text-white shadow-sm rounded-md"
-                )}
-              >
-                {isCurrentMonth ? day.getDate() : ""}
-              </div>
-            );
-          })}
-        </div>
-      </GlassPanelContent>
-    </GlassPanel>
-  );
-}
+import { CALENDAR_VARIANTS, SPRING_TRANSITION } from "../constants";
+import { useCalendar } from "../hooks/useCalendar";
+import { MonthCard } from "./MonthCard";
 
 export function Calendar() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [direction, setDirection] = useState(0);
-
-  const year = currentDate.getFullYear();
-
-  const nextYear = () => {
-    setDirection(1);
-    setCurrentDate((prev) => addYears(prev, 1));
-  };
-
-  const prevYear = () => {
-    setDirection(-1);
-    setCurrentDate((prev) => subYears(prev, 1));
-  };
-
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, { offset, velocity }: PanInfo) => {
-    const swipe = offset.x;
-    const velocityX = velocity.x;
-
-    const isLeftSwipe = swipe < -SWIPE_THRESHOLD || (swipe < -10 && velocityX < -VELOCITY_THRESHOLD);
-    const isRightSwipe = swipe > SWIPE_THRESHOLD || (swipe > 10 && velocityX > VELOCITY_THRESHOLD);
-
-    if (isLeftSwipe) {
-      nextYear();
-    } else if (isRightSwipe) {
-      prevYear();
-    }
-  };
-
-  const months = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => {
-      const monthDate = setMonth(new Date(year, 0, 1), i);
-      const days = eachDayOfInterval({
-        start: startOfWeek(startOfMonth(monthDate), { weekStartsOn: 1 }),
-        end: endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 }),
-      });
-      return {
-        date: monthDate,
-        name: monthDate.toLocaleString("default", { month: "long" }),
-        days,
-      };
-    });
-  }, [year]);
+  const { year, direction, months, handleDragEnd } = useCalendar();
 
   return (
     <div className="relative flex items-center justify-center w-full h-full overflow-hidden md:p-8">
@@ -139,7 +13,7 @@ export function Calendar() {
         <motion.div
           key={year}
           custom={direction}
-          variants={variants}
+          variants={CALENDAR_VARIANTS}
           initial="enter"
           animate="center"
           exit="exit"

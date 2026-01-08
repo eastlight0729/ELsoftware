@@ -1,1 +1,1 @@
-export { YearCalendar } from "./components/YearCalendar";
+export { Calendar } from "./components/Calendar";

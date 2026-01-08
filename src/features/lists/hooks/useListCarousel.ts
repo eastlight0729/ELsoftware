@@ -15,9 +15,9 @@ export function useListCarousel({ columns, createColumn }: UseListCarouselProps)
       if (window.innerWidth < 768) {
         setColumnsPerPage(1);
       } else if (window.innerWidth < 1280) {
-        setColumnsPerPage(3);
+        setColumnsPerPage(2);
       } else {
-        setColumnsPerPage(4);
+        setColumnsPerPage(3);
       }
     };
     handleResize();

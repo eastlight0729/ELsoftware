@@ -94,7 +94,7 @@ export default function App() {
         className={`fixed inset-0 min-h-screen w-full -z-10 transition-colors duration-500 ${
           backgroundPath
             ? "bg-cover bg-fixed bg-center bg-no-repeat"
-            : activeCategory === "inbox" || activeCategory === "lists"
+            : activeCategory === "inbox" || activeCategory === "lists" || activeCategory === "setting"
             ? "bg-linear-to-br from-sky-500 to-red-400"
             : "bg-neutral-100 dark:bg-neutral-800"
         }`}

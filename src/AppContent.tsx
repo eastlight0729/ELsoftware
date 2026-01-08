@@ -1,6 +1,6 @@
 import { AppCategory } from "./components/navigation/types";
 
-import { Memo } from "./features/memo";
+// import { Memo } from "./features/memo";
 import { YearCalendar } from "./features/year-calendar";
 import { ListBoard } from "./features/lists";
 import { InboxView } from "./features/inbox";
@@ -45,8 +45,8 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
       );
     case "review":
       return <ComingSoon title="Review" />;
-    case "memo":
-      return <Memo />;
+//     case "memo":
+//       return <Memo />;
     case "setting":
       return <SettingsView userEmail={userEmail} onLogout={onLogout} />;
     default:

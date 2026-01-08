@@ -1,6 +1,7 @@
+import { FeatureHeader } from "@/components/ui/FeatureHeader";
+import { ArchiveButton } from "@/components/ui/ArchiveButton";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
-import { Archive } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -100,21 +101,13 @@ export function ListBoard() {
   return (
     <div className="flex flex-col h-full w-full">
       {/* Header */}
-      <header className="flex-none mb-8 px-6">
-        <div className="w-full flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">Lists</h1>
-            <p className="text-white/80 font-medium">Manage your workflow.</p>
-          </div>
-          <button
-            onClick={() => setIsArchiveOpen(true)}
-            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10 shadow-lg hover:scale-105"
-            title="Open Archive"
-          >
-            <Archive size={20} />
-          </button>
-        </div>
-      </header>
+      <div className="flex-none px-6 pt-4">
+        <FeatureHeader
+          title="Lists"
+          subtitle="Manage your workflow."
+          action={<ArchiveButton onClick={() => setIsArchiveOpen(true)} />}
+        />
+      </div>
 
       {/* Board Content (Carousel) */}
       <div className="flex-1 w-full relative overflow-hidden pb-0">

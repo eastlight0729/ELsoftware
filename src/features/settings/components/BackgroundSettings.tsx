@@ -9,20 +9,9 @@ export function BackgroundSettings() {
   const [activeUpdateConfig, setActiveUpdateConfig] = useState<((path: string) => void) | null>(null);
 
   const handleSelect = async (update: (path: string) => void) => {
-    // 1. Try Electron Native Picker
-    if (window.electron?.system) {
-      try {
-        const path = await window.electron.system.openFileDialog();
-        if (path) {
-          update(path);
-        }
-      } catch (error) {
-        console.error("Failed to select file via Electron", error);
-      }
-      return;
-    }
 
-    // 2. Fallback to Web Picker (Base64)
+
+    // Web Picker (Base64)
     setActiveUpdateConfig(() => update);
     fileInputRef.current?.click();
   };

@@ -6,7 +6,7 @@ import { GlassPanel, GlassPanelContent, GlassPanelHeader } from "@/components/ui
 import { WEEKDAYS } from "../constants";
 import { MonthCardProps } from "../types";
 
-export function MonthCard({ date, name, days }: MonthCardProps) {
+export function MonthCard({ date, name, days, onDateClick }: MonthCardProps) {
   return (
     <GlassPanel>
       <GlassPanelHeader className="justify-center py-2 min-h-[40px]">
@@ -28,12 +28,13 @@ export function MonthCard({ date, name, days }: MonthCardProps) {
             return (
               <div
                 key={`${name}-day-${i}`}
+                onClick={() => isCurrentMonth && onDateClick?.(day)}
                 className={cn(
-                  "flex aspect-square items-center justify-center rounded-sm text-[10px] sm:text-xs",
-                  !isCurrentMonth && "opacity-0",
-                  isCurrentMonth && "text-white/70",
+                  "flex aspect-square items-center justify-center rounded-sm text-[10px] sm:text-xs transition-colors",
+                  !isCurrentMonth && "opacity-0 cursor-default",
+                  isCurrentMonth && "text-white/70 cursor-pointer hover:bg-white/10",
                   isCurrentMonth && isWeekend && "text-red-400/80",
-                  isToday(day) && "bg-sky-500 font-bold text-white shadow-sm rounded-md"
+                  isToday(day) && "bg-sky-500 font-bold text-white shadow-sm rounded-md hover:bg-sky-600"
                 )}
               >
                 {isCurrentMonth ? day.getDate() : ""}

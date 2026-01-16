@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MoreHorizontal } from "lucide-react";
 
@@ -6,9 +7,22 @@ import { HeaderIconButton } from "../../../components/ui/HeaderIconButton";
 import { CALENDAR_VARIANTS, SPRING_TRANSITION } from "../constants";
 import { useCalendar } from "../hooks/useCalendar";
 import { MonthCard } from "./MonthCard";
+import { ScheduleModal } from "./ScheduleModal";
 
 export function Calendar() {
   const { year, direction, months, handleDragEnd } = useCalendar();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedDate(undefined);
+  };
 
   return (
     <div className="relative flex items-center justify-center w-full h-full overflow-hidden md:p-8">
@@ -44,7 +58,13 @@ export function Calendar() {
               <div className="flex-1 p-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {months.map((month) => (
-                    <MonthCard key={month.name} date={month.date} name={month.name} days={month.days} />
+                    <MonthCard
+                      key={month.name}
+                      date={month.date}
+                      name={month.name}
+                      days={month.days}
+                      onDateClick={handleDateClick}
+                    />
                   ))}
                 </div>
               </div>
@@ -52,6 +72,12 @@ export function Calendar() {
           </div>
         </motion.div>
       </AnimatePresence>
+
+      <ScheduleModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        initialDate={selectedDate}
+      />
     </div>
   );
 }

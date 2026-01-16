@@ -103,7 +103,16 @@ export default function App() {
 
       <div className="min-h-screen w-full text-neutral-800 dark:text-neutral-100 relative overflow-x-hidden">
         {/* Main Content Area */}
-        <main className={`transition-[padding] duration-300 ease-in-out min-h-screen`}>
+        {/* 
+            Added pb-32 to accomodate the floating dock at the bottom.
+            Removed pl-12 since navigation is now a dock.
+        */}
+        <main
+          className={`
+            transition-[padding] duration-300 ease-in-out
+            min-h-screen
+          `}
+        >
           <AnimatePresence mode="popLayout" custom={direction} initial={false}>
             <motion.div
               key={activeCategory}
@@ -118,12 +127,43 @@ export default function App() {
               }}
               className="w-full h-full"
             >
-              <div className="h-screen w-full overflow-hidden">
-                <AppContent activeCategory={activeCategory} userEmail={session.user.email} onLogout={signOut} />
-              </div>
+              {activeCategory === "lists" ? (
+                <div className="h-screen w-full pt-4 px-4 pb-[100px] overflow-hidden">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              ) : activeCategory === "inbox" ? (
+                <div className="h-screen w-full pt-4 pb-32 px-4 overflow-hidden">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              ) : activeCategory === "calendar" ? (
+                <div className="h-screen w-full pt-4 px-4 pb-32 overflow-hidden">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              ) : (
+                <div className="max-w-7xl mx-auto p-5 pt-24 flex flex-col items-center gap-12">
+                  <AppContent
+                    activeCategory={activeCategory}
+                    userEmail={session.user.email}
+                    onLogout={signOut}
+                  />
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </main>
+
 
         <Navigation activeCategory={activeCategory} onSelectCategory={(cat) => handleCategoryChange(cat)} />
       </div>

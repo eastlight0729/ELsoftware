@@ -1,7 +1,7 @@
 import { AppCategory } from "./components/navigation/types";
 
 // import { Memo } from "./features/memo";
-import { YearCalendar } from "./features/year-calendar";
+import { Calendar } from "./features/calendar";
 import { ListBoard } from "./features/lists";
 import { InboxView } from "./features/inbox";
 import { SettingsView } from "./features/settings";
@@ -38,7 +38,7 @@ export function AppContent({ activeCategory, userEmail, onLogout }: AppContentPr
     case "actions":
       return <ComingSoon title="Actions" />;
     case "calendar":
-      return <YearCalendar />;
+      return <Calendar />;
     case "lists":
       return (
           <ListBoard />

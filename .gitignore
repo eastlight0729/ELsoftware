@@ -32,3 +32,6 @@ release
 .env
 .env.local
 
+# private files
+notes
+archives

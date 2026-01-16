@@ -1,7 +1,6 @@
 
 import { createPortal } from "react-dom";
 import { X, Archive, Save } from "lucide-react";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 import { useState, useEffect } from "react";
 
 interface ScheduleModalProps {
@@ -47,14 +46,14 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <GlassPanel className="w-full max-w-lg overflow-hidden border-white/20 shadow-2xl animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-200">
+      <div className="w-full max-w-lg overflow-hidden bg-zinc-900 border border-zinc-800 shadow-xl rounded-xl animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <h2 className="text-lg font-bold text-white">New Schedule</h2>
+        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+          <h2 className="text-lg font-semibold text-zinc-100">New Schedule</h2>
           <button
             onClick={onClose}
-            className="p-1 text-white/50 transition-colors rounded-md hover:text-white hover:bg-white/10"
+            className="p-1 text-zinc-400 transition-colors rounded-md hover:text-zinc-100 hover:bg-zinc-800"
           >
             <X className="w-5 h-5" />
           </button>
@@ -64,7 +63,7 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
         <div className="flex flex-col gap-4 p-6">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold tracking-wide uppercase text-white/60">
+            <label className="text-xs font-medium tracking-wide uppercase text-zinc-400">
               Title
             </label>
             <input
@@ -72,7 +71,7 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Add title"
-              className="w-full px-3 py-2 text-white placeholder-white/30 transition-all border rounded-md outline-none bg-white/5 border-white/10 focus:border-white/30 focus:bg-white/10"
+              className="w-full px-3 py-2 text-zinc-100 placeholder-zinc-500 transition-all border rounded-md outline-none bg-zinc-800 border-zinc-700 focus:border-zinc-600 focus:bg-zinc-800"
             />
           </div>
 
@@ -80,7 +79,7 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
           <div className="flex flex-col gap-4">
             {/* Start */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold tracking-wide uppercase text-white/60">
+              <label className="text-xs font-medium tracking-wide uppercase text-zinc-400">
                 Start
               </label>
               <div className="flex gap-2">
@@ -88,20 +87,20 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-2 py-2 text-sm text-white transition-all border rounded-md outline-none bg-white/5 border-white/10 focus:border-white/30 focus:bg-white/10 scheme-dark"
+                  className="w-full px-2 py-2 text-sm text-zinc-100 transition-all border rounded-md outline-none bg-zinc-800 border-zinc-700 focus:border-zinc-600 focus:bg-zinc-800 scheme-dark"
                 />
                 <input
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-2 py-2 text-sm text-white transition-all border rounded-md outline-none bg-white/5 border-white/10 focus:border-white/30 focus:bg-white/10 scheme-dark"
+                  className="w-full px-2 py-2 text-sm text-zinc-100 transition-all border rounded-md outline-none bg-zinc-800 border-zinc-700 focus:border-zinc-600 focus:bg-zinc-800 scheme-dark"
                 />
               </div>
             </div>
 
             {/* End */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold tracking-wide uppercase text-white/60">
+              <label className="text-xs font-medium tracking-wide uppercase text-zinc-400">
                 End
               </label>
               <div className="flex gap-2">
@@ -109,13 +108,13 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-2 py-2 text-sm text-white transition-all border rounded-md outline-none bg-white/5 border-white/10 focus:border-white/30 focus:bg-white/10 scheme-dark"
+                  className="w-full px-2 py-2 text-sm text-zinc-100 transition-all border rounded-md outline-none bg-zinc-800 border-zinc-700 focus:border-zinc-600 focus:bg-zinc-800 scheme-dark"
                 />
                 <input
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-2 py-2 text-sm text-white transition-all border rounded-md outline-none bg-white/5 border-white/10 focus:border-white/30 focus:bg-white/10 scheme-dark"
+                  className="w-full px-2 py-2 text-sm text-zinc-100 transition-all border rounded-md outline-none bg-zinc-800 border-zinc-700 focus:border-zinc-600 focus:bg-zinc-800 scheme-dark"
                 />
               </div>
             </div>
@@ -123,7 +122,7 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold tracking-wide uppercase text-white/60">
+            <label className="text-xs font-medium tracking-wide uppercase text-zinc-400">
               Description
             </label>
             <textarea
@@ -131,16 +130,16 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add description"
               rows={4}
-              className="w-full px-3 py-2 text-white placeholder-white/30 transition-all border rounded-md outline-none bg-white/5 border-white/10 focus:border-white/30 focus:bg-white/10 resize-none"
+              className="w-full px-3 py-2 text-zinc-100 placeholder-zinc-500 transition-all border rounded-md outline-none bg-zinc-800 border-zinc-700 focus:border-zinc-600 focus:bg-zinc-800 resize-none"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-white/10 bg-white/5">
+        <div className="flex items-center justify-between p-4 border-t border-zinc-800 bg-zinc-900">
           <button
             onClick={handleArchive}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/70 transition-colors rounded-md hover:text-white hover:bg-white/10"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors rounded-md hover:text-zinc-100 hover:bg-zinc-800"
           >
             <Archive className="w-4 h-4" />
             Archive
@@ -149,20 +148,20 @@ export function ScheduleModal({ isOpen, onClose, initialDate }: ScheduleModalPro
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-white/70 transition-colors rounded-md hover:text-white hover:bg-white/10"
+              className="px-4 py-2 text-sm font-medium text-zinc-400 transition-colors rounded-md hover:text-zinc-100 hover:bg-zinc-800"
             >
               Close
             </button>
             <button
               onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white shadow-lg transition-colors bg-blue-600 rounded-md hover:bg-blue-500"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors bg-blue-600 rounded-md hover:bg-blue-500"
             >
               <Save className="w-4 h-4" />
               Save
             </button>
           </div>
         </div>
-      </GlassPanel>
+      </div>
     </div>,
     document.body
   );

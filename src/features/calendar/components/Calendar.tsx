@@ -7,7 +7,7 @@ import { HeaderIconButton } from "../../../components/ui/HeaderIconButton";
 import { CALENDAR_VARIANTS, SPRING_TRANSITION } from "../constants";
 import { useCalendar } from "../hooks/useCalendar";
 import { MonthCard } from "./MonthCard";
-import { ScheduleModal } from "./ScheduleModal";
+import { CardModal } from "@/components/ui/CardModal";
 
 export function Calendar() {
   const { year, direction, months, handleDragEnd } = useCalendar();
@@ -73,10 +73,19 @@ export function Calendar() {
         </motion.div>
       </AnimatePresence>
 
-      <ScheduleModal
+      <CardModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        initialDate={selectedDate}
+        initialData={selectedDate ? {
+          startDate: selectedDate.toISOString().split("T")[0]
+        } : undefined}
+        onSave={(data) => {
+          console.log("Saving schedule:", data);
+          handleCloseModal();
+        }}
+        onArchive={() => {
+            console.log("Archive feature coming soon");
+        }}
       />
     </div>
   );

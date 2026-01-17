@@ -22,7 +22,7 @@ import {
 import { UndoNotification } from "@/components/ui/UndoNotification";
 import { ListArchiveModal } from "./ListArchiveModal";
 import { ListCard } from "./ListCard";
-import { ListCardModal } from "./ListCardModal";
+import { CardModal } from "@/components/ui/CardModal";
 import { ListColumn } from "./ListColumn";
 
 export function ListBoard() {
@@ -169,17 +169,40 @@ export function ListBoard() {
             document.body
           )}
 
-          <ListCardModal
+          <CardModal
             isOpen={!!editingCardId}
-            card={cards.find((c) => c.id === editingCardId) || null}
-            onSave={(id, updates) => updateCard({ id, updates })}
-            onRemove={(id) => {
-              deleteCard(id);
-              setEditingCardId(null);
-              setArchivedCardId(id);
-              setArchivedColumnId(null);
-            }}
             onClose={() => setEditingCardId(null)}
+            initialData={
+              (() => {
+                const card = cards.find((c) => c.id === editingCardId);
+                return card ? {
+                  id: card.id,
+                  title: card.content,
+                  description: card.description || "",
+                  size: card.size || "1"
+                } : undefined;
+              })()
+            }
+            onSave={(data) => {
+              if (editingCardId) {
+                updateCard({ 
+                  id: editingCardId, 
+                  updates: {
+                    content: data.title,
+                    description: data.description,
+                    size: data.size
+                  } 
+                });
+              }
+            }}
+            onArchive={() => {
+              if (editingCardId) {
+                deleteCard(editingCardId);
+                setEditingCardId(null);
+                setArchivedCardId(editingCardId);
+                setArchivedColumnId(null);
+              }
+            }}
           />
         </DndContext>
       </div>
